@@ -232,6 +232,45 @@ h1 span {
   font-size: 0.95rem;
 }
 
+.accomplishments {
+  margin-top: clamp(4.5rem, 10vw, 7rem);
+}
+
+.accomplishment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accomplishment {
+  display: grid;
+  min-height: 76px;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.accomplishment-number {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+}
+
+.accomplishment-name {
+  font-size: 0.9rem;
+}
+
+.accomplishment-detail {
+  color: var(--olive);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
 .site-footer {
   min-height: 82px;
   margin-top: 6rem;
@@ -271,6 +310,20 @@ h1 span {
     max-width: 15rem;
     line-height: 1.5;
   }
+
+  .accomplishment {
+    min-height: 72px;
+    grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+    gap: 0.85rem;
+  }
+
+  .accomplishment-name {
+    font-size: 0.82rem;
+  }
+
+  .accomplishment-detail {
+    font-size: 0.57rem;
+  }
 }
 
 @media (max-width: 420px) {
@@ -287,6 +340,17 @@ h1 span {
   .project-link {
     grid-column: 2;
     justify-self: start;
+  }
+
+  .accomplishment {
+    grid-template-columns: 1.35rem minmax(0, 1fr);
+    gap: 0.85rem;
+    padding-block: 0.8rem;
+  }
+
+  .accomplishment-detail {
+    grid-column: 2;
+    text-align: left;
   }
 }
 
