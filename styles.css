@@ -69,6 +69,29 @@ a:focus-visible {
   border-bottom: 1px solid var(--line);
 }
 
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.2rem);
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.site-nav a {
+  transition: color 180ms ease;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--olive);
+}
+
+.site-nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.35rem;
+}
+
 .wordmark {
   font-size: 0.78rem;
   font-weight: 600;
@@ -232,10 +255,6 @@ h1 span {
   font-size: 0.95rem;
 }
 
-.accomplishments {
-  margin-top: clamp(4.5rem, 10vw, 7rem);
-}
-
 .accomplishment-list {
   margin: 0;
   padding: 0;
@@ -282,6 +301,14 @@ h1 span {
   padding-inline: 0.25rem;
 }
 
+.empty-state {
+  padding-block: 2rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
 @media (max-width: 700px) {
   .site-header,
   .site-footer {
@@ -290,6 +317,15 @@ h1 span {
 
   main {
     width: 88%;
+  }
+
+  .site-header {
+    gap: 1rem;
+  }
+
+  .site-nav {
+    gap: 0.9rem;
+    font-size: 0.68rem;
   }
 
   .intro {
@@ -330,6 +366,20 @@ h1 span {
   .header-note,
   .project-link {
     font-size: 0.58rem;
+  }
+
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.8rem;
+    padding-block: 1rem;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.68rem;
   }
 
   .project {
