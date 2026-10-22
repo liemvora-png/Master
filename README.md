@@ -1,10 +1,11 @@
-# Liem Vora — Website projects
+# Liem Vora — Personal website
 
-A minimal, responsive index linking to the SKYWARD aerospace portfolio and the LHANA interior design studio.
+A minimal, responsive website for projects, accomplishments, and sheet music arrangements.
 
-## Projects
+## Pages
 
-- [SKYWARD](https://aerospace.liemvora.cc) — concept aircraft design
-- [LHANA](https://lhana.liemvora.cc) — interior design studio
+- `index.html` — links to the SKYWARD aerospace portfolio and LHANA interior design studio
+- `accomplishments.html` — selected music, athletics, and coaching highlights
+- `arrangements.html` — sheet music arrangements
 
-The site is plain HTML and CSS and can be hosted directly with GitHub Pages.
+The site uses plain HTML and CSS and can be hosted directly with GitHub Pages.
