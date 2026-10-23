@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { onRequest as contentRequest } from "../functions/api/content.js";
 import { onRequest as adminRequest } from "../functions/api/admin/content.js";
@@ -257,4 +258,20 @@ test("Worker handler does not construct Responses at module load", async () => {
   } finally {
     globalThis.Response = originalResponse;
   }
+});
+
+test("admin page provides visual sections and item controls instead of a JSON paste area", () => {
+  const template = readFileSync(new URL("../src/templates/admin.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/assets/admin.js", import.meta.url), "utf8");
+
+  assert.match(template, /role="tablist"/);
+  assert.match(template, /id="save-content"/);
+  assert.doesNotMatch(template, /<textarea[^>]*id="content-editor"/);
+  assert.doesNotMatch(template, />JSON</);
+  assert.match(script, /renderPreview/);
+  assert.match(script, /Add project/);
+  assert.match(script, /Add highlight/);
+  assert.match(script, /Add arrangement/);
+  assert.match(script, /Move up/);
+  assert.match(script, /Move down/);
 });

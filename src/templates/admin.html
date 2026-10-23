@@ -29,15 +29,16 @@
 
       <section aria-labelledby="editor-title">
         <div class="section-heading">
-          <h2 id="editor-title">Content document</h2>
-          <span class="project-count">JSON</span>
+          <h2 id="editor-title">Site editor</h2>
+          <span class="project-count">VISUAL EDITOR</span>
         </div>
-        <p id="editor-help" class="editor-help">Update labeled fields below. Use the add and remove controls to manage projects, accomplishments, arrangements, and navigation items.</p>
+        <p id="editor-help" class="editor-help">Choose a section to edit its text and entries. Changes are saved to the live site when you select Save changes.</p>
+        <div id="editor-tabs" class="editor-tabs" role="tablist" aria-label="Site content sections" aria-describedby="editor-help"></div>
         <div id="content-editor" class="content-editor" aria-describedby="editor-help editor-status"></div>
         <p id="editor-status" class="editor-status" role="status" aria-live="polite">Loading site content…</p>
         <div class="editor-actions">
           <button class="editor-button editor-button-secondary" id="reload-content" type="button">Reload</button>
-          <button class="editor-button" id="save-content" type="button">Save changes</button>
+          <button class="editor-button" id="save-content" type="button" disabled>Save changes</button>
         </div>
       </section>
     </main>
