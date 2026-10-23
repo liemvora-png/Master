@@ -137,6 +137,38 @@ test("content API rejects unsupported methods and unauthenticated edits", async 
   assert.equal(unauthenticatedWrite.status, 401);
 });
 
+test("public content endpoint explains how to fix a missing D1 schema", async () => {
+  const originalError = console.error;
+  console.error = () => {};
+
+  try {
+    const response = await contentRequest({
+      request: new Request("https://example.com/api/content"),
+      env: {
+        DB: {
+          prepare() {
+            return {
+              all: async () => {
+                throw new Error("no such table: pages");
+              },
+              bind() {
+                return {
+                  first: async () => null
+                };
+              }
+            };
+          }
+        }
+      }
+    });
+
+    assert.equal(response.status, 503);
+    assert.match((await response.json()).error, /migrations\/0001_site_content\.sql/);
+  } finally {
+    console.error = originalError;
+  }
+});
+
 test("Worker serves private page templates and falls back to public assets", async () => {
   const { createWorker } = await import("../src/worker-handler.js");
   const worker = createWorker({
