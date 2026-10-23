@@ -39,7 +39,7 @@ function validItems(pageName, items) {
     }
 
     return isText(item.name, 160)
-      && isText(item.description, 500)
+      && (item.description === undefined || item.description === "" || isText(item.description, 500))
       && (item.instrument === undefined || item.instrument === "" || isText(item.instrument, 120))
       && (item.url === undefined || item.url === "" || isLink(item.url));
   });

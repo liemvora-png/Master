@@ -161,7 +161,7 @@ function renderArrangements(items, labels) {
     name.textContent = item.name;
     const description = document.createElement("span");
     description.className = "project-description";
-    description.textContent = item.description;
+    description.textContent = item.description || "";
     details.append(name, description);
     row.append(number, details);
 

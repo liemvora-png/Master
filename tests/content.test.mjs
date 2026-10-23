@@ -92,7 +92,14 @@ test("rejects malformed content and oversized item collections", () => {
 
 test("allows optional arrangement details to be left blank", () => {
   const content = structuredClone(validContent);
+  content.pages.arrangements.items[0].description = "";
   content.pages.arrangements.items[0].instrument = "";
   content.pages.arrangements.items[0].url = "";
+  assert.equal(validateContent(content), null);
+});
+
+test("allows an arrangement to be saved with only its title", () => {
+  const content = structuredClone(validContent);
+  content.pages.arrangements.items = [{ name: "Sonata" }];
   assert.equal(validateContent(content), null);
 });

@@ -295,6 +295,9 @@ function renderItems(container, items, path, sectionId) {
         label: "Link label",
         page: "Page"
       };
+      if (sectionId === "arrangements" && key === "description") {
+        labels.description = "Description (optional)";
+      }
       fields.append(makeField({
         label: labels[key],
         value: item[key] ?? "",
