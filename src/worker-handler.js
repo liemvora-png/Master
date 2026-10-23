@@ -12,10 +12,12 @@ const PAGE_ROUTES = new Map([
   ["/arrangements.html", "arrangements"]
 ]);
 
-const NOT_FOUND = new Response("Not found.", {
-  status: 404,
-  headers: { "Content-Type": "text/plain; charset=utf-8" }
-});
+function notFoundResponse() {
+  return new Response("Not found.", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8" }
+  });
+}
 
 function pageResponse(template, request) {
   return new Response(request.method === "HEAD" ? null : template, {
@@ -50,7 +52,7 @@ export function createWorker(templates) {
         return adminContent({ request, env, context });
       }
 
-      if (pathname.startsWith("/api/")) return NOT_FOUND.clone();
+      if (pathname.startsWith("/api/")) return notFoundResponse();
 
       if (isAdminPage) {
         const authorization = await authorizeAdmin(request, env);
@@ -68,7 +70,7 @@ export function createWorker(templates) {
         if (!authorization.ok) {
           return jsonResponse({ error: authorization.message }, authorization.status);
         }
-        return NOT_FOUND.clone();
+        return notFoundResponse();
       }
 
       const page = PAGE_ROUTES.get(pathname);

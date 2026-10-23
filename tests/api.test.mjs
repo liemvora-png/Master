@@ -211,3 +211,18 @@ test("Worker serves private page templates and falls back to public assets", asy
   assert.equal(await staticResponse.text(), "static page");
   assert.deepEqual(calls, ["/assets/site.js"]);
 });
+
+test("Worker handler does not construct Responses at module load", async () => {
+  const originalResponse = globalThis.Response;
+  globalThis.Response = new Proxy(originalResponse, {
+    construct() {
+      throw new Error("Response construction must be deferred until a request.");
+    }
+  });
+
+  try {
+    await import("../src/worker-handler.js?module-scope-check");
+  } finally {
+    globalThis.Response = originalResponse;
+  }
+});
