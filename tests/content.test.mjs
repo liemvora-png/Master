@@ -125,7 +125,16 @@ test("accepts valid optional arrangement dates and rejects invalid dates", () =>
   assert.equal(validateContent(content), null);
 
   content.pages.arrangements.items[0].date = "2025-02-30";
-  assert.match(validateContent(content), /arrangements page/);
+  assert.match(validateContent(content), /Arrangement 1 date must be a valid date/);
+});
+
+test("identifies the invalid arrangement field when content cannot be saved", () => {
+  const content = structuredClone(validContent);
+  content.pages.arrangements.items = [{ name: "Sonata", url: "javascript:alert(1)" }];
+  assert.match(validateContent(content), /Arrangement 1 link must be an HTTPS URL or a site-relative path/);
+
+  content.pages.arrangements.items = [{ name: "", date: "" }];
+  assert.match(validateContent(content), /Arrangement 1 needs a title/);
 });
 
 test("requires the home page to remain title-only", () => {

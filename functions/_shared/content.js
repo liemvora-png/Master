@@ -53,6 +53,32 @@ function isDate(value) {
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
+function validateArrangements(items) {
+  if (!Array.isArray(items) || items.length > 100) {
+    return "Check the fields and items for the arrangements page.";
+  }
+
+  for (const [index, item] of items.entries()) {
+    const entry = `Arrangement ${index + 1}`;
+    if (!isRecord(item)) return `${entry} must be a valid entry.`;
+    if (!isText(item.name, 160)) return `${entry} needs a title (up to 160 characters).`;
+    if (item.description !== undefined && item.description !== "" && !isText(item.description, 500)) {
+      return `${entry} description must be 500 characters or fewer.`;
+    }
+    if (item.instrument !== undefined && item.instrument !== "" && !isText(item.instrument, 120)) {
+      return `${entry} instrument must be 120 characters or fewer.`;
+    }
+    if (item.url !== undefined && item.url !== "" && !isLink(item.url)) {
+      return `${entry} link must be an HTTPS URL or a site-relative path.`;
+    }
+    if (item.date !== undefined && item.date !== "" && !isDate(item.date)) {
+      return `${entry} date must be a valid date.`;
+    }
+  }
+
+  return null;
+}
+
 export function validateContent(content) {
   if (!isRecord(content)
     || !isText(content.brand, 80)
@@ -85,6 +111,10 @@ export function validateContent(content) {
   for (const pageName of PAGE_NAMES) {
     const page = content.pages[pageName];
     const isHome = pageName === "home";
+    if (pageName === "arrangements" && isRecord(page)) {
+      const arrangementsError = validateArrangements(page.items);
+      if (arrangementsError) return arrangementsError;
+    }
     if (!isRecord(page)
       || !isText(page.metaTitle, 160)
       || !isText(page.metaDescription, 300)
