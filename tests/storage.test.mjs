@@ -8,7 +8,8 @@ const content = {
     { label: "Home", href: "/", page: "home" },
     { label: "Projects", href: "/projects", page: "projects" },
     { label: "Accomplishments", href: "/accomplishments.html", page: "accomplishments" },
-    { label: "Arrangements", href: "/arrangements.html", page: "arrangements" }
+    { label: "Arrangements", href: "/arrangements.html", page: "arrangements" },
+    { label: "Services", href: "/services", page: "services" }
   ],
   labels: {
     projectLink: "Visit website",
@@ -58,6 +59,26 @@ const content = {
       description: "Arrangements page",
       sectionTitle: "Arrangements",
       items: []
+    },
+    services: {
+      metaTitle: "Services",
+      metaDescription: "Services.",
+      eyebrow: "Work together",
+      title: "Services",
+      titleAccent: "",
+      description: "Bookings and creative services.",
+      sectionTitle: "",
+      items: []
+    },
+    gallery: {
+      metaTitle: "Photography",
+      metaDescription: "Gallery.",
+      eyebrow: "Selected work",
+      title: "Photography",
+      titleAccent: "",
+      description: "Selected photographs.",
+      sectionTitle: "",
+      items: []
     }
   },
   footer: { label: "LIEM VORA", note: "MADE WITH CARE", year: "2026" }
@@ -83,14 +104,16 @@ test("writes pages, ordered JSON blocks, navigation, and settings", () => {
   assert.equal(statements[0].sql, "DELETE FROM blocks");
   assert.equal(statements[1].sql, "DELETE FROM nav_items");
   assert.equal(statements[2].sql, "DELETE FROM pages");
-  assert.equal(pages.length, 4);
+  assert.equal(pages.length, 6);
   assert.equal(blocks.length, 3);
-  assert.equal(navigation.length, 4);
+  assert.equal(navigation.length, 5);
   assert.deepEqual(pages.map(({ values }) => values.slice(0, 2)), [
     ["home", "home"],
     ["projects", "projects"],
     ["accomplishments", "accomplishments"],
-    ["arrangements", "arrangements"]
+    ["arrangements", "arrangements"],
+    ["services", "services"],
+    ["gallery", "gallery"]
   ]);
   assert.deepEqual(blocks.map(({ values }) => values.slice(0, 3)), [
     ["projects", 1, "project"],
@@ -101,6 +124,7 @@ test("writes pages, ordered JSON blocks, navigation, and settings", () => {
     ["Home", "/", "home"],
     ["Projects", "/projects", "projects"],
     ["Accomplishments", "/accomplishments.html", "accomplishments"],
-    ["Arrangements", "/arrangements.html", "arrangements"]
+    ["Arrangements", "/arrangements.html", "arrangements"],
+    ["Services", "/services", "services"]
   ]);
 });

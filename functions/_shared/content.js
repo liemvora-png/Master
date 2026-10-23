@@ -1,5 +1,12 @@
-const PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements"];
-const PAGE_FILES = new Set(["index.html", "projects.html", "accomplishments.html", "arrangements.html"]);
+const PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements", "services", "gallery"];
+const PAGE_FILES = new Set([
+  "index.html",
+  "projects.html",
+  "accomplishments.html",
+  "arrangements.html",
+  "services.html",
+  "gallery.html"
+]);
 
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -24,6 +31,7 @@ function isLink(value, allowPageLinks = false) {
 function validItems(pageName, items) {
   if (!Array.isArray(items) || items.length > 100) return false;
   if (pageName === "home") return items.length === 0;
+  if (pageName === "services" || pageName === "gallery") return items.length === 0;
 
   return items.every((item) => {
     if (!isRecord(item)) return false;
@@ -111,6 +119,7 @@ export function validateContent(content) {
   for (const pageName of PAGE_NAMES) {
     const page = content.pages[pageName];
     const isHome = pageName === "home";
+    const isCollectionPage = pageName === "services" || pageName === "gallery";
     if (pageName === "arrangements" && isRecord(page)) {
       const arrangementsError = validateArrangements(page.items);
       if (arrangementsError) return arrangementsError;
@@ -121,12 +130,12 @@ export function validateContent(content) {
       || !isText(page.title, 160)
       || (!isHome && !isText(page.eyebrow, 120))
       || (isHome && page.eyebrow !== "")
-      || (!isHome && !isText(page.titleAccent, 160))
-      || (isHome && page.titleAccent !== "")
+      || (!isHome && !isCollectionPage && !isText(page.titleAccent, 160))
+      || ((isHome || isCollectionPage) && page.titleAccent !== "")
       || (!isHome && !isText(page.description, 500))
       || (isHome && page.description !== "")
-      || (!isHome && !isText(page.sectionTitle, 120))
-      || (isHome && page.sectionTitle !== "")
+      || (!isHome && !isCollectionPage && !isText(page.sectionTitle, 120))
+      || ((isHome || isCollectionPage) && page.sectionTitle !== "")
       || !validItems(pageName, page.items)) {
       return `Check the fields and items for the ${pageName} page.`;
     }

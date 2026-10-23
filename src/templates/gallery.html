@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1e9">
+    <meta name="description" content="A selection of photography by Liem Vora.">
+    <title>Liem Vora — Photography gallery</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/assets/site.js" defer></script>
+    <script src="/assets/gallery.js" defer></script>
+  </head>
+  <body data-page="gallery">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">Liem Vora</span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/">Home</a>
+        <a href="/projects">Projects</a>
+        <a href="/accomplishments.html">Accomplishments</a>
+        <a href="/arrangements.html">Arrangements</a>
+        <a href="/services">Services</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Selected work</p>
+        <h1 id="page-title">Photography</h1>
+        <p class="intro-copy">A selection of photographs.</p>
+      </section>
+      <section aria-label="Photography gallery">
+        <div id="gallery-grid" class="gallery-grid" aria-live="polite">
+          <p class="empty-state">Loading photographs…</p>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><span>δ</span><span>MADE WITH CARE <span class="footer-dot" aria-hidden="true">·</span> 2026</span></footer>
+  </body>
+</html>

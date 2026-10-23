@@ -22,6 +22,17 @@
       "database_id": "c8f201ef-8b43-49b7-8dc6-7bbc7c60f6f0"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "GALLERY",
+      "bucket_name": "portfolio-gallery"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "BOOKING_EMAIL"
+    }
+  ],
   "vars": {
     "ACCESS_TEAM_DOMAIN": "old-shadow-43e8.cloudflareaccess.com",
     "ACCESS_AUD": "fac222eeb5ac4b2eda46a56ecc6be54d8186192f451046c03f7e2b87995a9cb7"

@@ -9,7 +9,9 @@ const SECTIONS = [
   { id: "site", label: "Site settings" },
   { id: "projects", label: "Projects" },
   { id: "accomplishments", label: "Accomplishments" },
-  { id: "arrangements", label: "Arrangements" }
+  { id: "arrangements", label: "Arrangements" },
+  { id: "services", label: "Services page" },
+  { id: "gallery", label: "Gallery page" }
 ];
 
 const PAGE_FIELDS = [
@@ -165,12 +167,16 @@ function renderSiteSettings() {
 function renderPage(sectionId) {
   const page = content.pages[sectionId];
   const isHome = sectionId === "home";
+  const isStaticPage = ["home", "services", "gallery"].includes(sectionId);
   const isProjects = sectionId === "projects";
   const isAccomplishments = sectionId === "accomplishments";
+  const sectionTitle = sectionId === "services" ? "Services page"
+    : sectionId === "gallery" ? "Gallery page"
+      : page.sectionTitle;
   const section = document.createElement("section");
   section.className = "editor-page";
   section.append(makePanelHeading(
-    isHome ? "Home page" : page.sectionTitle,
+    isHome ? "Home page" : sectionTitle,
     isHome
       ? "Set the title and search text for your home page."
       : `Edit this page's text and manage its ${isProjects ? "projects" : isAccomplishments ? "highlights" : "arrangements"}.`
@@ -195,8 +201,12 @@ function renderPage(sectionId) {
   pageCopy.append(fields);
   section.append(pageCopy);
 
-  const itemLabel = isHome ? "Home" : isProjects ? "Projects" : isAccomplishments ? "Highlights" : "Arrangements";
-  if (!isHome) {
+  const itemLabel = isHome ? "Home"
+    : isProjects ? "Projects"
+      : isAccomplishments ? "Highlights"
+        : sectionId === "services" ? "Services"
+          : sectionId === "gallery" ? "Gallery" : "Arrangements";
+  if (!isStaticPage) {
     const description = document.createElement("p");
     description.className = "editor-collection-intro";
     description.textContent = `${page.items.length} ${page.items.length === 1 ? "entry" : "entries"}. Add, edit, or reorder the items displayed on this page.`;
@@ -277,6 +287,10 @@ function renderPreviewMarkup(page, sectionId) {
       }).join("")
       : `<p class="empty-state">${escapeHtml(content.labels.emptyArrangements)}</p>`;
     section = `<section aria-labelledby="arrangements-title"><div class="section-heading"><h2 id="arrangements-title">${escapeHtml(page.sectionTitle)}</h2><span class="project-count">${page.items.length ? `${String(page.items.length).padStart(2, "0")} ARRANGEMENTS` : "IN PROGRESS"}</span></div>${page.items.length ? `<ul class="accomplishment-list">${items}</ul>` : items}</section>`;
+  } else if (sectionId === "services") {
+    section = '<section class="services-section"><p class="empty-state">Service details are edited in the Services &amp; bookings panel.</p></section>';
+  } else if (sectionId === "gallery") {
+    section = '<section><p class="empty-state">Gallery images are edited in the Services &amp; bookings panel.</p></section>';
   }
 
   return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">${escapeHtml(content.brand)}</span></a><nav class="site-nav" aria-label="Main navigation">${navigation}</nav>${adminLink}</header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;

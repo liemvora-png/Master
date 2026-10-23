@@ -2,14 +2,18 @@ const PAGE_SLUGS = {
   home: "home",
   projects: "projects",
   accomplishments: "accomplishments",
-  arrangements: "arrangements"
+  arrangements: "arrangements",
+  services: "services",
+  gallery: "gallery"
 };
 
 const BLOCK_TYPES = {
   home: null,
   projects: "project",
   accomplishments: "accomplishment",
-  arrangements: "arrangement"
+  arrangements: "arrangement",
+  services: null,
+  gallery: null
 };
 
 function rows(result) {

@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <script src="/assets/admin.js" defer></script>
+    <script src="/assets/portfolio-admin.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -24,7 +25,7 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Private editor</p>
         <h1 id="page-title">Manage the<br><span>site content.</span></h1>
-        <p class="intro-copy">Edit page copy, navigation, projects, accomplishments, and arrangements below. Changes publish to the live site when saved.</p>
+        <p class="intro-copy">Edit page copy, navigation, projects, accomplishments, arrangements, services, and bookings below. Changes publish to the live site when saved.</p>
       </section>
 
       <section aria-labelledby="editor-title">
@@ -40,6 +41,16 @@
           <button class="editor-button editor-button-secondary" id="reload-content" type="button">Reload</button>
           <button class="editor-button" id="save-content" type="button" disabled>Save changes</button>
         </div>
+      </section>
+
+      <section class="portfolio-admin" aria-labelledby="portfolio-admin-title">
+        <div class="section-heading">
+          <h2 id="portfolio-admin-title">Services, gallery &amp; bookings</h2>
+          <span class="project-count">SERVICE MANAGER</span>
+        </div>
+        <p class="editor-help">Manage public offerings and subjects, lesson availability, gallery photos, and private booking requests.</p>
+        <p id="portfolio-admin-status" class="editor-status" role="status" aria-live="polite">Loading service manager…</p>
+        <div id="portfolio-admin-content"></div>
       </section>
     </main>
 

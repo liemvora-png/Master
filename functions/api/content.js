@@ -16,6 +16,12 @@ export async function onRequestGet({ env }) {
         error: "The database has the previous site layout. Apply migrations/0002_home_projects_empty_accomplishments.sql to the portfolio-content database bound as DB."
       }, 503);
     }
+    if (details.includes("Missing page record: services")
+      || details.includes("Missing page record: gallery")) {
+      return jsonResponse({
+        error: "The database is missing the services and gallery pages. Apply migrations/0004_services_gallery_bookings.sql to the portfolio-content database bound as DB."
+      }, 503);
+    }
     return jsonResponse({
       error: "Could not read site content from D1. Apply migrations/0001_site_content.sql to the portfolio-content database bound as DB."
     }, 503);

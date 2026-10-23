@@ -52,7 +52,9 @@ function updatePageHeading(page) {
     eyebrow.append(document.createTextNode(page.eyebrow));
   }
   setText(document.querySelector(".intro-copy"), page.description);
-  setText(document.querySelector(".section-heading h2"), page.sectionTitle);
+  if (!["services", "gallery"].includes(document.body.dataset.page)) {
+    setText(document.querySelector(".section-heading h2"), page.sectionTitle);
+  }
   document.title = page.metaTitle;
 
   const description = document.querySelector('meta[name="description"]');

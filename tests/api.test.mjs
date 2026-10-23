@@ -9,7 +9,9 @@ test("public content endpoint reads the D1 site record", async () => {
     ["home", "home"],
     ["projects", "projects"],
     ["accomplishments", "accomplishments"],
-    ["arrangements", "arrangements"]
+    ["arrangements", "arrangements"],
+    ["services", "services"],
+    ["gallery", "gallery"]
   ].map(([id, slug]) => ({
     id,
     slug,
@@ -17,9 +19,9 @@ test("public content endpoint reads the D1 site record", async () => {
     meta_title: "Projects",
     meta_description: "Projects description",
     eyebrow: id === "home" ? "" : "Portfolio",
-    title_accent: id === "home" ? "" : "work.",
+    title_accent: ["home", "services", "gallery"].includes(id) ? "" : "work.",
     description: id === "home" ? "" : "Project description",
-    section_title: id === "home" ? "" : "My projects"
+    section_title: ["home", "services", "gallery"].includes(id) ? "" : "My projects"
   }));
   const env = {
     DB: {
@@ -120,6 +122,26 @@ test("public content endpoint reads the D1 site record", async () => {
           titleAccent: "work.",
           description: "Project description",
           sectionTitle: "My projects",
+          items: []
+        },
+        services: {
+          metaTitle: "Projects",
+          metaDescription: "Projects description",
+          eyebrow: "Portfolio",
+          title: "Projects",
+          titleAccent: "",
+          description: "Project description",
+          sectionTitle: "",
+          items: []
+        },
+        gallery: {
+          metaTitle: "Projects",
+          metaDescription: "Projects description",
+          eyebrow: "Portfolio",
+          title: "Projects",
+          titleAccent: "",
+          description: "Project description",
+          sectionTitle: "",
           items: []
         }
       },
@@ -250,6 +272,8 @@ test("Worker serves private page templates and falls back to public assets", asy
     projects: "<html>projects template</html>",
     accomplishments: "<html>accomplishment template</html>",
     arrangements: "<html>arrangement template</html>",
+    services: "<html>services template</html>",
+    gallery: "<html>gallery template</html>",
     admin: "<html>private editor</html>"
   });
   const calls = [];
@@ -309,6 +333,20 @@ test("Worker serves private page templates and falls back to public assets", asy
     {}
   );
   assert.equal(await projectsResponse.text(), "<html>projects template</html>");
+
+  const servicesResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/services"),
+    env,
+    {}
+  );
+  assert.equal(await servicesResponse.text(), "<html>services template</html>");
+
+  const galleryResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/gallery"),
+    env,
+    {}
+  );
+  assert.equal(await galleryResponse.text(), "<html>gallery template</html>");
 
   const adminResponse = await worker.fetch(
     new Request("https://www.liemvora.cc/admin"),

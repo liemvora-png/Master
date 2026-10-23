@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1e9">
+    <meta name="description" content="Photography, private piano lessons, and tutoring.">
+    <title>Liem Vora — Services</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/assets/site.js" defer></script>
+    <script src="/assets/services.js" defer></script>
+  </head>
+  <body data-page="services">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">Liem Vora</span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/">Home</a>
+        <a href="/projects">Projects</a>
+        <a href="/accomplishments.html">Accomplishments</a>
+        <a href="/arrangements.html">Arrangements</a>
+        <a href="/services" aria-current="page">Services</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Work together</p>
+        <h1 id="page-title">Services</h1>
+        <p class="intro-copy">Photography, piano lessons, and academic tutoring.</p>
+      </section>
+
+      <section class="services-section" aria-label="Services">
+        <div id="services-list" class="service-list" aria-live="polite">
+          <p class="empty-state">Loading services…</p>
+        </div>
+      </section>
+
+      <section class="booking-section" aria-labelledby="booking-title">
+        <div class="section-heading"><h2 id="booking-title">Request a piano lesson</h2></div>
+        <p class="service-booking-note">Choose an open time and send a request. Lessons are not confirmed until you hear back.</p>
+        <form id="booking-form" class="booking-form">
+          <label class="content-field"><span>Your name</span><input name="name" autocomplete="name" maxlength="120" required></label>
+          <label class="content-field"><span>Email</span><input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+          <label class="content-field"><span>Date</span><input name="date" type="date" required></label>
+          <label class="content-field"><span>Available time</span><select name="time" required disabled><option value="">Choose a date first</option></select></label>
+          <label class="content-field booking-note-field"><span>Note (optional)</span><textarea name="note" rows="4" maxlength="1000"></textarea></label>
+          <button class="editor-button booking-submit" type="submit">Send request</button>
+          <p id="booking-status" class="editor-status booking-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <footer class="site-footer"><span>δ</span><span>MADE WITH CARE <span class="footer-dot" aria-hidden="true">·</span> 2026</span></footer>
+  </body>
+</html>

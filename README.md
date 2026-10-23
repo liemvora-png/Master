@@ -1,6 +1,6 @@
 # Liem Vora — Personal website
 
-A minimal, responsive website with a title-only home page, projects, accomplishments, and sheet music arrangements. Public pages remain plain HTML and CSS, with content loaded from Cloudflare D1. The HTML stays in place as an offline/static fallback.
+A minimal, responsive website with projects, accomplishments, arrangements, photography, and a service-request flow. Public pages use plain HTML/CSS with browser JavaScript for live D1 content and form controls.
 
 ## Pages
 
@@ -8,6 +8,8 @@ A minimal, responsive website with a title-only home page, projects, accomplishm
 - `/projects` — projects
 - `accomplishments.html` — music, athletics, and coaching highlights
 - `arrangements.html` — sheet music arrangements
+- `/services` — photography, piano lessons, and tutoring
+- `/gallery` — R2-backed photography gallery
 - `/admin` — private visual content editor
 
 ## Cloudflare Worker setup
@@ -20,7 +22,9 @@ For an existing database created with the earlier seed, run [`migrations/0002_ho
 
 To separate the lowercase delta logo from the site name in the header, run [`migrations/0003_separate_logo_and_site_name.sql`](migrations/0003_separate_logo_and_site_name.sql) once after migration 0002. It changes the default site name from `δ` to `Liem Vora`; your custom site name is preserved if you already changed it.
 
-The fresh seed contains 4 pages (`home`, `projects`, `accomplishments`, `arrangements`), 2 project blocks, no accomplishment blocks, and 4 navigation links. `blocks.content` stores each item as JSON text and `blocks.type` identifies whether the item is a project, accomplishment, or arrangement. These console checks should work as written:
+Run [`migrations/0004_services_gallery_bookings.sql`](migrations/0004_services_gallery_bookings.sql) after the earlier migrations. It adds the Services page and nav link, default offering records and SAT/AP subjects, photo metadata, availability windows, and private lesson bookings. It also creates a partial unique index preventing two non-cancelled bookings for the same date and time.
+
+The fresh seed contains 6 pages, 2 project blocks, no accomplishment blocks, and 5 navigation links. `blocks.content` stores each item as JSON text and `blocks.type` identifies whether the item is a project, accomplishment, or arrangement. These console checks should work as written:
 
 ```sql
 SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';
@@ -44,16 +48,22 @@ SELECT b.id FROM blocks b LEFT JOIN pages p ON p.id = b.page_id WHERE p.id IS NU
 SELECT id FROM blocks WHERE content IS NULL OR trim(content) = '';
 ```
 
-The final two integrity checks should return no rows. After upgrading an existing database, confirm the projects slug is `projects`, accomplishments has no blocks, and `site_settings.brand` is `δ`.
+The final two integrity checks should return no rows. After upgrading, confirm the `services` and `gallery` rows exist, the projects slug is `projects`, accomplishments has no blocks, and the site name is `Liem Vora`.
 
 The `DB` binding and the two Access variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. The Cloudflare Access self-hosted application should protect `admin*` and `api/admin*` on `www.liemvora.cc` with an allow policy for your email. Cloudflare Access provides the login flow and enforces the email policy. The Worker validates the Access JWT signature, issuer, audience, and expiry before returning the editor or accepting writes.
 
-The existing Cloudflare Workers Build can continue deploying from this repository with `wrangler deploy`. The asset directory is `./public`, and `run_worker_first: true` sends every request through `src/worker.js`. The Worker serves page templates imported as text from `src/templates/`, routes `GET /api/content` to D1, and accepts saves through `PUT /api/admin/content`. Requests for stylesheets, scripts, and images fall through to `env.ASSETS.fetch`. The templates, Worker code, SQL, and tests are not in the public directory; `.assetsignore` also excludes `src` and other repository files.
+The existing Cloudflare Workers Build can continue deploying from this repository with `wrangler deploy`. The asset directory is `./public`, and `run_worker_first: true` sends every request through `src/worker.js`. The Worker serves templates imported from `src/templates/`, uses D1 for content and bookings, stores gallery objects in the configured R2 bucket, and sends booking notices through the Email Service binding. The templates, Worker code, SQL, and tests are not in the public directory; `.assetsignore` also excludes `src` and other repository files.
+
+Create an R2 bucket named `portfolio-gallery` to match the `GALLERY` binding in `wrangler.jsonc`.
+
+For booking email, configure Cloudflare Email Service (outbound sending) in addition to any Email Routing you use for inbound mail. Onboard/verify a sender domain with Email Service, and verify the Gmail destination address as an allowed recipient. Add Worker secrets named `BOOKING_EMAIL_TO` (your verified Gmail destination) and `BOOKING_EMAIL_FROM` (an address on the verified sending domain). The destination and sender are not included in the repository, and the Gmail address is never displayed publicly. Without these values, the Worker still saves the request as pending but reports that email notification is not configured.
 
 Also disable `workers.dev` and preview URLs, or include those hostnames in the Access protection, so the admin API cannot be reached through a hostname that bypasses the Access application.
 
 ## Editing content
 
-Open `/admin` after signing in through Cloudflare Access. The labeled editor manages site branding, navigation, the home-page title, page copy, projects, accomplishments, and arrangements. Arrangement entries can include an optional date. Page copy is stored in `pages`, each listed item is stored in its page's ordered `blocks`, navigation is stored in `nav_items`, and shared brand/footer text is stored in `site_settings`. Save validates the document before replacing these rows in one D1 batch. The server rejects unsafe URLs, invalid fields, and oversized documents.
+Open `/admin` after signing in through Cloudflare Access. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, tutoring subjects, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
+
+Page copy is stored in `pages`, listed content in ordered `blocks`, navigation in `nav_items`, and shared brand/footer text in `site_settings`. The service manager edits `services`, `test_prep_options`, `availability`, `photo_gallery`, and private `lesson_bookings`. Booking request data is never returned by public APIs.
 
 Changes in D1 become the source for the public pages on their next load. If the API is temporarily unavailable, the existing HTML copy remains visible and the page displays a small notice.

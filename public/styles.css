@@ -345,6 +345,205 @@ h1 span {
   margin-bottom: 1rem;
 }
 
+.services-section,
+.booking-section,
+.portfolio-admin {
+  margin-top: 3rem;
+}
+
+.service-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.service-card {
+  min-width: 0;
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+}
+
+.service-card h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.service-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.service-price {
+  color: var(--olive) !important;
+  font-family: var(--mono);
+  font-size: 0.78rem !important;
+}
+
+.tutoring-selectors {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.tutoring-selectors select,
+.booking-form input,
+.booking-form select,
+.booking-form textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 0.84rem/1.5 var(--sans);
+}
+
+.booking-section {
+  max-width: 760px;
+}
+
+.service-booking-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.booking-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+}
+
+.booking-form .content-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.booking-form .content-field > span {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.booking-note-field,
+.booking-submit,
+.booking-status {
+  grid-column: 1 / -1;
+}
+
+.booking-status {
+  margin: 0;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.gallery-photo {
+  min-width: 0;
+  margin: 0;
+}
+
+.gallery-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--paper-deep);
+}
+
+.gallery-photo figcaption {
+  padding-top: 0.65rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.portfolio-admin {
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.portfolio-admin-group {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+}
+
+.portfolio-admin-group h3 {
+  margin-bottom: 0.5rem;
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.portfolio-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.portfolio-row .content-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.portfolio-row input,
+.portfolio-row select,
+.portfolio-row textarea,
+.gallery-upload input,
+.gallery-upload textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 0.82rem/1.5 var(--sans);
+}
+
+.portfolio-row .full-width,
+.portfolio-image,
+.gallery-upload {
+  grid-column: 1 / -1;
+}
+
+.portfolio-image img {
+  width: min(100%, 20rem);
+  max-height: 12rem;
+  object-fit: cover;
+}
+
+.portfolio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.portfolio-booking {
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.portfolio-booking p {
+  margin-bottom: 0.5rem;
+}
+
 .admin-main {
   max-width: 1100px;
 }
@@ -921,6 +1120,15 @@ h1 span {
   .editor-settings-grid {
     grid-template-columns: 1fr;
   }
+
+  .service-list,
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-form {
+    padding: 0.8rem;
+  }
 }
 
 @media (max-width: 420px) {
@@ -941,6 +1149,22 @@ h1 span {
     flex-wrap: wrap;
     gap: 0.5rem 1rem;
     font-size: 0.68rem;
+  }
+
+  .service-list,
+  .gallery-grid,
+  .booking-form,
+  .portfolio-row {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-note-field,
+  .booking-submit,
+  .booking-status,
+  .portfolio-row .full-width,
+  .portfolio-image,
+  .gallery-upload {
+    grid-column: auto;
   }
 
   .admin-entry-button {

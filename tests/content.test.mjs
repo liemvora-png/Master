@@ -9,7 +9,8 @@ const validContent = {
     { label: "Home", href: "/", page: "home" },
     { label: "Projects", href: "/projects", page: "projects" },
     { label: "Accomplishments", href: "accomplishments.html", page: "accomplishments" },
-    { label: "Arrangements", href: "arrangements.html", page: "arrangements" }
+    { label: "Arrangements", href: "arrangements.html", page: "arrangements" },
+    { label: "Services", href: "/services", page: "services" }
   ],
   labels: {
     projectLink: "Visit website",
@@ -56,6 +57,26 @@ const validContent = {
       description: "For musicians.",
       sectionTitle: "Arrangements",
       items: [{ name: "Theme", description: "A short piece.", instrument: "Piano", url: "/scores/theme.pdf" }]
+    },
+    services: {
+      metaTitle: "Services",
+      metaDescription: "Lessons, tutoring, and photography.",
+      eyebrow: "Work together",
+      title: "Services",
+      titleAccent: "",
+      description: "Photography, piano lessons, and tutoring.",
+      sectionTitle: "",
+      items: []
+    },
+    gallery: {
+      metaTitle: "Photography",
+      metaDescription: "Selected photographs.",
+      eyebrow: "Selected work",
+      title: "Photography",
+      titleAccent: "",
+      description: "A selection of photographs.",
+      sectionTitle: "",
+      items: []
     }
   },
   footer: { label: "LIEM VORA", note: "MADE WITH CARE", year: "2026" }
@@ -85,6 +106,15 @@ test("migration seed matches the supported content model", () => {
   const brandingUpgrade = readFileSync(new URL("../migrations/0003_separate_logo_and_site_name.sql", import.meta.url), "utf8");
   assert.match(brandingUpgrade, /SET brand = 'Liem Vora'/);
   assert.match(brandingUpgrade, /AND brand = 'δ'/);
+  const servicesMigration = readFileSync(new URL("../migrations/0004_services_gallery_bookings.sql", import.meta.url), "utf8");
+  for (const table of ["services", "test_prep_options", "photo_gallery", "availability", "lesson_bookings"]) {
+    assert.match(servicesMigration, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}`));
+  }
+  assert.match(servicesMigration, /lesson_bookings_active_slot/);
+  assert.match(servicesMigration, /'photography'/);
+  assert.match(servicesMigration, /'piano'/);
+  assert.match(servicesMigration, /'tutoring'/);
+  assert.match(servicesMigration, /page_slug = 'services'/);
 });
 
 test("rejects unsafe project URLs", () => {
