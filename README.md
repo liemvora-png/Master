@@ -11,10 +11,7 @@ A minimal, responsive website for projects, accomplishments, and sheet music arr
 
 ## Cloudflare Worker setup
 
-`wrangler.jsonc` is the deployment source of truth for the `master` Worker, static assets, D1 binding, and Access variables. Before deploying, replace the two `REPLACE_...` Access placeholders in that file:
-
-- `ACCESS_TEAM_DOMAIN` — your Zero Trust team domain, such as `your-team.cloudflareaccess.com`.
-- `ACCESS_AUD` — the application audience tag for the Access app protecting the admin paths.
+`wrangler.jsonc` is the deployment source of truth for the `master` Worker, static assets, D1 binding, and Access variables. It is configured with the `old-shadow-43e8.cloudflareaccess.com` team domain and the Access application audience tag for the admin routes.
 
 The D1 database ID is already set in `wrangler.jsonc`. Create a D1 database named `portfolio-content`. In the D1 Console, paste and run the complete [`migrations/0001_site_content.sql`](migrations/0001_site_content.sql) file. It creates the `pages`, `blocks`, and `nav_items` tables used by the console checks below, plus `site_settings` for shared brand/footer text, and seeds the existing site content. The migration uses `CREATE TABLE IF NOT EXISTS` and `INSERT OR IGNORE`, so it can be run again without replacing content that has already been edited.
 
@@ -44,7 +41,7 @@ SELECT id FROM blocks WHERE content IS NULL OR trim(content) = '';
 
 The final two integrity checks should return no rows.
 
-The `DB` binding and the two Access variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. The Cloudflare Access self-hosted application should protect `admin*` and `api/admin*` on `www.liemvora.cc` with an allow policy for your email. The Worker validates the Access JWT signature, issuer, audience, and expiry before returning the editor or accepting writes. Cloudflare Access enforces the email policy. While either Access value is still a placeholder, admin routes return a clear `503` instead of skipping token verification.
+The `DB` binding and the two Access variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. The Cloudflare Access self-hosted application should protect `admin*` and `api/admin*` on `www.liemvora.cc` with an allow policy for your email. Cloudflare Access provides the login flow and enforces the email policy. The Worker validates the Access JWT signature, issuer, audience, and expiry before returning the editor or accepting writes.
 
 The existing Cloudflare Workers Build can continue deploying from this repository with `wrangler deploy`. The asset directory is `./public`, and `run_worker_first: true` sends every request through `src/worker.js`. The Worker serves page templates imported as text from `src/templates/`, routes `GET /api/content` to D1, and accepts saves through `PUT /api/admin/content`. Requests for stylesheets, scripts, and images fall through to `env.ASSETS.fetch`. The templates, Worker code, SQL, and tests are not in the public directory; `.assetsignore` also excludes `src` and other repository files.
 
