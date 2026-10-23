@@ -334,6 +334,30 @@ h1 span {
   font-size: 0.76rem;
 }
 
+.admin-entry-button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--olive);
+  font-size: 0.72rem;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.admin-entry-button:hover {
+  border-color: var(--olive);
+  background: var(--paper-deep);
+}
+
+.admin-entry-button:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
+}
+
 .editor-help {
   max-width: 55rem;
   margin-block: 1rem;
@@ -853,6 +877,11 @@ h1 span {
     gap: 1rem;
   }
 
+  .admin-entry-button {
+    min-height: 36px;
+    padding: 0.45rem 0.65rem;
+  }
+
   .site-nav {
     gap: 0.9rem;
     font-size: 0.68rem;
@@ -941,6 +970,10 @@ h1 span {
     flex-wrap: wrap;
     gap: 0.5rem 1rem;
     font-size: 0.68rem;
+  }
+
+  .admin-entry-button {
+    align-self: flex-start;
   }
 
   .project {

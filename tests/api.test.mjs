@@ -275,3 +275,8 @@ test("admin page provides visual sections and item controls instead of a JSON pa
   assert.match(script, /Move up/);
   assert.match(script, /Move down/);
 });
+
+test("home page links to the protected admin editor", () => {
+  const template = readFileSync(new URL("../src/templates/index.html", import.meta.url), "utf8");
+  assert.match(template, /<a class="admin-entry-button" href="\/admin">Admin/);
+});
