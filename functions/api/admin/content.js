@@ -1,5 +1,6 @@
 import { authorizeAdmin } from "../../_shared/access.js";
 import { jsonResponse, validateContent } from "../../_shared/content.js";
+import { buildSiteContentStatements } from "../../_shared/site-storage.js";
 
 export async function onRequestPut({ request, env }) {
   const authorization = await authorizeAdmin(request, env);
@@ -28,10 +29,7 @@ export async function onRequestPut({ request, env }) {
   if (validationError) return jsonResponse({ error: validationError }, 400);
 
   const updatedAt = new Date().toISOString();
-  await env.DB.prepare(
-    "INSERT INTO site_content (id, content_json, updated_at) VALUES (?, ?, ?) " +
-    "ON CONFLICT(id) DO UPDATE SET content_json = excluded.content_json, updated_at = excluded.updated_at"
-  ).bind("site", JSON.stringify(content), updatedAt).run();
+  await env.DB.batch(buildSiteContentStatements(env.DB, content, updatedAt));
 
   return jsonResponse({ saved: true, updatedAt });
 }

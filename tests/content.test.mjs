@@ -56,9 +56,16 @@ test("accepts valid site content", () => {
 
 test("migration seed matches the supported content model", () => {
   const migration = readFileSync(new URL("../migrations/0001_site_content.sql", import.meta.url), "utf8");
-  const seed = migration.match(/  '(\{[\s\S]*?\})',\r?\n  CURRENT_TIMESTAMP/);
-  assert.ok(seed, "migration should contain the initial site content JSON");
-  assert.equal(validateContent(JSON.parse(seed[1].replace(/''/g, "'"))), null);
+  for (const table of ["pages", "blocks", "nav_items", "site_settings"]) {
+    assert.match(migration, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}`));
+  }
+  assert.match(migration, /INSERT OR IGNORE INTO pages/);
+  assert.match(migration, /INSERT OR IGNORE INTO blocks/);
+  assert.match(migration, /INSERT OR IGNORE INTO nav_items/);
+  assert.match(migration, /INSERT OR IGNORE INTO site_settings/);
+  assert.match(migration, /'projects', 'index'/);
+  assert.match(migration, /'accomplishments', 5, 'accomplishment'/);
+  assert.match(migration, /'Arrangements', 'arrangements\.html', 'arrangements', 3/);
 });
 
 test("rejects unsafe project URLs", () => {

@@ -1,19 +1,12 @@
 import { jsonResponse } from "../_shared/content.js";
+import { readSiteContent } from "../_shared/site-storage.js";
 
 export async function onRequestGet({ env }) {
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
 
-  const result = await env.DB
-    .prepare("SELECT content_json, updated_at FROM site_content WHERE id = ?")
-    .bind("site")
-    .first();
-
-  if (!result) return jsonResponse({ error: "Site content has not been initialized." }, 503);
-
-  return jsonResponse({
-    content: JSON.parse(result.content_json),
-    updatedAt: result.updated_at
-  });
+  const site = await readSiteContent(env.DB);
+  if (!site) return jsonResponse({ error: "Site content has not been initialized." }, 503);
+  return jsonResponse(site);
 }
 
 export async function onRequest({ request, env }) {
