@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "liemvora.cc",
+  "name": "master",
   "main": "functions/worker.js",
   "compatibility_date": "2026-10-23",
   "assets": {
