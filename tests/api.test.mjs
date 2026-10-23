@@ -180,6 +180,62 @@ test("public content endpoint explains how to fix a missing D1 schema", async ()
       }
     });
 
+    test("public content endpoint recommends the layout upgrade for an existing D1 database", async () => {
+      const originalError = console.error;
+      console.error = () => {};
+      try {
+        const response = await contentRequest({
+          request: new Request("https://example.com/api/content"),
+          env: {
+            DB: {
+              prepare(query) {
+                if (/FROM pages/.test(query)) {
+                  return {
+                    all: async () => ({
+                      results: [{
+                        id: "projects",
+                        slug: "index",
+                        title: "Projects",
+                        meta_title: "Projects",
+                        meta_description: "Projects",
+                        eyebrow: "Projects",
+                        title_accent: "work.",
+                        description: "Projects",
+                        section_title: "Projects"
+                      }]
+                    })
+                  };
+                }
+                if (/FROM blocks|FROM nav_items/.test(query)) {
+                  return { all: async () => ({ results: [] }) };
+                }
+                return {
+                  bind() {
+                    return {
+                      first: async () => ({
+                        brand: "LIEM VORA",
+                        labels_json: "{}",
+                        footer_json: "{}",
+                        updated_at: "2026-10-23T00:00:00.000Z"
+                      })
+                    };
+                  }
+                };
+              }
+            }
+          }
+        });
+
+        assert.equal(response.status, 503);
+        assert.match(
+          (await response.json()).error,
+          /migrations\/0002_home_projects_empty_accomplishments\.sql/
+        );
+      } finally {
+        console.error = originalError;
+      }
+    });
+
     assert.equal(response.status, 503);
     assert.match((await response.json()).error, /migrations\/0001_site_content\.sql/);
   } finally {

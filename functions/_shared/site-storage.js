@@ -73,7 +73,9 @@ export async function readSiteContent(db) {
   }
 
   for (const pageKey of Object.keys(PAGE_SLUGS)) {
-    if (!content.pages[pageKey]) return null;
+    if (!content.pages[pageKey]) {
+      throw new Error(`Missing page record: ${pageKey}.`);
+    }
   }
 
   return {

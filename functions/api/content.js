@@ -9,6 +9,13 @@ export async function onRequestGet({ env }) {
     site = await readSiteContent(env.DB);
   } catch (error) {
     console.error("Failed to read managed site content from D1:", error);
+    const details = error instanceof Error ? error.message : "";
+    if (details.includes("Unexpected page record: projects (index)")
+      || details.includes("Missing page record: home")) {
+      return jsonResponse({
+        error: "The database has the previous site layout. Apply migrations/0002_home_projects_empty_accomplishments.sql to the portfolio-content database bound as DB."
+      }, 503);
+    }
     return jsonResponse({
       error: "Could not read site content from D1. Apply migrations/0001_site_content.sql to the portfolio-content database bound as DB."
     }, 503);
