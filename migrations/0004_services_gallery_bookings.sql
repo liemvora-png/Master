@@ -84,3 +84,8 @@ INSERT INTO nav_items (label, href, page_slug, position)
 SELECT 'Services', '/services', 'services',
        (SELECT COALESCE(MAX(position), 0) + 1 FROM nav_items)
 WHERE NOT EXISTS (SELECT 1 FROM nav_items WHERE page_slug = 'services');
+
+INSERT INTO nav_items (label, href, page_slug, position)
+SELECT 'Gallery', '/gallery', 'gallery',
+       (SELECT COALESCE(MAX(position), 0) + 1 FROM nav_items)
+WHERE NOT EXISTS (SELECT 1 FROM nav_items WHERE page_slug = 'gallery');

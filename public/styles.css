@@ -65,16 +65,32 @@ a:focus-visible {
 }
 
 .site-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   min-height: 82px;
   border-bottom: 1px solid var(--line);
+}
+
+.site-header > .wordmark {
+  justify-self: start;
 }
 
 .site-nav {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: clamp(1rem, 3vw, 2.2rem);
   color: var(--muted);
   font-size: 0.76rem;
+}
+
+.site-header > .site-nav {
+  justify-self: center;
+}
+
+.site-header > .admin-entry-button {
+  justify-self: end;
 }
 
 .site-nav a {
@@ -184,6 +200,21 @@ h1 {
 
 h1 span {
   color: var(--olive);
+}
+
+.home-intro h1 {
+  font-size: clamp(2.5rem, 8.4vw, 6.8rem);
+}
+
+.home-update-status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
 }
 
 .intro-copy {
@@ -1044,7 +1075,9 @@ h1 span {
   }
 
   .site-header {
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.7rem 1rem;
+    padding-block: 0.8rem;
   }
 
   .admin-entry-button {
@@ -1053,6 +1086,9 @@ h1 span {
   }
 
   .site-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: stretch;
     gap: 0.9rem;
     font-size: 0.68rem;
   }
@@ -1138,15 +1174,15 @@ h1 span {
   }
 
   .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 0.8rem;
     padding-block: 1rem;
   }
 
   .site-nav {
-    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    grid-row: 2;
     gap: 0.5rem 1rem;
     font-size: 0.68rem;
   }
@@ -1168,7 +1204,9 @@ h1 span {
   }
 
   .admin-entry-button {
-    align-self: flex-start;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
   }
 
   .project {

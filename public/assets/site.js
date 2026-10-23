@@ -75,6 +75,46 @@ function updateNavigation(content, currentPage) {
   }
 }
 
+function updateHomeTimestamp(updatedAt) {
+  const timestamp = document.querySelector("#home-last-updated");
+  if (!timestamp) return;
+
+  const value = typeof updatedAt === "string" ? updatedAt : "";
+  const normalized = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value)
+    ? value
+    : value.replace(" ", "T") + "Z";
+  const date = new Date(normalized);
+  if (!value || Number.isNaN(date.getTime())) {
+    timestamp.textContent = "time unavailable";
+    return;
+  }
+
+  const now = new Date();
+  const calendarDay = (day) => Date.UTC(day.getFullYear(), day.getMonth(), day.getDate());
+  const daysAgo = Math.round((calendarDay(now) - calendarDay(date)) / 86400000);
+  let dayLabel;
+  if (daysAgo === 0) {
+    dayLabel = "today";
+  } else if (daysAgo === 1) {
+    dayLabel = "yesterday";
+  } else if (daysAgo > 1 && daysAgo < 7) {
+    dayLabel = `${daysAgo} days ago`;
+  } else {
+    dayLabel = new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      ...(date.getFullYear() === now.getFullYear() ? {} : { year: "numeric" })
+    }).format(date);
+  }
+
+  const timeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+  timestamp.dateTime = date.toISOString();
+  timestamp.textContent = `${dayLabel} at ${timeLabel}`;
+}
+
 function renderProjects(items, labels) {
   const list = document.querySelector(".project-list");
   if (!list) return;
@@ -229,12 +269,14 @@ async function loadManagedContent() {
   try {
     const response = await fetch("/api/content", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`Content request returned ${response.status}.`);
-    const { content } = await response.json();
+    const { content, updatedAt } = await response.json();
     const page = content.pages[currentPage];
-    if (!page) throw new Error(`No managed content found for ${currentPage}.`);
+    if (currentPage && !page) throw new Error(`No managed content found for ${currentPage}.`);
 
     updateNavigation(content, currentPage);
-    updatePageHeading(page);
+    if (!currentPage) return;
+    if (currentPage === "home") updateHomeTimestamp(updatedAt);
+    else updatePageHeading(page);
     setText(document.querySelector(".wordmark-name"), content.brand);
     setText(document.querySelector(".site-footer > span:first-child"), content.footer.label);
     const footerNote = document.querySelector(".site-footer > span:last-child");
@@ -261,6 +303,7 @@ async function loadManagedContent() {
     }
   } catch (error) {
     console.error("Unable to load live site content:", error);
+    if (currentPage === "home") updateHomeTimestamp(null);
     showContentStatus("Live content is unavailable; showing the saved page instead.");
   }
 }

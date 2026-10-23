@@ -22,9 +22,9 @@ For an existing database created with the earlier seed, run [`migrations/0002_ho
 
 To separate the lowercase delta logo from the site name in the header, run [`migrations/0003_separate_logo_and_site_name.sql`](migrations/0003_separate_logo_and_site_name.sql) once after migration 0002. It changes the default site name from `δ` to `Liem Vora`; your custom site name is preserved if you already changed it.
 
-Run [`migrations/0004_services_gallery_bookings.sql`](migrations/0004_services_gallery_bookings.sql) after the earlier migrations. It adds the Services page and nav link, default offering records and SAT/AP subjects, photo metadata, availability windows, and private lesson bookings. It also creates a partial unique index preventing two non-cancelled bookings for the same date and time.
+Run [`migrations/0004_services_gallery_bookings.sql`](migrations/0004_services_gallery_bookings.sql) after the earlier migrations. It adds the Services and Gallery pages and navigation links, default offering records and SAT/AP subjects, photo metadata, availability windows, and private lesson bookings. It also creates a partial unique index preventing two non-cancelled bookings for the same date and time.
 
-The fresh seed contains 6 pages, 2 project blocks, no accomplishment blocks, and 5 navigation links. `blocks.content` stores each item as JSON text and `blocks.type` identifies whether the item is a project, accomplishment, or arrangement. These console checks should work as written:
+The fresh seed contains 6 pages, 2 project blocks, no accomplishment blocks, and 6 navigation links. `blocks.content` stores each item as JSON text and `blocks.type` identifies whether the item is a project, accomplishment, or arrangement. These console checks should work as written:
 
 ```sql
 SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';
