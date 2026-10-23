@@ -6,19 +6,20 @@ import { onRequest as adminRequest } from "../functions/api/admin/content.js";
 
 test("public content endpoint reads the D1 site record", async () => {
   const pageRows = [
-    ["projects", "index"],
+    ["home", "home"],
+    ["projects", "projects"],
     ["accomplishments", "accomplishments"],
     ["arrangements", "arrangements"]
   ].map(([id, slug]) => ({
     id,
     slug,
-    title: "Projects",
+    title: id === "home" ? "Liem Vora" : "Projects",
     meta_title: "Projects",
     meta_description: "Projects description",
-    eyebrow: "Portfolio",
-    title_accent: "work.",
-    description: "Project description",
-    section_title: "My projects"
+    eyebrow: id === "home" ? "" : "Portfolio",
+    title_accent: id === "home" ? "" : "work.",
+    description: id === "home" ? "" : "Project description",
+    section_title: id === "home" ? "" : "My projects"
   }));
   const env = {
     DB: {
@@ -41,7 +42,10 @@ test("public content endpoint reads the D1 site record", async () => {
         if (/FROM nav_items/.test(query)) {
           return {
             all: async () => ({
-              results: [{ label: "Projects", href: "index.html", page_slug: "index", position: 1 }]
+              results: [
+                { label: "Home", href: "/", page_slug: "home", position: 1 },
+                { label: "Projects", href: "/projects", page_slug: "projects", position: 2 }
+              ]
             })
           };
         }
@@ -72,9 +76,22 @@ test("public content endpoint reads the D1 site record", async () => {
     updatedAt: "2026-10-23T00:00:00.000Z",
     content: {
       brand: "LIEM VORA",
-      navigation: [{ label: "Projects", href: "index.html", page: "projects" }],
+      navigation: [
+        { label: "Home", href: "/", page: "home" },
+        { label: "Projects", href: "/projects", page: "projects" }
+      ],
       labels: { projectLink: "Visit website" },
       pages: {
+        home: {
+          metaTitle: "Projects",
+          metaDescription: "Projects description",
+          eyebrow: "",
+          title: "Liem Vora",
+          titleAccent: "",
+          description: "",
+          sectionTitle: "",
+          items: []
+        },
         projects: {
           metaTitle: "Projects",
           metaDescription: "Projects description",
@@ -173,7 +190,8 @@ test("public content endpoint explains how to fix a missing D1 schema", async ()
 test("Worker serves private page templates and falls back to public assets", async () => {
   const { createWorker } = await import("../src/worker-handler.js");
   const worker = createWorker({
-    index: "<html>home template</html>",
+    home: "<html>home template</html>",
+    projects: "<html>projects template</html>",
     accomplishments: "<html>accomplishment template</html>",
     arrangements: "<html>arrangement template</html>",
     admin: "<html>private editor</html>"
@@ -229,6 +247,13 @@ test("Worker serves private page templates and falls back to public assets", asy
   );
   assert.equal(await homeResponse.text(), "<html>home template</html>");
 
+  const projectsResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/projects"),
+    env,
+    {}
+  );
+  assert.equal(await projectsResponse.text(), "<html>projects template</html>");
+
   const adminResponse = await worker.fetch(
     new Request("https://www.liemvora.cc/admin"),
     env,
@@ -277,6 +302,6 @@ test("admin page provides visual sections and item controls instead of a JSON pa
 });
 
 test("home page links to the protected admin editor", () => {
-  const template = readFileSync(new URL("../src/templates/index.html", import.meta.url), "utf8");
+  const template = readFileSync(new URL("../src/templates/home.html", import.meta.url), "utf8");
   assert.match(template, /<a class="admin-entry-button" href="\/admin">Admin/);
 });

@@ -39,7 +39,9 @@ CREATE TABLE IF NOT EXISTS site_settings (
 INSERT OR IGNORE INTO pages
   (id, slug, title, meta_title, meta_description, eyebrow, title_accent, description, section_title, updated_at)
 VALUES
-  ('projects', 'index', 'A few things,', 'Liem Vora — Website projects',
+  ('home', 'home', 'Liem Vora', 'Liem Vora',
+   'The personal website of Liem Vora.', '', '', '', '', CURRENT_TIMESTAMP),
+  ('projects', 'projects', 'A few things,', 'Liem Vora — Website projects',
    'A small index of Liem Vora''s website projects.', 'Independent projects',
    'made thoughtfully.',
    'A small collection of websites exploring design, flight, and the spaces we live in.',
@@ -58,24 +60,20 @@ VALUES
 INSERT OR IGNORE INTO blocks (page_id, position, type, content)
 VALUES
   ('projects', 1, 'project', '{"name":"SKYWARD","description":"A study in regional aircraft design.","category":"AEROSPACE","url":"https://aerospace.liemvora.cc"}'),
-  ('projects', 2, 'project', '{"name":"LHANA","description":"Thoughtful interiors, made for everyday life.","category":"INTERIOR DESIGN","url":"https://lhana.liemvora.cc"}'),
-  ('accomplishments', 1, 'accomplishment', '{"name":"Ponce Project piano competition","detail":"3rd place"}'),
-  ('accomplishments', 2, 'accomplishment', '{"name":"Founded a six-person string ensemble","detail":"5K+ revenue"}'),
-  ('accomplishments', 3, 'accomplishment', '{"name":"Varsity water polo","detail":"2 years"}'),
-  ('accomplishments', 4, 'accomplishment', '{"name":"Swim coach","detail":"400+ students"}'),
-  ('accomplishments', 5, 'accomplishment', '{"name":"AFA Symphony","detail":"Qualifier"}');
+  ('projects', 2, 'project', '{"name":"LHANA","description":"Thoughtful interiors, made for everyday life.","category":"INTERIOR DESIGN","url":"https://lhana.liemvora.cc"}');
 
 INSERT OR IGNORE INTO nav_items (label, href, page_slug, position)
 VALUES
-  ('Projects', 'index.html', 'index', 1),
-  ('Accomplishments', 'accomplishments.html', 'accomplishments', 2),
-  ('Arrangements', 'arrangements.html', 'arrangements', 3);
+  ('Home', '/', 'home', 1),
+  ('Projects', '/projects', 'projects', 2),
+  ('Accomplishments', '/accomplishments.html', 'accomplishments', 3),
+  ('Arrangements', '/arrangements.html', 'arrangements', 4);
 
 INSERT OR IGNORE INTO site_settings (id, brand, labels_json, footer_json, updated_at)
 VALUES (
   'site',
-  'LIEM VORA',
+  'δ',
   '{"projectLink":"Visit website","arrangementLink":"View arrangement","emptyArrangements":"Arrangements will be added here."}',
-  '{"label":"LIEM VORA","note":"MADE WITH CARE","year":"2026"}',
+  '{"label":"δ","note":"MADE WITH CARE","year":"2026"}',
   CURRENT_TIMESTAMP
 );

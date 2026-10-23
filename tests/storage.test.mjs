@@ -5,9 +5,10 @@ import { buildSiteContentStatements } from "../functions/_shared/site-storage.js
 const content = {
   brand: "LIEM VORA",
   navigation: [
-    { label: "Projects", href: "index.html", page: "projects" },
-    { label: "Accomplishments", href: "accomplishments.html", page: "accomplishments" },
-    { label: "Arrangements", href: "arrangements.html", page: "arrangements" }
+    { label: "Home", href: "/", page: "home" },
+    { label: "Projects", href: "/projects", page: "projects" },
+    { label: "Accomplishments", href: "/accomplishments.html", page: "accomplishments" },
+    { label: "Arrangements", href: "/arrangements.html", page: "arrangements" }
   ],
   labels: {
     projectLink: "Visit website",
@@ -15,6 +16,16 @@ const content = {
     emptyArrangements: "Arrangements will be added here."
   },
   pages: {
+    home: {
+      metaTitle: "Liem Vora",
+      metaDescription: "Personal website",
+      eyebrow: "",
+      title: "Liem Vora",
+      titleAccent: "",
+      description: "",
+      sectionTitle: "",
+      items: []
+    },
     projects: {
       metaTitle: "Projects",
       metaDescription: "Projects",
@@ -72,11 +83,12 @@ test("writes pages, ordered JSON blocks, navigation, and settings", () => {
   assert.equal(statements[0].sql, "DELETE FROM blocks");
   assert.equal(statements[1].sql, "DELETE FROM nav_items");
   assert.equal(statements[2].sql, "DELETE FROM pages");
-  assert.equal(pages.length, 3);
+  assert.equal(pages.length, 4);
   assert.equal(blocks.length, 3);
-  assert.equal(navigation.length, 3);
+  assert.equal(navigation.length, 4);
   assert.deepEqual(pages.map(({ values }) => values.slice(0, 2)), [
-    ["projects", "index"],
+    ["home", "home"],
+    ["projects", "projects"],
     ["accomplishments", "accomplishments"],
     ["arrangements", "arrangements"]
   ]);
@@ -86,8 +98,9 @@ test("writes pages, ordered JSON blocks, navigation, and settings", () => {
     ["accomplishments", 1, "accomplishment"]
   ]);
   assert.deepEqual(navigation.map(({ values }) => values.slice(0, 3)), [
-    ["Projects", "index.html", "index"],
-    ["Accomplishments", "accomplishments.html", "accomplishments"],
-    ["Arrangements", "arrangements.html", "arrangements"]
+    ["Home", "/", "home"],
+    ["Projects", "/projects", "projects"],
+    ["Accomplishments", "/accomplishments.html", "accomplishments"],
+    ["Arrangements", "/arrangements.html", "arrangements"]
   ]);
 });

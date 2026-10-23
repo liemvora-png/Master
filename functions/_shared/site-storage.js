@@ -1,10 +1,12 @@
 const PAGE_SLUGS = {
-  projects: "index",
+  home: "home",
+  projects: "projects",
   accomplishments: "accomplishments",
   arrangements: "arrangements"
 };
 
 const BLOCK_TYPES = {
+  home: null,
   projects: "project",
   accomplishments: "accomplishment",
   arrangements: "arrangement"
@@ -64,7 +66,7 @@ export async function readSiteContent(db) {
 
   for (const block of rows(blockResult)) {
     const page = content.pages[block.page_id];
-    if (!page || block.type !== BLOCK_TYPES[block.page_id]) {
+    if (!page || !BLOCK_TYPES[block.page_id] || block.type !== BLOCK_TYPES[block.page_id]) {
       throw new Error(`Unexpected content block for page ${block.page_id}.`);
     }
     page.items.push(JSON.parse(block.content));

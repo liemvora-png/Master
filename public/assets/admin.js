@@ -5,6 +5,7 @@ const saveButton = document.querySelector("#save-content");
 const reloadButton = document.querySelector("#reload-content");
 
 const SECTIONS = [
+  { id: "home", label: "Home" },
   { id: "site", label: "Site settings" },
   { id: "projects", label: "Projects" },
   { id: "accomplishments", label: "Accomplishments" },
@@ -17,6 +18,11 @@ const PAGE_FIELDS = [
   ["titleAccent", "Heading accent"],
   ["description", "Short introduction"],
   ["sectionTitle", "List heading"],
+  ["metaTitle", "Browser title"],
+  ["metaDescription", "Search description"]
+];
+const HOME_FIELDS = [
+  ["title", "Home title"],
   ["metaTitle", "Browser title"],
   ["metaDescription", "Search description"]
 ];
@@ -157,13 +163,16 @@ function renderSiteSettings() {
 
 function renderPage(sectionId) {
   const page = content.pages[sectionId];
+  const isHome = sectionId === "home";
   const isProjects = sectionId === "projects";
   const isAccomplishments = sectionId === "accomplishments";
   const section = document.createElement("section");
   section.className = "editor-page";
   section.append(makePanelHeading(
-    page.sectionTitle,
-    `Edit this page's text and manage its ${isProjects ? "projects" : isAccomplishments ? "highlights" : "arrangements"}.`
+    isHome ? "Home page" : page.sectionTitle,
+    isHome
+      ? "Set the title and search text for your home page."
+      : `Edit this page's text and manage its ${isProjects ? "projects" : isAccomplishments ? "highlights" : "arrangements"}.`
   ));
 
   const pageCopy = document.createElement("details");
@@ -174,7 +183,7 @@ function renderPage(sectionId) {
 
   const fields = document.createElement("div");
   fields.className = "editor-settings-grid";
-  for (const [key, label] of PAGE_FIELDS) {
+  for (const [key, label] of (isHome ? HOME_FIELDS : PAGE_FIELDS)) {
     fields.append(makeField({
       label,
       value: page[key],
@@ -185,12 +194,14 @@ function renderPage(sectionId) {
   pageCopy.append(fields);
   section.append(pageCopy);
 
-  const itemLabel = isProjects ? "Projects" : isAccomplishments ? "Highlights" : "Arrangements";
-  const description = document.createElement("p");
-  description.className = "editor-collection-intro";
-  description.textContent = `${page.items.length} ${page.items.length === 1 ? "entry" : "entries"}. Add, edit, or reorder the items displayed on this page.`;
-  section.append(description);
-  renderItems(section, page.items, ["pages", sectionId, "items"], sectionId);
+  const itemLabel = isHome ? "Home" : isProjects ? "Projects" : isAccomplishments ? "Highlights" : "Arrangements";
+  if (!isHome) {
+    const description = document.createElement("p");
+    description.className = "editor-collection-intro";
+    description.textContent = `${page.items.length} ${page.items.length === 1 ? "entry" : "entries"}. Add, edit, or reorder the items displayed on this page.`;
+    section.append(description);
+    renderItems(section, page.items, ["pages", sectionId, "items"], sectionId);
+  }
   editor.append(section);
 
   const preview = document.createElement("aside");
@@ -210,6 +221,7 @@ function renderPreview(container, page, sectionId) {
   const eyebrow = document.createElement("p");
   eyebrow.className = "eyebrow";
   eyebrow.textContent = page.eyebrow;
+  eyebrow.hidden = !page.eyebrow;
   const title = document.createElement("h3");
   title.className = "editor-preview-title";
   title.append(document.createTextNode(`${page.title} `));
@@ -237,15 +249,24 @@ function renderPreview(container, page, sectionId) {
     detail.className = "editor-preview-detail";
     detail.textContent = item.description || item.detail || item.category || item.instrument || "";
     row.append(detail);
+    if (item.date) {
+      const date = document.createElement("time");
+      date.className = "editor-preview-detail";
+      date.dateTime = item.date;
+      date.textContent = item.date;
+      row.append(date);
+    }
     list.append(row);
   });
-  if (page.items.length === 0) {
+  if (page.items.length === 0 && sectionId !== "home") {
     const empty = document.createElement("p");
     empty.className = "editor-preview-description";
-    empty.textContent = content.labels.emptyArrangements;
+    empty.textContent = sectionId === "accomplishments"
+      ? "Accomplishments will be added here."
+      : content.labels.emptyArrangements;
     list.append(empty);
   }
-  preview.append(list);
+  if (sectionId !== "home") preview.append(list);
   container.append(label, preview);
 }
 
@@ -275,7 +296,7 @@ function renderItems(container, items, path, sectionId) {
         ? ["name", "description", "category", "url"]
         : sectionId === "accomplishments"
           ? ["name", "detail"]
-          : ["name", "description", "instrument", "url"];
+          : ["name", "date", "description", "instrument", "url"];
 
     for (const key of keys) {
       const options = key === "page"
@@ -289,6 +310,7 @@ function renderItems(container, items, path, sectionId) {
         description: "Description",
         category: "Category",
         detail: "Detail",
+        date: "Date",
         instrument: "Instrument",
         url: "Link",
         href: "Destination",
@@ -303,6 +325,7 @@ function renderItems(container, items, path, sectionId) {
         value: item[key] ?? "",
         path: [...itemPath, key],
         multiline: ["description", "detail"].includes(key),
+        type: key === "date" ? "date" : "text",
         options
       }));
     }
@@ -354,7 +377,7 @@ function newArrayItem(path) {
   if (path[0] !== "pages" || path[2] !== "items") return null;
   if (path[1] === "projects") return { name: "", description: "", category: "", url: "" };
   if (path[1] === "accomplishments") return { name: "", detail: "" };
-  if (path[1] === "arrangements") return { name: "", description: "", instrument: "", url: "" };
+  if (path[1] === "arrangements") return { name: "", date: "", description: "", instrument: "", url: "" };
   return null;
 }
 

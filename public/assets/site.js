@@ -1,4 +1,4 @@
-const PAGE_FILES = new Set(["index.html", "accomplishments.html", "arrangements.html"]);
+const PAGE_FILES = new Set(["index.html", "projects.html", "accomplishments.html", "arrangements.html"]);
 
 function setText(target, value) {
   if (target && typeof value === "string") target.textContent = value;
@@ -39,10 +39,13 @@ function updatePageHeading(page) {
     const textNode = nodes.find((node) => node.nodeType === Node.TEXT_NODE);
     if (textNode) textNode.textContent = page.title;
     setText(accent, page.titleAccent);
+  } else {
+    setText(title, `${page.title}${page.titleAccent}`);
   }
 
   const eyebrow = document.querySelector(".eyebrow");
   if (eyebrow) {
+    eyebrow.hidden = !page.eyebrow;
     const dot = eyebrow.querySelector(".status-dot");
     eyebrow.replaceChildren();
     if (dot) eyebrow.append(dot);
@@ -74,6 +77,14 @@ function renderProjects(items, labels) {
   const list = document.querySelector(".project-list");
   if (!list) return;
   list.replaceChildren();
+
+  if (items.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "Projects will be added here.";
+    list.append(empty);
+    return;
+  }
 
   items.forEach((item, index) => {
     const project = document.createElement("a");
@@ -115,6 +126,14 @@ function renderAccomplishments(items) {
   const list = document.querySelector(".accomplishment-list");
   if (!list) return;
   list.replaceChildren();
+
+  if (items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "empty-state";
+    empty.textContent = "Accomplishments will be added here.";
+    list.append(empty);
+    return;
+  }
 
   items.forEach((item, index) => {
     const row = document.createElement("li");
@@ -165,11 +184,28 @@ function renderArrangements(items, labels) {
     details.append(name, description);
     row.append(number, details);
 
-    if (item.instrument) {
-      const instrument = document.createElement("span");
-      instrument.className = "accomplishment-detail";
-      instrument.textContent = item.instrument;
-      row.append(instrument);
+    if (item.instrument || item.date) {
+      const metadata = document.createElement("span");
+      metadata.className = "arrangement-meta";
+      if (item.instrument) {
+        const instrument = document.createElement("span");
+        instrument.className = "accomplishment-detail";
+        instrument.textContent = item.instrument;
+        metadata.append(instrument);
+      }
+      if (item.date) {
+        const date = document.createElement("time");
+        date.className = "accomplishment-detail arrangement-date";
+        date.dateTime = item.date;
+        const parsedDate = new Date(`${item.date}T00:00:00`);
+        date.textContent = parsedDate.toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric"
+        });
+        metadata.append(date);
+      }
+      row.append(metadata);
     }
     if (item.url) {
       const href = safeHref(item.url);

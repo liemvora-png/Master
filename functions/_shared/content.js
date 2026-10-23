@@ -1,5 +1,5 @@
-const PAGE_NAMES = ["projects", "accomplishments", "arrangements"];
-const PAGE_FILES = new Set(["index.html", "accomplishments.html", "arrangements.html"]);
+const PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements"];
+const PAGE_FILES = new Set(["index.html", "projects.html", "accomplishments.html", "arrangements.html"]);
 
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -23,6 +23,7 @@ function isLink(value, allowPageLinks = false) {
 
 function validItems(pageName, items) {
   if (!Array.isArray(items) || items.length > 100) return false;
+  if (pageName === "home") return items.length === 0;
 
   return items.every((item) => {
     if (!isRecord(item)) return false;
@@ -41,8 +42,15 @@ function validItems(pageName, items) {
     return isText(item.name, 160)
       && (item.description === undefined || item.description === "" || isText(item.description, 500))
       && (item.instrument === undefined || item.instrument === "" || isText(item.instrument, 120))
-      && (item.url === undefined || item.url === "" || isLink(item.url));
+      && (item.url === undefined || item.url === "" || isLink(item.url))
+      && (item.date === undefined || item.date === "" || isDate(item.date));
   });
+}
+
+function isDate(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 export function validateContent(content) {
@@ -76,14 +84,19 @@ export function validateContent(content) {
 
   for (const pageName of PAGE_NAMES) {
     const page = content.pages[pageName];
+    const isHome = pageName === "home";
     if (!isRecord(page)
       || !isText(page.metaTitle, 160)
       || !isText(page.metaDescription, 300)
-      || !isText(page.eyebrow, 120)
       || !isText(page.title, 160)
-      || !isText(page.titleAccent, 160)
-      || !isText(page.description, 500)
-      || !isText(page.sectionTitle, 120)
+      || (!isHome && !isText(page.eyebrow, 120))
+      || (isHome && page.eyebrow !== "")
+      || (!isHome && !isText(page.titleAccent, 160))
+      || (isHome && page.titleAccent !== "")
+      || (!isHome && !isText(page.description, 500))
+      || (isHome && page.description !== "")
+      || (!isHome && !isText(page.sectionTitle, 120))
+      || (isHome && page.sectionTitle !== "")
       || !validItems(pageName, page.items)) {
       return `Check the fields and items for the ${pageName} page.`;
     }

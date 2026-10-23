@@ -4,8 +4,10 @@ import { onRequest as adminContent } from "../functions/api/admin/content.js";
 import { onRequest as publicContent } from "../functions/api/content.js";
 
 const PAGE_ROUTES = new Map([
-  ["/", "index"],
-  ["/index.html", "index"],
+  ["/", "home"],
+  ["/index.html", "home"],
+  ["/projects", "projects"],
+  ["/projects.html", "projects"],
   ["/accomplishments", "accomplishments"],
   ["/accomplishments.html", "accomplishments"],
   ["/arrangements", "arrangements"],

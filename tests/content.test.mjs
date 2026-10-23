@@ -6,7 +6,8 @@ import { validateContent } from "../functions/_shared/content.js";
 const validContent = {
   brand: "LIEM VORA",
   navigation: [
-    { label: "Projects", href: "index.html", page: "projects" },
+    { label: "Home", href: "/", page: "home" },
+    { label: "Projects", href: "/projects", page: "projects" },
     { label: "Accomplishments", href: "accomplishments.html", page: "accomplishments" },
     { label: "Arrangements", href: "arrangements.html", page: "arrangements" }
   ],
@@ -16,6 +17,16 @@ const validContent = {
     emptyArrangements: "Arrangements will be added here."
   },
   pages: {
+    home: {
+      metaTitle: "Liem Vora",
+      metaDescription: "Personal website",
+      eyebrow: "",
+      title: "Liem Vora",
+      titleAccent: "",
+      description: "",
+      sectionTitle: "",
+      items: []
+    },
     projects: {
       metaTitle: "Projects",
       metaDescription: "Projects description",
@@ -63,9 +74,13 @@ test("migration seed matches the supported content model", () => {
   assert.match(migration, /INSERT OR IGNORE INTO blocks/);
   assert.match(migration, /INSERT OR IGNORE INTO nav_items/);
   assert.match(migration, /INSERT OR IGNORE INTO site_settings/);
-  assert.match(migration, /'projects', 'index'/);
-  assert.match(migration, /'accomplishments', 5, 'accomplishment'/);
-  assert.match(migration, /'Arrangements', 'arrangements\.html', 'arrangements', 3/);
+  assert.match(migration, /'home', 'home'/);
+  assert.match(migration, /'projects', 'projects'/);
+  assert.doesNotMatch(migration, /'accomplishments', \d+, 'accomplishment'/);
+  assert.match(migration, /'Arrangements', '\/arrangements\.html', 'arrangements', 4/);
+  const upgrade = readFileSync(new URL("../migrations/0002_home_projects_empty_accomplishments.sql", import.meta.url), "utf8");
+  assert.match(upgrade, /DELETE FROM blocks\s+WHERE page_id = 'accomplishments'/);
+  assert.match(upgrade, /UPDATE pages\s+SET slug = 'projects'/);
 });
 
 test("rejects unsafe project URLs", () => {
@@ -76,7 +91,7 @@ test("rejects unsafe project URLs", () => {
 
 test("rejects duplicate navigation targets", () => {
   const content = structuredClone(validContent);
-  content.navigation[1].page = "projects";
+  content.navigation[2].page = "projects";
   assert.match(validateContent(content), /Navigation entries/);
 });
 
@@ -102,4 +117,19 @@ test("allows an arrangement to be saved with only its title", () => {
   const content = structuredClone(validContent);
   content.pages.arrangements.items = [{ name: "Sonata" }];
   assert.equal(validateContent(content), null);
+});
+
+test("accepts valid optional arrangement dates and rejects invalid dates", () => {
+  const content = structuredClone(validContent);
+  content.pages.arrangements.items = [{ name: "Sonata", date: "2025-02-28" }];
+  assert.equal(validateContent(content), null);
+
+  content.pages.arrangements.items[0].date = "2025-02-30";
+  assert.match(validateContent(content), /arrangements page/);
+});
+
+test("requires the home page to remain title-only", () => {
+  const content = structuredClone(validContent);
+  content.pages.home.items = [{ name: "Unexpected entry" }];
+  assert.match(validateContent(content), /home page/);
 });
