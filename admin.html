@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1e9">
+    <meta name="description" content="Private content editor for Liem Vora's website.">
+    <title>Liem Vora — Site editor</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="assets/admin.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="index.html" aria-label="Liem Vora home">LIEM VORA<span>.</span></a>
+      <a class="admin-back-link" href="index.html">View public site ↗</a>
+    </header>
+
+    <main id="main" class="admin-main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Private editor</p>
+        <h1 id="page-title">Manage the<br><span>site content.</span></h1>
+        <p class="intro-copy">Edit page copy, navigation, projects, accomplishments, and arrangements below. Changes publish to the live site when saved.</p>
+      </section>
+
+      <section aria-labelledby="editor-title">
+        <div class="section-heading">
+          <h2 id="editor-title">Content document</h2>
+          <span class="project-count">JSON</span>
+        </div>
+        <p id="editor-help" class="editor-help">Update labeled fields below. Use the add and remove controls to manage projects, accomplishments, arrangements, and navigation items.</p>
+        <div id="content-editor" class="content-editor" aria-describedby="editor-help editor-status"></div>
+        <p id="editor-status" class="editor-status" role="status" aria-live="polite">Loading site content…</p>
+        <div class="editor-actions">
+          <button class="editor-button editor-button-secondary" id="reload-content" type="button">Reload</button>
+          <button class="editor-button" id="save-content" type="button">Save changes</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>LIEM VORA</span>
+      <span>PRIVATE EDITOR <span class="footer-dot" aria-hidden="true">·</span> 2026</span>
+    </footer>
+  </body>
+</html>
