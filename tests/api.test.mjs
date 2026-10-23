@@ -137,8 +137,14 @@ test("content API rejects unsupported methods and unauthenticated edits", async 
   assert.equal(unauthenticatedWrite.status, 401);
 });
 
-test("Worker routes APIs and falls back to static assets", async () => {
-  const { default: worker } = await import("../functions/worker.js");
+test("Worker serves private page templates and falls back to public assets", async () => {
+  const { createWorker } = await import("../src/worker-handler.js");
+  const worker = createWorker({
+    index: "<html>home template</html>",
+    accomplishments: "<html>accomplishment template</html>",
+    arrangements: "<html>arrangement template</html>",
+    admin: "<html>private editor</html>"
+  });
   const calls = [];
   const env = {
     DB: {
@@ -180,6 +186,28 @@ test("Worker routes APIs and falls back to static assets", async () => {
     env,
     {}
   );
-  assert.equal(await pageResponse.text(), "static page");
-  assert.deepEqual(calls, ["/accomplishments.html"]);
+  assert.match(pageResponse.headers.get("Content-Type"), /text\/html/);
+  assert.equal(await pageResponse.text(), "<html>accomplishment template</html>");
+
+  const homeResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/"),
+    env,
+    {}
+  );
+  assert.equal(await homeResponse.text(), "<html>home template</html>");
+
+  const adminResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/admin"),
+    env,
+    {}
+  );
+  assert.equal(adminResponse.status, 503);
+
+  const staticResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/assets/site.js"),
+    env,
+    {}
+  );
+  assert.equal(await staticResponse.text(), "static page");
+  assert.deepEqual(calls, ["/assets/site.js"]);
 });

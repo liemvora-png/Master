@@ -6,6 +6,7 @@ functions
 migrations
 tests
 wrangler.jsonc
+src
 package.json
 package-lock.json
 node_modules
