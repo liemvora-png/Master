@@ -93,14 +93,25 @@ a:focus-visible {
 }
 
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.wordmark-symbol {
   font-family: var(--serif);
-  font-size: 1.5rem;
+  font-size: 1.55rem;
   font-weight: 400;
-  letter-spacing: 0;
   line-height: 1;
 }
 
-.wordmark span,
+.wordmark-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+}
+
+.wordmark-symbol,
 .status-dot,
 .footer-dot {
   color: var(--olive);

@@ -72,7 +72,7 @@ VALUES
 INSERT OR IGNORE INTO site_settings (id, brand, labels_json, footer_json, updated_at)
 VALUES (
   'site',
-  'δ',
+  'Liem Vora',
   '{"projectLink":"Visit website","arrangementLink":"View arrangement","emptyArrangements":"Arrangements will be added here."}',
   '{"label":"δ","note":"MADE WITH CARE","year":"2026"}',
   CURRENT_TIMESTAMP

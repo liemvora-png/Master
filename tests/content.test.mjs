@@ -76,11 +76,15 @@ test("migration seed matches the supported content model", () => {
   assert.match(migration, /INSERT OR IGNORE INTO site_settings/);
   assert.match(migration, /'home', 'home'/);
   assert.match(migration, /'projects', 'projects'/);
+  assert.match(migration, /'Liem Vora',\s*'["{]/);
   assert.doesNotMatch(migration, /'accomplishments', \d+, 'accomplishment'/);
   assert.match(migration, /'Arrangements', '\/arrangements\.html', 'arrangements', 4/);
   const upgrade = readFileSync(new URL("../migrations/0002_home_projects_empty_accomplishments.sql", import.meta.url), "utf8");
   assert.match(upgrade, /DELETE FROM blocks\s+WHERE page_id = 'accomplishments'/);
   assert.match(upgrade, /UPDATE pages\s+SET slug = 'projects'/);
+  const brandingUpgrade = readFileSync(new URL("../migrations/0003_separate_logo_and_site_name.sql", import.meta.url), "utf8");
+  assert.match(brandingUpgrade, /SET brand = 'Liem Vora'/);
+  assert.match(brandingUpgrade, /AND brand = 'δ'/);
 });
 
 test("rejects unsafe project URLs", () => {

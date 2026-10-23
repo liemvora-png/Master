@@ -18,6 +18,8 @@ The D1 database ID is already set in `wrangler.jsonc`. For a new database, creat
 
 For an existing database created with the earlier seed, run [`migrations/0002_home_projects_empty_accomplishments.sql`](migrations/0002_home_projects_empty_accomplishments.sql) once. It adds the home page, moves the projects slug and navigation to `/projects`, replaces the navigation with the four default links, removes the seeded accomplishments so they can be managed in the editor, and updates the shared brand to `δ`.
 
+To separate the lowercase delta logo from the site name in the header, run [`migrations/0003_separate_logo_and_site_name.sql`](migrations/0003_separate_logo_and_site_name.sql) once after migration 0002. It changes the default site name from `δ` to `Liem Vora`; your custom site name is preserved if you already changed it.
+
 The fresh seed contains 4 pages (`home`, `projects`, `accomplishments`, `arrangements`), 2 project blocks, no accomplishment blocks, and 4 navigation links. `blocks.content` stores each item as JSON text and `blocks.type` identifies whether the item is a project, accomplishment, or arrangement. These console checks should work as written:
 
 ```sql

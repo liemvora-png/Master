@@ -233,15 +233,7 @@ async function loadManagedContent() {
 
     updateNavigation(content, currentPage);
     updatePageHeading(page);
-    const wordmark = document.querySelector(".wordmark");
-    if (wordmark) {
-      const dot = wordmark.querySelector("span");
-      wordmark.replaceChildren(document.createTextNode(content.brand));
-      if (dot) {
-        dot.textContent = ".";
-        wordmark.append(dot);
-      }
-    }
+    setText(document.querySelector(".wordmark-name"), content.brand);
     setText(document.querySelector(".site-footer > span:first-child"), content.footer.label);
     const footerNote = document.querySelector(".site-footer > span:last-child");
     if (footerNote) {

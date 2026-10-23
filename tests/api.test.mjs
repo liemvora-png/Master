@@ -354,6 +354,8 @@ test("admin page provides visual sections and item controls instead of a JSON pa
   assert.match(script, /href="\/styles\.css"/);
   assert.match(script, /class="project-list"/);
   assert.match(script, /class="accomplishment-list"/);
+  assert.match(script, /class="wordmark-symbol"/);
+  assert.match(script, /class="wordmark-name"/);
   assert.match(script, /Add project/);
   assert.match(script, /Add highlight/);
   assert.match(script, /Add arrangement/);
