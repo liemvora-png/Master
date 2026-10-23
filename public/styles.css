@@ -806,70 +806,21 @@ h1 span {
   background: var(--paper);
 }
 
+.editor-preview-frame {
+  display: block;
+  width: 100%;
+  height: min(72vh, 760px);
+  min-height: 560px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
 .editor-preview-label {
   margin-bottom: 0.7rem;
   color: var(--olive);
   font-family: var(--mono);
   font-size: 0.62rem;
   letter-spacing: 0.12em;
-}
-
-.editor-preview-card {
-  padding: clamp(1rem, 2vw, 1.5rem);
-  border: 1px solid var(--line);
-  background: #fffdf8;
-}
-
-.editor-preview-card .eyebrow {
-  margin-bottom: 0.75rem;
-  font-size: 0.55rem;
-}
-
-.editor-preview-title {
-  margin: 0 0 0.65rem;
-  font-family: var(--serif);
-  font-size: clamp(1.6rem, 3vw, 2.5rem);
-  font-weight: 400;
-  letter-spacing: -0.045em;
-  line-height: 1.05;
-}
-
-.editor-preview-title span {
-  color: var(--olive);
-}
-
-.editor-preview-description {
-  color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.7;
-}
-
-.editor-preview-list {
-  margin-top: 1rem;
-  border-top: 1px solid var(--line);
-}
-
-.editor-preview-item {
-  display: grid;
-  grid-template-columns: 1.6rem minmax(0, 1fr);
-  gap: 0.2rem 0.6rem;
-  padding-block: 0.7rem;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.78rem;
-}
-
-.editor-preview-number,
-.editor-preview-detail {
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
-}
-
-.editor-preview-detail {
-  grid-column: 2;
-  font-family: var(--sans);
-  font-size: 0.7rem;
 }
 
 @media (max-width: 700px) {

@@ -30,6 +30,7 @@ const HOME_FIELDS = [
 let content;
 let activeSection = "site";
 let dirty = false;
+let previewFrame;
 
 function setStatus(message, state = "") {
   status.textContent = message;
@@ -214,60 +215,88 @@ function renderPage(sectionId) {
 function renderPreview(container, page, sectionId) {
   const label = document.createElement("p");
   label.className = "editor-preview-label";
-  label.textContent = "LIVE PREVIEW";
-  const preview = document.createElement("div");
-  preview.className = "editor-preview-card";
-
-  const eyebrow = document.createElement("p");
-  eyebrow.className = "eyebrow";
-  eyebrow.textContent = page.eyebrow;
-  eyebrow.hidden = !page.eyebrow;
-  const title = document.createElement("h3");
-  title.className = "editor-preview-title";
-  title.append(document.createTextNode(`${page.title} `));
-  const accent = document.createElement("span");
-  accent.textContent = page.titleAccent;
-  title.append(accent);
-  const description = document.createElement("p");
-  description.className = "editor-preview-description";
-  description.textContent = page.description;
-  preview.append(eyebrow, title, description);
-
-  const list = document.createElement("div");
-  list.className = "editor-preview-list";
-  page.items.forEach((item, index) => {
-    const row = document.createElement("div");
-    row.className = "editor-preview-item";
-    const number = document.createElement("span");
-    number.className = "editor-preview-number";
-    number.textContent = String(index + 1).padStart(2, "0");
-    const titleText = document.createElement("span");
-    titleText.textContent = item.name;
-    row.append(number, titleText);
-
-    const detail = document.createElement("span");
-    detail.className = "editor-preview-detail";
-    detail.textContent = item.description || item.detail || item.category || item.instrument || "";
-    row.append(detail);
-    if (item.date) {
-      const date = document.createElement("time");
-      date.className = "editor-preview-detail";
-      date.dateTime = item.date;
-      date.textContent = item.date;
-      row.append(date);
-    }
-    list.append(row);
+  label.textContent = "RESPONSIVE SITE PREVIEW";
+  previewFrame = document.createElement("iframe");
+  previewFrame.className = "editor-preview-frame";
+  previewFrame.title = `${sectionId} page preview`;
+  previewFrame.loading = "eager";
+  const frame = previewFrame;
+  previewFrame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base href="${window.location.origin}/"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css"><style>html,body{min-width:320px}body{min-height:100vh}</style></head><body><div id="site-preview"></div></body></html>`;
+  previewFrame.addEventListener("load", () => {
+    if (previewFrame === frame) refreshPreviewFrame(sectionId);
   });
-  if (page.items.length === 0 && sectionId !== "home") {
-    const empty = document.createElement("p");
-    empty.className = "editor-preview-description";
-    empty.textContent = sectionId === "accomplishments"
-      ? "Accomplishments will be added here."
-      : content.labels.emptyArrangements;
-    list.append(empty);
+  container.append(label, previewFrame);
+  refreshPreviewFrame(sectionId);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+function renderPreviewMarkup(page, sectionId) {
+  const navigation = content.navigation.map((item) => (
+    `<a href="${escapeHtml(safePreviewHref(item.href))}"${item.page === sectionId ? ' aria-current="page"' : ""}>${escapeHtml(item.label)}</a>`
+  )).join("");
+  const adminLink = ["home", "projects"].includes(sectionId)
+    ? '<a class="admin-entry-button" href="/admin">Admin <span aria-hidden="true">↗</span></a>'
+    : "";
+  const eyebrow = page.eyebrow
+    ? `<p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> ${escapeHtml(page.eyebrow)}</p>`
+    : "";
+  const heading = `<h1 id="page-title">${escapeHtml(page.title)}${page.titleAccent ? `<br><span>${escapeHtml(page.titleAccent)}</span>` : ""}</h1>`;
+  const description = page.description ? `<p class="intro-copy">${escapeHtml(page.description)}</p>` : "";
+  let section = "";
+
+  if (sectionId === "projects") {
+    const projects = page.items.length
+      ? page.items.map((item, index) => `<a class="project" href="${escapeHtml(safePreviewHref(item.url))}" aria-label="Visit ${escapeHtml(item.name)}, ${escapeHtml(item.description)}"><span class="project-number">${String(index + 1).padStart(2, "0")}</span><span class="project-info"><span class="project-name">${escapeHtml(item.name)}</span><span class="project-description">${escapeHtml(item.description)}</span></span><span class="project-category">${escapeHtml(item.category)}</span><span class="project-link">${escapeHtml(content.labels.projectLink)} <span aria-hidden="true">↗</span></span></a>`).join("")
+      : '<p class="empty-state">Projects will be added here.</p>';
+    section = `<section class="projects" aria-labelledby="projects-title"><div class="section-heading"><h2 id="projects-title">${escapeHtml(page.sectionTitle)}</h2><span class="project-count">${String(page.items.length).padStart(2, "0")} PROJECTS</span></div><div class="project-list">${projects}</div></section>`;
+  } else if (sectionId === "accomplishments") {
+    const items = page.items.length
+      ? page.items.map((item, index) => `<li class="accomplishment"><span class="accomplishment-number">${String(index + 1).padStart(2, "0")}</span><span class="accomplishment-name">${escapeHtml(item.name)}</span><span class="accomplishment-detail">${escapeHtml(item.detail)}</span></li>`).join("")
+      : '<li class="empty-state">Accomplishments will be added here.</li>';
+    section = `<section aria-labelledby="accomplishments-title"><div class="section-heading"><h2 id="accomplishments-title">${escapeHtml(page.sectionTitle)}</h2><span class="project-count">${String(page.items.length).padStart(2, "0")} HIGHLIGHTS</span></div><ul class="accomplishment-list">${items}</ul></section>`;
+  } else if (sectionId === "arrangements") {
+    const items = page.items.length
+      ? page.items.map((item, index) => {
+        const metadata = [
+          item.instrument ? `<span class="accomplishment-detail">${escapeHtml(item.instrument)}</span>` : "",
+          item.date ? `<time class="accomplishment-detail arrangement-date" datetime="${escapeHtml(item.date)}">${escapeHtml(new Date(`${item.date}T00:00:00`).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }))}</time>` : ""
+        ].filter(Boolean).join("");
+        const link = item.url && safePreviewHref(item.url)
+          ? `<a class="project-link" href="${escapeHtml(safePreviewHref(item.url))}">${escapeHtml(content.labels.arrangementLink)} ↗</a>`
+          : "";
+        return `<li class="accomplishment arrangement"><span class="accomplishment-number">${String(index + 1).padStart(2, "0")}</span><span class="project-info"><span class="accomplishment-name">${escapeHtml(item.name)}</span><span class="project-description">${escapeHtml(item.description)}</span></span>${metadata ? `<span class="arrangement-meta">${metadata}</span>` : ""}${link}</li>`;
+      }).join("")
+      : `<p class="empty-state">${escapeHtml(content.labels.emptyArrangements)}</p>`;
+    section = `<section aria-labelledby="arrangements-title"><div class="section-heading"><h2 id="arrangements-title">${escapeHtml(page.sectionTitle)}</h2><span class="project-count">${page.items.length ? `${String(page.items.length).padStart(2, "0")} ARRANGEMENTS` : "IN PROGRESS"}</span></div>${page.items.length ? `<ul class="accomplishment-list">${items}</ul>` : items}</section>`;
   }
-  if (sectionId !== "home") preview.append(list);
-  container.append(label, preview);
+
+  return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home">${escapeHtml(content.brand)}</a><nav class="site-nav" aria-label="Main navigation">${navigation}</nav>${adminLink}</header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;
+}
+
+function safePreviewHref(value) {
+  if (typeof value !== "string") return "#";
+  if (["index.html", "projects.html", "accomplishments.html", "arrangements.html"].includes(value)) return value;
+  if (value.startsWith("/") && !value.startsWith("//") && !value.includes("\\")) return value;
+  try {
+    return new URL(value).protocol === "https:" ? value : "#";
+  } catch {
+    return "#";
+  }
+}
+
+function refreshPreviewFrame(sectionId) {
+  const previewRoot = previewFrame?.contentDocument?.querySelector("#site-preview");
+  if (!previewRoot || !content) return;
+  previewRoot.innerHTML = renderPreviewMarkup(content.pages[sectionId], sectionId);
 }
 
 function renderItems(container, items, path, sectionId) {
@@ -383,12 +412,7 @@ function newArrayItem(path) {
 
 function updatePreview() {
   if (activeSection !== "site") {
-    const preview = editor.querySelector(".editor-preview");
-    if (preview) {
-      const page = content.pages[activeSection];
-      preview.replaceChildren();
-      renderPreview(preview, page, activeSection);
-    }
+    refreshPreviewFrame(activeSection);
   }
   const activeTab = tabs.querySelector('[aria-selected="true"]');
   const count = activeTab?.querySelector(".editor-tab-count");
