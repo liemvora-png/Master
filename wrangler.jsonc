@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "portfolio-content",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+      "database_id": "c8f201ef-8b43-49b7-8dc6-7bbc7c60f6f0"
     }
   ],
   "vars": {

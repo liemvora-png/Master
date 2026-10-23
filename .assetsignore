@@ -1,8 +1,13 @@
+.wrangler
 .git
 .github
+src
 functions
 migrations
 tests
-README.md
 wrangler.jsonc
+package.json
+package-lock.json
+node_modules
+README.md
 CNAME
