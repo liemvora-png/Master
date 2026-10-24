@@ -32,12 +32,120 @@ function availabilityDb({ booked = [] } = {}) {
   };
 }
 
+function encodeBase64Url(value) {
+  return Buffer.from(value).toString("base64url");
+}
+
+async function createAccessAssertion() {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+    true,
+    ["sign", "verify"]
+  );
+  const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+  publicKey.kid = "portfolio-test-key";
+  const header = encodeBase64Url(JSON.stringify({ alg: "RS256", kid: publicKey.kid }));
+  const payload = encodeBase64Url(JSON.stringify({
+    iss: "https://team.cloudflareaccess.com",
+    aud: "expected-audience",
+    exp: Math.floor(Date.now() / 1000) + 60
+  }));
+  const signingInput = `${header}.${payload}`;
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    keyPair.privateKey,
+    new TextEncoder().encode(signingInput)
+  );
+  return {
+    publicKey,
+    token: `${signingInput}.${Buffer.from(signature).toString("base64url")}`
+  };
+}
+
 test("availability returns open hourly slots and excludes reserved times", async () => {
   const db = availabilityDb({ booked: [{ lesson_time: "10:00" }] });
   assert.deepEqual(await getAvailableSlots(db, "2026-10-26"), [
     { time: "09:00" },
     { time: "11:00" }
   ]);
+});
+
+test("admin availability round-trips D1 integer flags through the editor save", async () => {
+  const { publicKey, token } = await createAccessAssertion();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ keys: [publicKey] }), {
+    headers: { "Content-Type": "application/json" }
+  });
+  const savedStatements = [];
+  const db = {
+    prepare(query) {
+      const all = async () => {
+        if (/FROM services/.test(query)) {
+          return { results: ["photography", "piano", "tutoring"].map((id) => ({
+            id, title: id, description: "", price: null, position: 1, active: 1
+          })) };
+        }
+        if (/FROM availability/.test(query)) {
+          return { results: [
+            { id: "weekly", day_of_week: 1, start_time: "09:00", end_time: "10:00", exception_date: null, is_available: 1 },
+            { id: "blocked", day_of_week: 2, start_time: "09:00", end_time: "10:00", exception_date: null, is_available: 0 }
+          ] };
+        }
+        return { results: [] };
+      };
+      return {
+        all,
+        bind(...values) {
+          return {
+            query,
+            values,
+            async all() {
+              return all();
+            }
+          };
+        }
+      };
+    },
+    async batch(statements) {
+      savedStatements.push(...statements);
+    }
+  };
+  const env = {
+    DB: db,
+    ACCESS_TEAM_DOMAIN: "team.cloudflareaccess.com",
+    ACCESS_AUD: "expected-audience"
+  };
+  const headers = { "Cf-Access-Jwt-Assertion": token };
+
+  try {
+    const loaded = await adminPortfolioRequest({
+      request: new Request("https://example.com/api/admin/portfolio", { headers }),
+      env
+    });
+    assert.equal(loaded.status, 200);
+    const portfolio = await loaded.json();
+    assert.deepEqual(portfolio.availability.map((entry) => entry.is_available), [true, false]);
+
+    const saved = await adminPortfolioRequest({
+      request: new Request("https://example.com/api/admin/portfolio", {
+        method: "PUT",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          services: ["photography", "piano", "tutoring"].map((id) => ({
+            id, title: id, description: "", price: null
+          })),
+          testPrepOptions: [],
+          availability: portfolio.availability
+        })
+      }),
+      env
+    });
+    assert.equal(saved.status, 200);
+    const availabilityInserts = savedStatements.filter((statement) => /INSERT INTO availability/.test(statement.query));
+    assert.deepEqual(availabilityInserts.map((statement) => statement.values[5]), [1, 0]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("availability validates dates and returns no slots for closed days", async () => {

@@ -32,7 +32,10 @@ async function readPortfolio(db) {
     services: services.results || [],
     testPrepOptions: subjects.results || [],
     gallery: gallery.results || [],
-    availability: availability.results || [],
+    availability: (availability.results || []).map((row) => ({
+      ...row,
+      is_available: row.is_available === 1
+    })),
     bookings: bookings.results || []
   };
 }
