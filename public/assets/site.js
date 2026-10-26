@@ -308,4 +308,70 @@ async function loadManagedContent() {
   }
 }
 
+const THEME_COLORS = { light: "#f4f1e9", dark: "#161814" };
+
+function currentTheme() {
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr === "dark" || attr === "light") return attr;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function storedTheme() {
+  try {
+    const value = localStorage.getItem("theme");
+    return value === "dark" || value === "light" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function updateThemeToggle(theme) {
+  const button = document.querySelector("[data-theme-toggle]");
+  if (!button) return;
+  const isDark = theme === "dark";
+  button.setAttribute("aria-pressed", String(isDark));
+  button.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
+  const icon = button.querySelector(".theme-toggle-icon");
+  if (icon) icon.textContent = isDark ? "☀" : "☾";
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = THEME_COLORS[theme];
+  updateThemeToggle(theme);
+}
+
+function initThemeToggle() {
+  const button = document.querySelector("[data-theme-toggle]");
+  if (!button) return;
+
+  const theme = currentTheme();
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = THEME_COLORS[theme];
+  updateThemeToggle(theme);
+
+  button.addEventListener("click", () => {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      /* ignore storage errors */
+    }
+    applyTheme(next);
+  });
+
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const onSystemChange = (event) => {
+    if (storedTheme()) return;
+    applyTheme(event.matches ? "dark" : "light");
+  };
+  if (typeof media.addEventListener === "function") {
+    media.addEventListener("change", onSystemChange);
+  } else if (typeof media.addListener === "function") {
+    media.addListener(onSystemChange);
+  }
+}
+
+initThemeToggle();
 loadManagedContent();

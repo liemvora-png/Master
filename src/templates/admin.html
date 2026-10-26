@@ -4,6 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f4f1e9">
+    <script>
+      (function () {
+        var theme = null;
+        try { theme = localStorage.getItem("theme"); } catch (e) {}
+        if (theme === "dark" || theme === "light") {
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+      })();
+    </script>
     <meta name="description" content="Private content editor for Liem Vora's website.">
     <title>Liem Vora — Site editor</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -27,7 +36,10 @@
         <a href="/services">Services</a>
         <a href="/gallery">Gallery</a>
       </nav>
-      <a class="admin-entry-button" href="/admin" aria-current="page">Admin <span aria-hidden="true">↗</span></a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>
+        <a class="admin-entry-button" href="/admin" aria-current="page">Admin <span aria-hidden="true">↗</span></a>
+      </div>
     </header>
 
     <main id="main" class="admin-main">
