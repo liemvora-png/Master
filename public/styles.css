@@ -1,17 +1,20 @@
 :root {
   color-scheme: light;
   --paper: #f4f1e9;
-  --paper-deep: #e9e5d9;
+  --paper-deep: #e7ddcd;
   --ink: #242820;
   --muted: #73766a;
   --olive: #58604b;
-  --line: rgba(36, 40, 32, 0.2);
+    --line: rgba(94, 74, 54, 0.22);
   --surface: #fffdf8;
   --danger: #9a3d2e;
   --danger-line: rgba(154, 61, 46, 0.35);
   --danger-soft: rgba(154, 61, 46, 0.08);
   --on-accent: #fff;
-  --sans: "DM Sans", "Helvetica Neue", sans-serif;
+    --brown: #8a5a3c;
+    --brown-deep: #6e4529;
+    --brown-line: rgba(138, 90, 60, 0.35);
+    --sans: "DM Sans", "Helvetica Neue", sans-serif;
   --serif: "Playfair Display", Georgia, serif;
   --mono: "DM Mono", ui-monospace, monospace;
 }
@@ -19,33 +22,39 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --paper: #161814;
-  --paper-deep: #1e211b;
+  --paper-deep: #211d17;
   --ink: #e7e5db;
   --muted: #979a8a;
   --olive: #a9b891;
-  --line: rgba(231, 229, 219, 0.16);
+  --line: rgba(214, 190, 150, 0.16);
   --surface: #1c1f19;
   --danger: #d98a7a;
   --danger-line: rgba(217, 138, 122, 0.4);
   --danger-soft: rgba(217, 138, 122, 0.12);
   --on-accent: #161814;
-}
+  --brown: #c19a6b;
+  --brown-deep: #d0ab7d;
+  --brown-line: rgba(193, 154, 107, 0.4);
+  }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --paper: #161814;
-    --paper-deep: #1e211b;
+      --paper-deep: #211d17;
     --ink: #e7e5db;
     --muted: #979a8a;
     --olive: #a9b891;
-    --line: rgba(231, 229, 219, 0.16);
+      --line: rgba(214, 190, 150, 0.16);
     --surface: #1c1f19;
     --danger: #d98a7a;
     --danger-line: rgba(217, 138, 122, 0.4);
     --danger-soft: rgba(217, 138, 122, 0.12);
     --on-accent: #161814;
-  }
+      --brown: #c19a6b;
+      --brown-deep: #d0ab7d;
+      --brown-line: rgba(193, 154, 107, 0.4);
+    }
 }
 
 * {
@@ -490,7 +499,7 @@ h1 span {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   padding: 1.25rem;
-  border: 1px solid var(--line);
+    border: 1px solid var(--brown-line);
     background: var(--surface);
 }
 
@@ -550,7 +559,7 @@ h1 span {
 .portfolio-admin-group {
   margin-top: 2rem;
   padding: 1.25rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--brown-line);
   background: var(--surface);
 }
 
@@ -801,13 +810,18 @@ h1 span {
 .editor-button {
   min-height: 44px;
   padding: 0.7rem 1rem;
-  border: 1px solid var(--olive);
+  border: 1px solid var(--brown);
   border-radius: 2px;
-  background: var(--olive);
+  background: var(--brown);
     color: var(--on-accent);
   font: inherit;
   font-size: 0.82rem;
   cursor: pointer;
+}
+
+.editor-button:not(.editor-button-secondary):not(.editor-button-danger):hover {
+  border-color: var(--brown-deep);
+  background: var(--brown-deep);
 }
 
 .editor-button-secondary {
