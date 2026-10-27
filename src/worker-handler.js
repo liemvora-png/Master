@@ -24,7 +24,7 @@ const PAGE_ROUTES = new Map([
   ["/gallery.html", "gallery"]
 ]);
 
-const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsuZGVsdGFnLnRlY2gk";
+const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
 
 function notFoundResponse() {
   return new Response("Not found.", {

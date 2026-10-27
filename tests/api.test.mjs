@@ -357,7 +357,7 @@ test("Worker serves private page templates and falls back to public assets", asy
   assert.equal(adminResponse.status, 200);
   assert.equal(
     await adminResponse.text(),
-    "<html>private editor \"pk_live_Y2xlcmsuZGVsdGFnLnRlY2gk\"</html>"
+    "<html>private editor \"pk_live_Y2xlcmsubGllbXZvcmEuY2Mk\"</html>"
   );
 
   const staticResponse = await worker.fetch(
