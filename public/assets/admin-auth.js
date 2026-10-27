@@ -5,7 +5,7 @@
   const editor = document.querySelector("#admin-editor");
   const manager = document.querySelector(".portfolio-admin");
   const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
-  const clerkScript = document.querySelector('script[src*="/npm/@clerk/clerk-js@"]');
+  const clerkScript = document.querySelector('script[src*="@clerk/clerk-js@"]');
 
   function waitForClerk() {
     return new Promise((resolve, reject) => {

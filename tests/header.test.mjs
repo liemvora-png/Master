@@ -43,6 +43,6 @@ test("admin page passes the Clerk key to the browser SDK", () => {
   const admin = readFileSync(new URL("../src/templates/admin.html", import.meta.url), "utf8");
   assert.match(admin, /defer[\s\S]*crossorigin="anonymous"/);
   assert.match(admin, /data-clerk-publishable-key="__CLERK_PUBLISHABLE_KEY_ATTR__"/);
-  assert.match(admin, /src="https:\/\/clerk\.liemvora\.cc\/npm\/@clerk\/ui@1\/dist\/ui\.browser\.js"/);
-  assert.match(admin, /src="https:\/\/clerk\.liemvora\.cc\/npm\/@clerk\/clerk-js@6\/dist\/clerk\.browser\.js"/);
+  assert.match(admin, /src="https:\/\/cdn\.jsdelivr\.net\/npm\/@clerk\/clerk-js@6\/dist\/clerk\.browser\.js"/);
+  assert.match(admin, /src="https:\/\/cdn\.jsdelivr\.net\/npm\/@clerk\/ui@1\/dist\/ui\.browser\.js"/);
 });
