@@ -355,7 +355,10 @@ test("Worker serves private page templates and falls back to public assets", asy
     {}
   );
   assert.equal(adminResponse.status, 200);
-  assert.equal(await adminResponse.text(), "<html>private editor \"\"</html>");
+  assert.equal(
+    await adminResponse.text(),
+    "<html>private editor \"pk_live_Y2xlcmsuZGVsdGFnLnRlY2gk\"</html>"
+  );
 
   const staticResponse = await worker.fetch(
     new Request("https://www.liemvora.cc/assets/site.js"),

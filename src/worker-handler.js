@@ -24,6 +24,8 @@ const PAGE_ROUTES = new Map([
   ["/gallery.html", "gallery"]
 ]);
 
+const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsuZGVsdGFnLnRlY2gk";
+
 function notFoundResponse() {
   return new Response("Not found.", {
     status: 404,
@@ -83,7 +85,7 @@ export function createWorker(templates) {
         return adminPageResponse(
           templates.admin.replace(
             "__CLERK_PUBLISHABLE_KEY__",
-            JSON.stringify(env.CLERK_PUBLISHABLE_KEY || "")
+            JSON.stringify(env.CLERK_PUBLISHABLE_KEY || DEFAULT_CLERK_PUBLISHABLE_KEY)
           ),
           request
         );
