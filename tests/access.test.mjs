@@ -1,30 +1,32 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { authorizeAdmin } from "../functions/_shared/access.js";
+import { authorizeAdmin } from "../functions/_shared/clerk.js";
 
 function encode(value) {
   return Buffer.from(JSON.stringify(value)).toString("base64url");
 }
 
-test("requires Cloudflare Access configuration and a signed assertion", async () => {
+test("requires Clerk configuration and a signed session token", async () => {
   assert.deepEqual(
     await authorizeAdmin(new Request("https://example.com"), {}),
     {
       ok: false,
       status: 503,
-      message: "Admin authorization is not configured. Replace ACCESS_TEAM_DOMAIN and ACCESS_AUD in wrangler.jsonc."
+      message: "Admin authorization is not configured. Set CLERK_ISSUER, CLERK_JWKS_URL, and CLERK_ADMIN_USER_ID in wrangler.jsonc."
     }
   );
 
   const placeholderEnv = {
-    ACCESS_TEAM_DOMAIN: "REPLACE_WITH_TEAM.cloudflareaccess.com",
-    ACCESS_AUD: "REPLACE_WITH_ACCESS_APPLICATION_AUD_TAG"
+    CLERK_ISSUER: "REPLACE_WITH_CLERK_ISSUER",
+    CLERK_JWKS_URL: "REPLACE_WITH_CLERK_JWKS_URL",
+    CLERK_ADMIN_USER_ID: "REPLACE_WITH_CLERK_ADMIN_USER_ID"
   };
   assert.equal((await authorizeAdmin(new Request("https://example.com"), placeholderEnv)).status, 503);
 
   const env = {
-    ACCESS_TEAM_DOMAIN: "team.cloudflareaccess.com",
-    ACCESS_AUD: "expected-audience"
+    CLERK_ISSUER: "https://clerk.example.com",
+    CLERK_JWKS_URL: "https://clerk.example.com/.well-known/jwks.json",
+    CLERK_ADMIN_USER_ID: "user_test"
   };
   assert.equal((await authorizeAdmin(new Request("https://example.com"), env)).status, 401);
 
@@ -43,8 +45,8 @@ test("requires Cloudflare Access configuration and a signed assertion", async ()
   try {
     const header = encode({ alg: "RS256", kid: "test-key" });
     const payload = encode({
-      iss: "https://team.cloudflareaccess.com",
-      aud: "expected-audience",
+      iss: "https://clerk.example.com",
+      sub: "user_test",
       exp: Math.floor(Date.now() / 1000) + 60
     });
     const signingInput = `${header}.${payload}`;
@@ -55,12 +57,12 @@ test("requires Cloudflare Access configuration and a signed assertion", async ()
     );
     const token = `${signingInput}.${Buffer.from(signature).toString("base64url")}`;
     const request = new Request("https://example.com", {
-      headers: { "Cf-Access-Jwt-Assertion": token }
+      headers: { Authorization: `Bearer ${token}` }
     });
-    assert.deepEqual(await authorizeAdmin(request, env), { ok: true });
+    assert.deepEqual(await authorizeAdmin(request, env), { ok: true, userId: "user_test" });
 
     const tampered = new Request("https://example.com", {
-      headers: { "Cf-Access-Jwt-Assertion": `${header}.${payload}.${Buffer.from("bad").toString("base64url")}` }
+      headers: { Authorization: `Bearer ${header}.${payload}.${Buffer.from("bad").toString("base64url")}` }
     });
     assert.equal((await authorizeAdmin(tampered, env)).status, 401);
   } finally {

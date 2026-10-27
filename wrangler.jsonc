@@ -50,7 +50,9 @@
     }
   ],
   "vars": {
-    "ACCESS_TEAM_DOMAIN": "old-shadow-43e8.cloudflareaccess.com",
-    "ACCESS_AUD": "fac222eeb5ac4b2eda46a56ecc6be54d8186192f451046c03f7e2b87995a9cb7"
+    "CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsuZGVsdGFnLnRlY2gk",
+    "CLERK_ISSUER": "https://clerk.deltag.tech",
+    "CLERK_JWKS_URL": "https://clerk.deltag.tech/.well-known/jwks.json",
+    "CLERK_ADMIN_USER_ID": "user_3LHhoblyTQd373Y2LFWRZy4f5aJ"
   }
 }

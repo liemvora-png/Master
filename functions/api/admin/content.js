@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../../_shared/access.js";
+import { authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse, validateContent } from "../../_shared/content.js";
 import { buildSiteContentStatements } from "../../_shared/site-storage.js";
 

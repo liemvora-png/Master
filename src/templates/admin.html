@@ -20,7 +20,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
+    <script>window.__CLERK_PUBLISHABLE_KEY__ = __CLERK_PUBLISHABLE_KEY__;</script>
+    <script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js" defer></script>
     <script src="/assets/site.js" defer></script>
+    <script src="/assets/admin-auth.js" defer></script>
     <script src="/assets/admin.js" defer></script>
     <script src="/assets/portfolio-admin.js" defer></script>
   </head>
@@ -38,6 +41,7 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>
+        <div id="clerk-user-button"></div>
         <a class="admin-entry-button" href="/admin" aria-current="page">Admin <span aria-hidden="true">↗</span></a>
       </div>
     </header>
@@ -49,7 +53,13 @@
         <p class="intro-copy">Edit page copy, navigation, projects, accomplishments, arrangements, services, and bookings below. Changes publish to the live site when saved.</p>
       </section>
 
-      <section aria-labelledby="editor-title">
+      <section id="admin-auth" class="admin-auth" aria-live="polite">
+        <h2>Admin sign-in</h2>
+        <p id="admin-auth-status">Loading secure sign-in…</p>
+        <button id="admin-sign-in" class="editor-button" type="button" hidden>Sign in with Clerk</button>
+      </section>
+
+      <section id="admin-editor" aria-labelledby="editor-title" hidden>
         <div class="section-heading">
           <h2 id="editor-title">Site editor</h2>
           <span class="project-count">VISUAL EDITOR</span>

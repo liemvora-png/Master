@@ -36,7 +36,7 @@ function encodeBase64Url(value) {
   return Buffer.from(value).toString("base64url");
 }
 
-async function createAccessAssertion() {
+async function createClerkToken() {
   const keyPair = await crypto.subtle.generateKey(
     { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
     true,
@@ -46,8 +46,8 @@ async function createAccessAssertion() {
   publicKey.kid = "portfolio-test-key";
   const header = encodeBase64Url(JSON.stringify({ alg: "RS256", kid: publicKey.kid }));
   const payload = encodeBase64Url(JSON.stringify({
-    iss: "https://team.cloudflareaccess.com",
-    aud: "expected-audience",
+    iss: "https://clerk.example.com",
+    sub: "user_test",
     exp: Math.floor(Date.now() / 1000) + 60
   }));
   const signingInput = `${header}.${payload}`;
@@ -71,7 +71,7 @@ test("availability returns open hourly slots and excludes reserved times", async
 });
 
 test("admin availability round-trips D1 integer flags through the editor save", async () => {
-  const { publicKey, token } = await createAccessAssertion();
+  const { publicKey, token } = await createClerkToken();
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({ keys: [publicKey] }), {
     headers: { "Content-Type": "application/json" }
@@ -112,10 +112,11 @@ test("admin availability round-trips D1 integer flags through the editor save", 
   };
   const env = {
     DB: db,
-    ACCESS_TEAM_DOMAIN: "team.cloudflareaccess.com",
-    ACCESS_AUD: "expected-audience"
+    CLERK_ISSUER: "https://clerk.example.com",
+    CLERK_JWKS_URL: "https://clerk.example.com/.well-known/jwks.json",
+    CLERK_ADMIN_USER_ID: "user_test"
   };
-  const headers = { "Cf-Access-Jwt-Assertion": token };
+  const headers = { Authorization: `Bearer ${token}` };
 
   try {
     const loaded = await adminPortfolioRequest({
@@ -262,10 +263,11 @@ test("service and gallery APIs only expose active public content", async () => {
   assert.deepEqual((await gallery.json()).images[0].alt_text, "A view");
 });
 
-test("portfolio, gallery, and booking admin APIs require Cloudflare Access", async () => {
+test("portfolio, gallery, and booking admin APIs require Clerk authentication", async () => {
   const env = {
-    ACCESS_TEAM_DOMAIN: "team.cloudflareaccess.com",
-    ACCESS_AUD: "expected-audience",
+    CLERK_ISSUER: "https://clerk.example.com",
+    CLERK_JWKS_URL: "https://clerk.example.com/.well-known/jwks.json",
+    CLERK_ADMIN_USER_ID: "user_test",
     DB: {
       prepare() {
         throw new Error("Database must not be accessed before authorization.");

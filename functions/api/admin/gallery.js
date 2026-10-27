@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../../_shared/access.js";
+import { authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;

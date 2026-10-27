@@ -247,7 +247,7 @@ function renderManager() {
 }
 
 async function requestJson(url, options = {}) {
-  const response = await fetch(url, {
+  const response = await window.adminAuth.fetch(url, {
     ...options,
     headers: { Accept: "application/json", ...(options.headers || {}) },
     credentials: "same-origin"
@@ -373,4 +373,4 @@ async function deleteBooking(id) {
   }
 }
 
-loadManager();
+window.adminAuth.ready.then(() => loadManager()).catch(() => {});

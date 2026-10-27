@@ -440,7 +440,7 @@ async function loadContent() {
   reloadButton.disabled = true;
   saveButton.disabled = true;
   try {
-    const response = await fetch("/api/content", {
+    const response = await window.adminAuth.fetch("/api/content", {
       headers: { Accept: "application/json" },
       credentials: "same-origin"
     });
@@ -462,7 +462,7 @@ async function saveContent() {
   reloadButton.disabled = true;
   setStatus("Saving your changes…");
   try {
-    const response = await fetch("/api/admin/content", {
+    const response = await window.adminAuth.fetch("/api/admin/content", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -543,7 +543,7 @@ editor.addEventListener("click", (event) => {
 
 reloadButton.addEventListener("click", () => {
   if (dirty && !window.confirm("Discard your unsaved changes and reload the saved content?")) return;
-  loadContent();
+  window.adminAuth.ready.then(() => loadContent()).catch(() => {});
 });
 saveButton.addEventListener("click", saveContent);
 

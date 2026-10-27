@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../functions/_shared/access.js";
+import { authorizeAdmin } from "../functions/_shared/clerk.js";
 import { jsonResponse } from "../functions/_shared/content.js";
 import { onRequest as adminContent } from "../functions/api/admin/content.js";
 import { handleAdminBooking, onRequest as adminPortfolio } from "../functions/api/admin/portfolio.js";
@@ -84,7 +84,13 @@ export function createWorker(templates) {
         if (request.method !== "GET" && request.method !== "HEAD") {
           return jsonResponse({ error: "Method not allowed." }, 405);
         }
-        return adminPageResponse(templates.admin, request);
+        return adminPageResponse(
+          templates.admin.replace(
+            "__CLERK_PUBLISHABLE_KEY__",
+            JSON.stringify(env.CLERK_PUBLISHABLE_KEY || "")
+          ),
+          request
+        );
       }
 
       if (pathname === "/admin" || pathname.startsWith("/admin/")) {

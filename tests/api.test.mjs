@@ -170,8 +170,9 @@ test("content API rejects unsupported methods and unauthenticated edits", async 
       body: "{}"
     }),
     env: {
-      ACCESS_TEAM_DOMAIN: "team.cloudflareaccess.com",
-      ACCESS_AUD: "expected-audience"
+      CLERK_ISSUER: "https://clerk.example.com",
+      CLERK_JWKS_URL: "https://clerk.example.com/.well-known/jwks.json",
+      CLERK_ADMIN_USER_ID: "user_test"
     }
   });
   assert.equal(unauthenticatedWrite.status, 401);

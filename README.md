@@ -14,7 +14,7 @@ A minimal, responsive website with projects, accomplishments, arrangements, phot
 
 ## Cloudflare Worker setup
 
-`wrangler.jsonc` is the deployment source of truth for the `master` Worker, static assets, D1 binding, and Access variables. It is configured with the `old-shadow-43e8.cloudflareaccess.com` team domain and the Access application audience tag for the admin routes.
+`wrangler.jsonc` is the deployment source of truth for the `master` Worker, static assets, D1 binding, R2 bucket, email binding, and Clerk public configuration for the admin routes.
 
 The D1 database ID is already set in `wrangler.jsonc`. For a new database, create a D1 database named `portfolio-content`, then paste and run the complete [`migrations/0001_site_content.sql`](migrations/0001_site_content.sql) file in the D1 Console. It creates the `pages`, `blocks`, and `nav_items` tables used by the console checks below, plus `site_settings` for shared brand/footer text.
 
@@ -50,7 +50,7 @@ SELECT id FROM blocks WHERE content IS NULL OR trim(content) = '';
 
 The final two integrity checks should return no rows. After upgrading, confirm the `services` and `gallery` rows exist, the projects slug is `projects`, accomplishments has no blocks, and the site name is `Liem Vora`.
 
-The `DB` binding and the two Access variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. The Cloudflare Access self-hosted application should protect `admin*` and `api/admin*` on `www.liemvora.cc` with an allow policy for your email. Cloudflare Access provides the login flow and enforces the email policy. The Worker validates the Access JWT signature, issuer, audience, and expiry before returning the editor or accepting writes.
+The `DB` binding and the Clerk variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. Set `CLERK_PUBLISHABLE_KEY` to the publishable key for the selected Clerk application, `CLERK_ISSUER` to that application's JWT issuer, `CLERK_JWKS_URL` to its JWKS endpoint, and `CLERK_ADMIN_USER_ID` to the only Clerk user allowed to edit the site. The browser uses Clerk for sign-in and the Worker validates the Clerk JWT signature, issuer, expiry, and user ID before returning the editor or accepting writes. Never put a Clerk secret key in this repository.
 
 The existing Cloudflare Workers Build can continue deploying from this repository with `wrangler deploy`. The asset directory is `./public`, and `run_worker_first: true` sends every request through `src/worker.js`. The Worker serves templates imported from `src/templates/`, uses D1 for content and bookings, stores gallery objects in the configured R2 bucket, and sends booking notices through the Email Service binding. The templates, Worker code, SQL, and tests are not in the public directory; `.assetsignore` also excludes `src` and other repository files.
 
@@ -58,11 +58,11 @@ Create an R2 bucket named `portfolio-gallery` to match the `GALLERY` binding in 
 
 For booking email, configure Cloudflare Email Service (outbound sending) in addition to any Email Routing you use for inbound mail. Onboard/verify a sender domain with Email Service, and verify the Gmail destination address as an allowed recipient. Add Worker secrets named `BOOKING_EMAIL_TO` (your verified Gmail destination) and `BOOKING_EMAIL_FROM` (an address on the verified sending domain). The destination and sender are not included in the repository, and the Gmail address is never displayed publicly. Without these values, the Worker still saves the request as pending but reports that email notification is not configured.
 
-Also disable `workers.dev` and preview URLs, or include those hostnames in the Access protection, so the admin API cannot be reached through a hostname that bypasses the Access application.
+Keep the admin routes protected by Clerk regardless of the hostname used to reach the Worker. The API does not trust browser cookies or the visibility of the admin page; every admin request must include a valid Clerk bearer token.
 
 ## Editing content
 
-Open `/admin` after signing in through Cloudflare Access. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, tutoring subjects, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
+Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, tutoring subjects, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
 
 Page copy is stored in `pages`, listed content in ordered `blocks`, navigation in `nav_items`, and shared brand/footer text in `site_settings`. The service manager edits `services`, `test_prep_options`, `availability`, `photo_gallery`, and private `lesson_bookings`. Booking request data is never returned by public APIs.
 
