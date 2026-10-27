@@ -82,11 +82,12 @@ export function createWorker(templates) {
         if (request.method !== "GET" && request.method !== "HEAD") {
           return jsonResponse({ error: "Method not allowed." }, 405);
         }
+        const publishableKey = env.CLERK_PUBLISHABLE_KEY || DEFAULT_CLERK_PUBLISHABLE_KEY;
         return adminPageResponse(
           templates.admin.replace(
             "__CLERK_PUBLISHABLE_KEY__",
-            JSON.stringify(env.CLERK_PUBLISHABLE_KEY || DEFAULT_CLERK_PUBLISHABLE_KEY)
-          ),
+            JSON.stringify(publishableKey)
+          ).replace("__CLERK_PUBLISHABLE_KEY_ATTR__", publishableKey),
           request
         );
       }

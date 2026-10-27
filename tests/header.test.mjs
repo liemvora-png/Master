@@ -41,5 +41,5 @@ test("home page welcomes visitors and displays its managed update time", () => {
 
 test("admin page passes the Clerk key to the browser SDK", () => {
   const admin = readFileSync(new URL("../src/templates/admin.html", import.meta.url), "utf8");
-  assert.match(admin, /data-clerk-publishable-key="__CLERK_PUBLISHABLE_KEY__"/);
+  assert.match(admin, /data-clerk-publishable-key="__CLERK_PUBLISHABLE_KEY_ATTR__"/);
 });
