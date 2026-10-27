@@ -275,7 +275,7 @@ test("Worker serves private page templates and falls back to public assets", asy
     arrangements: "<html>arrangement template</html>",
     services: "<html>services template</html>",
     gallery: "<html>gallery template</html>",
-    admin: "<html>private editor</html>"
+    admin: "<html>private editor __CLERK_PUBLISHABLE_KEY__</html>"
   });
   const calls = [];
   const env = {
@@ -354,7 +354,8 @@ test("Worker serves private page templates and falls back to public assets", asy
     env,
     {}
   );
-  assert.equal(adminResponse.status, 503);
+  assert.equal(adminResponse.status, 200);
+  assert.equal(await adminResponse.text(), "<html>private editor \"\"</html>");
 
   const staticResponse = await worker.fetch(
     new Request("https://www.liemvora.cc/assets/site.js"),

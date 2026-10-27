@@ -77,10 +77,6 @@ export function createWorker(templates) {
       if (pathname.startsWith("/api/")) return notFoundResponse();
 
       if (isAdminPage) {
-        const authorization = await authorizeAdmin(request, env);
-        if (!authorization.ok) {
-          return jsonResponse({ error: authorization.message }, authorization.status);
-        }
         if (request.method !== "GET" && request.method !== "HEAD") {
           return jsonResponse({ error: "Method not allowed." }, 405);
         }
