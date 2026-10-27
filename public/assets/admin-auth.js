@@ -5,7 +5,7 @@
   const editor = document.querySelector("#admin-editor");
   const manager = document.querySelector(".portfolio-admin");
   const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
-  const clerkScript = document.querySelector('script[src="https://cdn.clerk.com/browser.js"]');
+  const clerkScript = document.querySelector('script[src*="/npm/@clerk/clerk-js@"]');
 
   function waitForClerk() {
     return new Promise((resolve, reject) => {
@@ -23,7 +23,10 @@
     const publishableKey = clerkScript?.dataset.clerkPublishableKey || DEFAULT_CLERK_PUBLISHABLE_KEY;
     if (!publishableKey) throw new Error("Clerk publishable key is not configured.");
     const clerk = await waitForClerk();
-    await clerk.load({ publishableKey });
+    await clerk.load({
+      publishableKey,
+      ui: { ClerkUI: window.__internal_ClerkUICtor }
+    });
     return clerk;
   }
 
