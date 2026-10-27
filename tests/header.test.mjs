@@ -38,3 +38,8 @@ test("home page welcomes visitors and displays its managed update time", () => {
   assert.match(siteScript, /dayLabel = "today"/);
   assert.match(siteScript, /dayLabel = "yesterday"/);
 });
+
+test("admin page passes the Clerk key to the browser SDK", () => {
+  const admin = readFileSync(new URL("../src/templates/admin.html", import.meta.url), "utf8");
+  assert.match(admin, /data-clerk-publishable-key="__CLERK_PUBLISHABLE_KEY__"/);
+});
