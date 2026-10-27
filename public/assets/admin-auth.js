@@ -5,13 +5,26 @@
   const editor = document.querySelector("#admin-editor");
   const manager = document.querySelector(".portfolio-admin");
   const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
+  const clerkScript = document.querySelector('script[src="https://cdn.clerk.com/browser.js"]');
+
+  function waitForClerk() {
+    return new Promise((resolve, reject) => {
+      const deadline = Date.now() + 10000;
+      const check = () => {
+        if (window.Clerk) return resolve(window.Clerk);
+        if (Date.now() >= deadline) return reject(new Error("Clerk failed to load."));
+        window.setTimeout(check, 50);
+      };
+      check();
+    });
+  }
 
   async function loadClerk() {
-    const publishableKey = window.__CLERK_PUBLISHABLE_KEY__ || DEFAULT_CLERK_PUBLISHABLE_KEY;
+    const publishableKey = clerkScript?.dataset.clerkPublishableKey || DEFAULT_CLERK_PUBLISHABLE_KEY;
     if (!publishableKey) throw new Error("Clerk publishable key is not configured.");
-    if (!window.Clerk) throw new Error("Clerk failed to load.");
-    await window.Clerk.load({ publishableKey });
-    return window.Clerk;
+    const clerk = await waitForClerk();
+    await clerk.load({ publishableKey });
+    return clerk;
   }
 
   const ready = loadClerk().then((clerk) => {
