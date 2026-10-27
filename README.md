@@ -64,6 +64,8 @@ Keep the admin routes protected by Clerk regardless of the hostname used to reac
 
 Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, tutoring subjects, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
 
+For Clerk application-domain redirects, use `https://www.liemvora.cc/admin` for sign-in and sign-up, and `https://www.liemvora.cc/` after sign-out. Keep sign-up restricted to the intended admin account.
+
 Page copy is stored in `pages`, listed content in ordered `blocks`, navigation in `nav_items`, and shared brand/footer text in `site_settings`. The service manager edits `services`, `test_prep_options`, `availability`, `photo_gallery`, and private `lesson_bookings`. Booking request data is never returned by public APIs.
 
 Changes in D1 become the source for the public pages on their next load. If the API is temporarily unavailable, the existing HTML copy remains visible and the page displays a small notice.

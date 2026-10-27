@@ -17,7 +17,9 @@
     if (!clerk.user) {
       authStatus.textContent = "Sign in to manage private site content.";
       signInButton.hidden = false;
-      signInButton.addEventListener("click", () => clerk.openSignIn());
+      signInButton.addEventListener("click", () => clerk.openSignIn({
+        fallbackRedirectUrl: "/admin"
+      }));
       editor.hidden = true;
       manager.hidden = true;
       return null;
@@ -26,7 +28,9 @@
     authSection.hidden = true;
     editor.hidden = false;
     manager.hidden = false;
-    clerk.mountUserButton(document.querySelector("#clerk-user-button"));
+    clerk.mountUserButton(document.querySelector("#clerk-user-button"), {
+      afterSignOutUrl: "/"
+    });
     return clerk;
   }).catch((error) => {
     authStatus.textContent = error.message;
