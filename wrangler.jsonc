@@ -51,8 +51,8 @@
   ],
   "vars": {
     "CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk",
-    "CLERK_ISSUER": "https://clerk.deltag.tech",
-    "CLERK_JWKS_URL": "https://clerk.deltag.tech/.well-known/jwks.json",
+    "CLERK_ISSUER": "https://clerk.liemvora.cc",
+    "CLERK_JWKS_URL": "https://clerk.liemvora.cc/.well-known/jwks.json",
     "CLERK_ADMIN_USER_ID": "user_3LHhoblyTQd373Y2LFWRZy4f5aJ"
   }
 }
