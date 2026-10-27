@@ -4,9 +4,10 @@
   const signInButton = document.querySelector("#admin-sign-in");
   const editor = document.querySelector("#admin-editor");
   const manager = document.querySelector(".portfolio-admin");
+  const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
 
   async function loadClerk() {
-    const publishableKey = window.__CLERK_PUBLISHABLE_KEY__;
+    const publishableKey = window.__CLERK_PUBLISHABLE_KEY__ || DEFAULT_CLERK_PUBLISHABLE_KEY;
     if (!publishableKey) throw new Error("Clerk publishable key is not configured.");
     if (!window.Clerk) throw new Error("Clerk failed to load.");
     await window.Clerk.load({ publishableKey });
