@@ -71,30 +71,6 @@ function renderServiceSettings(root) {
     group.append(row);
   }
 
-  const options = createElement("div", "portfolio-options");
-  for (const [testName, label] of [["SAT", "SAT subjects"], ["AP", "AP subjects"]]) {
-    const subsection = createElement("div", "portfolio-subsection");
-    subsection.append(createElement("h4", "", label));
-    const subjects = portfolio.testPrepOptions.filter((option) => option.test_name === testName);
-    for (const subject of subjects) {
-      const row = createElement("div", "portfolio-row portfolio-subject-row");
-      row.append(field("Subject", subject.subject, {
-        maxLength: 120,
-        onInput: (value) => { subject.subject = value; }
-      }));
-      row.append(button("Remove", () => {
-        portfolio.testPrepOptions = portfolio.testPrepOptions.filter((option) => option !== subject);
-        renderManager();
-      }, "editor-button editor-button-danger"));
-      subsection.append(row);
-    }
-    subsection.append(button(`Add ${testName} subject`, () => {
-      portfolio.testPrepOptions.push({ service_id: "tutoring", test_name: testName, subject: "" });
-      renderManager();
-    }, "editor-button editor-button-add"));
-    options.append(subsection);
-  }
-  group.append(options);
   group.append(button("Save services and availability", savePortfolio, "editor-button"));
   root.append(group);
 }

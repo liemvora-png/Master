@@ -7,6 +7,12 @@ import { handleAdminBooking, onRequest as adminPortfolioRequest } from "../funct
 import { onRequest as galleryRequest } from "../functions/api/gallery.js";
 import { onRequest as servicesRequest } from "../functions/api/services.js";
 
+function futureDate(offsetDays = 2) {
+  const value = new Date();
+  value.setDate(value.getDate() + offsetDays);
+  return value.toISOString().slice(0, 10);
+}
+
 function availabilityDb({ booked = [] } = {}) {
   return {
     prepare(query) {
@@ -81,7 +87,7 @@ test("admin availability round-trips D1 integer flags through the editor save", 
     prepare(query) {
       const all = async () => {
         if (/FROM services/.test(query)) {
-          return { results: ["photography", "piano", "tutoring"].map((id) => ({
+          return { results: ["photography", "piano", "viola"].map((id) => ({
             id, title: id, description: "", price: null, position: 1, active: 1
           })) };
         }
@@ -132,7 +138,7 @@ test("admin availability round-trips D1 integer flags through the editor save", 
         method: "PUT",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({
-          services: ["photography", "piano", "tutoring"].map((id) => ({
+          services: ["photography", "piano", "viola"].map((id) => ({
             id, title: id, description: "", price: null
           })),
           testPrepOptions: [],
@@ -193,7 +199,7 @@ test("booking is saved pending before the email is sent and email text is escape
       body: JSON.stringify({
         name: "<Alex>",
         email: "alex@example.com",
-        date: "2026-10-26",
+        date: futureDate(),
         time: "09:00",
         note: "Please call <me>"
       })
@@ -227,7 +233,7 @@ test("booking rejects a slot that is not open", async () => {
       body: JSON.stringify({
         name: "Alex",
         email: "alex@example.com",
-        date: "2026-10-27",
+        date: futureDate(1),
         time: "10:00",
         note: ""
       })
@@ -243,7 +249,7 @@ test("service and gallery APIs only expose active public content", async () => {
       return {
         async all() {
           if (/FROM services/.test(query)) return { results: [{ id: "piano", title: "Piano", active: 1 }] };
-          if (/FROM test_prep_options/.test(query)) return { results: [{ service_id: "tutoring", test_name: "SAT", subject: "Math" }] };
+          if (/FROM test_prep_options/.test(query)) return { results: [] };
           if (/FROM photo_gallery/.test(query)) return { results: [{ id: "photo1", image_url: "/gallery-images/abc.jpg", alt_text: "A view", caption: "" }] };
           return { results: [] };
         }
