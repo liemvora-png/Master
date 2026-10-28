@@ -1,5 +1,3 @@
-BEGIN;
-
 DELETE FROM test_prep_options
 WHERE service_id = 'tutoring';
 
@@ -20,5 +18,3 @@ UPDATE pages
 SET meta_description = 'Photography, private piano lessons, and viola lessons.',
     description = 'Photography, piano lessons, and viola lessons.'
 WHERE id = 'services';
-
-COMMIT;
