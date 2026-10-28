@@ -8,7 +8,7 @@ A minimal, responsive website with projects, accomplishments, arrangements, phot
 - `/projects` — projects
 - `accomplishments.html` — music, athletics, and coaching highlights
 - `arrangements.html` — sheet music arrangements
-- `/services` — photography, piano lessons, and tutoring
+- `/services` — photography, piano lessons, and viola lessons
 - `/gallery` — R2-backed photography gallery
 - `/admin` — private visual content editor
 
@@ -22,7 +22,7 @@ For an existing database created with the earlier seed, run [`migrations/0002_ho
 
 To separate the lowercase delta logo from the site name in the header, run [`migrations/0003_separate_logo_and_site_name.sql`](migrations/0003_separate_logo_and_site_name.sql) once after migration 0002. It changes the default site name from `δ` to `Liem Vora`; your custom site name is preserved if you already changed it.
 
-Run [`migrations/0004_services_gallery_bookings.sql`](migrations/0004_services_gallery_bookings.sql) after the earlier migrations. It adds the Services and Gallery pages and navigation links, default offering records and SAT/AP subjects, photo metadata, availability windows, and private lesson bookings. It also creates a partial unique index preventing two non-cancelled bookings for the same date and time.
+Run [`migrations/0004_services_gallery_bookings.sql`](migrations/0004_services_gallery_bookings.sql) after the earlier migrations. It adds the Services and Gallery pages and navigation links, default offerings and lesson windows, photo metadata, and private lesson bookings. It also creates a partial unique index preventing two non-cancelled bookings for the same date and time.
 
 The fresh seed contains 6 pages, 2 project blocks, no accomplishment blocks, and 6 navigation links. `blocks.content` stores each item as JSON text and `blocks.type` identifies whether the item is a project, accomplishment, or arrangement. These console checks should work as written:
 
@@ -62,10 +62,10 @@ Keep the admin routes protected by Clerk regardless of the hostname used to reac
 
 ## Editing content
 
-Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, tutoring subjects, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
+Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
 
 For Clerk application-domain redirects, use `https://www.liemvora.cc/admin` for sign-in and sign-up, and `https://www.liemvora.cc/` after sign-out. Keep sign-up restricted to the intended admin account.
 
-Page copy is stored in `pages`, listed content in ordered `blocks`, navigation in `nav_items`, and shared brand/footer text in `site_settings`. The service manager edits `services`, `test_prep_options`, `availability`, `photo_gallery`, and private `lesson_bookings`. Booking request data is never returned by public APIs.
+Page copy is stored in `pages`, listed content in ordered `blocks`, navigation in `nav_items`, and shared brand/footer text in `site_settings`. The service manager edits `services`, `availability`, `photo_gallery`, and private `lesson_bookings`. Booking request data is never returned by public APIs.
 
 Changes in D1 become the source for the public pages on their next load. If the API is temporarily unavailable, the existing HTML copy remains visible and the page displays a small notice.

@@ -106,15 +106,11 @@ test("migration seed matches the supported content model", () => {
   const brandingUpgrade = readFileSync(new URL("../migrations/0003_separate_logo_and_site_name.sql", import.meta.url), "utf8");
   assert.match(brandingUpgrade, /SET brand = 'Liem Vora'/);
   assert.match(brandingUpgrade, /AND brand = 'δ'/);
-  const servicesMigration = readFileSync(new URL("../migrations/0004_services_gallery_bookings.sql", import.meta.url), "utf8");
-  for (const table of ["services", "test_prep_options", "photo_gallery", "availability", "lesson_bookings"]) {
-    assert.match(servicesMigration, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}`));
-  }
-  assert.match(servicesMigration, /lesson_bookings_active_slot/);
-  assert.match(servicesMigration, /'photography'/);
-  assert.match(servicesMigration, /'piano'/);
-  assert.match(servicesMigration, /'tutoring'/);
-  assert.match(servicesMigration, /page_slug = 'services'/);
+  const servicesMigration = readFileSync(new URL("../migrations/0005_remove_tutoring_add_viola.sql", import.meta.url), "utf8");
+  assert.match(servicesMigration, /DELETE FROM services\s+WHERE id = 'tutoring'/);
+  assert.match(servicesMigration, /INSERT OR IGNORE INTO services \(id, title, description, price, position, active\)/);
+  assert.match(servicesMigration, /'viola'/);
+  assert.match(servicesMigration, /UPDATE services\s+SET title = 'Private piano lessons'/);
 });
 
 test("rejects unsafe project URLs", () => {
