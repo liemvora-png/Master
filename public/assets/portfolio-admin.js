@@ -218,7 +218,7 @@ function renderBookings(root) {
   }
   for (const booking of portfolio.bookings) {
     const card = createElement("article", "portfolio-booking");
-    const heading = createElement("h4", "", `${booking.name} — ${booking.lesson_date} at ${booking.lesson_time}`);
+    const heading = createElement("h4", "", `${booking.name}, ${booking.lesson_date} at ${booking.lesson_time}`);
     const email = document.createElement("a");
     email.href = `mailto:${encodeURIComponent(booking.email)}`;
     email.textContent = booking.email;

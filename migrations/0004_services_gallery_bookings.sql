@@ -56,10 +56,10 @@ WHERE status <> 'cancelled';
 INSERT OR IGNORE INTO pages
   (id, slug, title, meta_title, meta_description, eyebrow, title_accent, description, section_title, updated_at)
 VALUES
-  ('services', 'services', 'Services', 'Liem Vora — Services',
+  ('services', 'services', 'Services', 'Liem Vora: Services',
    'Photography, private piano lessons, and SAT/AP tutoring.', 'Work together',
    '', 'Photography, private piano lessons, and SAT/AP tutoring.', '', CURRENT_TIMESTAMP),
-  ('gallery', 'gallery', 'Photography', 'Liem Vora — Photography gallery',
+  ('gallery', 'gallery', 'Photography', 'Liem Vora: Photography gallery',
    'A selection of photography by Liem Vora.', 'Selected work',
    '', 'A selection of photographs by Liem Vora.', '', CURRENT_TIMESTAMP);
 
