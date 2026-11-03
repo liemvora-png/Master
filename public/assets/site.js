@@ -308,6 +308,79 @@ async function loadManagedContent() {
   }
 }
 
+const HOME_NEWS_LIMIT = 3;
+
+function formatNewsDate(value) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(new Date(value));
+}
+
+async function loadHomeNews() {
+  if (document.body.dataset.page !== "home") return;
+  const section = document.querySelector(".home-news");
+  const list = document.querySelector("#home-news-list");
+  if (!section || !list) return;
+
+  try {
+    const response = await fetch("/news/", { headers: { Accept: "text/html" } });
+    if (!response.ok) throw new Error(`News request returned ${response.status}.`);
+    const doc = new DOMParser().parseFromString(await response.text(), "text/html");
+    const articles = [...doc.querySelectorAll("main article")].slice(0, HOME_NEWS_LIMIT);
+    if (articles.length === 0) throw new Error("No news articles found in the digest.");
+
+    list.replaceChildren();
+    for (const article of articles) {
+      const headline = article.querySelector("h3")?.textContent?.trim();
+      if (!headline) continue;
+
+      const row = document.createElement("li");
+      row.className = "home-news-item";
+
+      const when = document.createElement("span");
+      when.className = "home-news-time";
+      const timeEl = article.querySelector("time[datetime]");
+      const stamp = timeEl?.getAttribute("datetime") || "";
+      if (stamp && !Number.isNaN(new Date(stamp).getTime())) {
+        const time = document.createElement("time");
+        time.dateTime = stamp;
+        time.textContent = formatNewsDate(stamp);
+        when.append(time);
+      } else {
+        when.textContent = timeEl?.textContent?.trim() || "";
+      }
+
+      const info = document.createElement("span");
+      info.className = "home-news-info";
+      const title = document.createElement("span");
+      title.className = "home-news-title";
+      title.textContent = headline;
+      info.append(title);
+
+      row.append(when, info);
+
+      const sourceEl = article.querySelector("p.source a");
+      const sourceHref = safeHref(sourceEl?.getAttribute("href") || "");
+      if (sourceHref) {
+        const source = document.createElement("a");
+        source.className = "project-link home-news-source";
+        source.href = sourceHref;
+        source.textContent = `${sourceEl.textContent.trim() || "Source"} ↗`;
+        row.append(source);
+      }
+
+      list.append(row);
+    }
+    section.hidden = false;
+  } catch (error) {
+    console.error("Unable to load the news digest:", error);
+    section.hidden = true;
+  }
+}
+
 const THEME_COLORS = { light: "#f4f1e9", dark: "#161814" };
 
 function currentTheme() {
@@ -375,3 +448,4 @@ function initThemeToggle() {
 
 initThemeToggle();
 loadManagedContent();
+loadHomeNews();

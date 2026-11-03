@@ -37,6 +37,7 @@ export async function onRequest({ request, env }) {
   const name = typeof input.name === "string" ? input.name.trim() : "";
   const email = typeof input.email === "string" ? input.email.trim() : "";
   const note = typeof input.note === "string" ? input.note.trim() : "";
+  const serviceId = ["piano", "viola"].includes(input.service) ? input.service : "piano";
   const date = input.date;
   const time = input.time;
   if (!name || name.length > 120 || /[\r\n]/.test(name)) {
@@ -66,8 +67,8 @@ export async function onRequest({ request, env }) {
     await env.DB.prepare(
       "INSERT INTO lesson_bookings " +
       "(id, service_id, name, email, note, lesson_date, lesson_time, status, created_at) " +
-      "VALUES (?, 'piano', ?, ?, ?, ?, ?, 'pending', ?)"
-    ).bind(id, name, email, note, date, time, createdAt).run();
+      "VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)"
+    ).bind(id, serviceId, name, email, note, date, time, createdAt).run();
   } catch (error) {
     if (/unique|constraint/i.test(error instanceof Error ? error.message : "")) {
       return jsonResponse({ error: "That time was just booked. Choose another time." }, 409);
@@ -86,16 +87,18 @@ export async function onRequest({ request, env }) {
     }, 202);
   }
 
+  const serviceLabel = serviceId === "viola" ? "Private viola lessons" : "Private piano lessons";
+
   try {
     await env.BOOKING_EMAIL.send({
       to: env.BOOKING_EMAIL_TO,
       from: env.BOOKING_EMAIL_FROM,
       replyTo: email,
-      subject: "New private piano lesson request",
+      subject: `New private ${serviceId} lesson request`,
       text: [
-        "New private piano lesson request",
+        `New private ${serviceId} lesson request`,
         "",
-        `Service: ${emailText("Private piano lessons")}`,
+        `Service: ${emailText(serviceLabel)}`,
         `Name: ${emailText(name)}`,
         `Email: ${emailText(email)}`,
         `Date: ${emailText(date)}`,

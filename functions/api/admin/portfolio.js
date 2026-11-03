@@ -48,7 +48,7 @@ function validatePortfolio(input) {
     return "Check services, test-prep subjects, and availability.";
   }
 
-  const serviceIds = new Set(["photography", "piano", "tutoring"]);
+  const serviceIds = new Set(["photography", "piano", "viola"]);
   const seenServices = new Set();
   for (const [index, service] of input.services.entries()) {
     if (!service || !serviceIds.has(service.id) || seenServices.has(service.id)

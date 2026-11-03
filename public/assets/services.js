@@ -17,7 +17,6 @@ function makeSelect(label, name) {
 
 function renderServices(data) {
   servicesList.replaceChildren();
-  const tutoring = data.services.find((service) => service.id === "tutoring");
   for (const service of data.services) {
     const article = document.createElement("article");
     article.className = "service-card";
@@ -39,38 +38,12 @@ function renderServices(data) {
       link.href = "/gallery";
       link.textContent = "View photography gallery ↗";
       article.append(link);
-    } else if (service.id === "piano") {
+    } else if (service.id === "piano" || service.id === "viola") {
       const link = document.createElement("a");
       link.className = "project-link";
       link.href = "#booking-form";
       link.textContent = "Request a lesson ↓";
       article.append(link);
-    } else if (service.id === "tutoring" && tutoring) {
-      const form = document.createElement("div");
-      form.className = "tutoring-selectors";
-      const test = makeSelect("Test", "test");
-      test.select.id = "test-prep-test";
-      test.select.setAttribute("aria-label", "Choose SAT or AP");
-      const subject = makeSelect("Subject", "subject");
-      subject.select.id = "test-prep-subject";
-      subject.select.setAttribute("aria-label", "Choose a tutoring subject");
-      subject.select.disabled = true;
-      form.append(test.wrapper, subject.wrapper);
-      article.append(form);
-      const updateSubjects = () => {
-        const options = data.testPrepOptions.filter((option) => option.test_name === test.select.value);
-        subject.select.replaceChildren(new Option("Choose a subject", ""));
-        for (const option of options) subject.select.add(new Option(option.subject, option.subject));
-        subject.select.disabled = options.length === 0;
-      };
-      test.select.add(new Option("Choose SAT or AP", ""));
-      for (const name of ["SAT", "AP"]) {
-        if (data.testPrepOptions.some((option) => option.test_name === name)) {
-          test.select.add(new Option(name, name));
-        }
-      }
-      test.select.addEventListener("change", updateSubjects);
-      updateSubjects();
     }
     servicesList.append(article);
   }
@@ -129,6 +102,7 @@ async function submitBooking(event) {
       body: JSON.stringify({
         name: fields.get("name"),
         email: fields.get("email"),
+        service: fields.get("service") || "piano",
         date: fields.get("date"),
         time: fields.get("time"),
         note: fields.get("note")
