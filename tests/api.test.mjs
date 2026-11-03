@@ -11,17 +11,18 @@ test("public content endpoint reads the D1 site record", async () => {
     ["accomplishments", "accomplishments"],
     ["arrangements", "arrangements"],
     ["services", "services"],
-    ["gallery", "gallery"]
+    ["gallery", "gallery"],
+    ["news", "news"]
   ].map(([id, slug]) => ({
     id,
     slug,
-    title: id === "home" ? "Liem Vora" : "Projects",
-    meta_title: "Projects",
-    meta_description: "Projects description",
+    title: id === "home" ? "Liem Vora" : id === "news" ? "Tech News Digest" : "Projects",
+    meta_title: id === "home" ? "Liem Vora" : id === "news" ? "Liem Vora: Tech News Digest" : "Projects",
+    meta_description: id === "home" ? "Personal website" : id === "news" ? "A regularly updated digest of technology news." : "Projects description",
     eyebrow: id === "home" ? "" : "Portfolio",
     title_accent: ["home", "services", "gallery"].includes(id) ? "" : "work.",
-    description: id === "home" ? "" : "Project description",
-    section_title: ["home", "services", "gallery"].includes(id) ? "" : "My projects"
+    description: id === "home" ? "" : id === "news" ? "" : "Project description",
+    section_title: ["home", "services", "gallery"].includes(id) ? "" : id === "news" ? "" : "My projects"
   }));
   const env = {
     DB: {
@@ -85,8 +86,8 @@ test("public content endpoint reads the D1 site record", async () => {
       labels: { projectLink: "Visit website" },
       pages: {
         home: {
-          metaTitle: "Projects",
-          metaDescription: "Projects description",
+          metaTitle: "Liem Vora",
+          metaDescription: "Personal website",
           eyebrow: "",
           title: "Liem Vora",
           titleAccent: "",
@@ -141,6 +142,16 @@ test("public content endpoint reads the D1 site record", async () => {
           title: "Projects",
           titleAccent: "",
           description: "Project description",
+          sectionTitle: "",
+          items: []
+        },
+        news: {
+          metaTitle: "Liem Vora: Tech News Digest",
+          metaDescription: "A regularly updated digest of technology news.",
+          eyebrow: "Portfolio",
+          title: "Tech News Digest",
+          titleAccent: "work.",
+          description: "",
           sectionTitle: "",
           items: []
         }

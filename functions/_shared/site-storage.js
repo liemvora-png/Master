@@ -4,7 +4,8 @@ const PAGE_SLUGS = {
   accomplishments: "accomplishments",
   arrangements: "arrangements",
   services: "services",
-  gallery: "gallery"
+  gallery: "gallery",
+  news: "news"
 };
 
 const BLOCK_TYPES = {
@@ -13,7 +14,8 @@ const BLOCK_TYPES = {
   accomplishments: "accomplishment",
   arrangements: "arrangement",
   services: null,
-  gallery: null
+  gallery: null,
+  news: null
 };
 
 function rows(result) {

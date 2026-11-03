@@ -108,6 +108,7 @@
     <a href="/arrangements.html">Arrangements</a>
     <a href="/services">Services</a>
     <a href="/gallery">Gallery</a>
+    <a href="/news" aria-current="page">News</a>
   </nav>
   <div class="header-actions">
     <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>
@@ -117,8 +118,117 @@
 
 <main class="news-digest" id="main">
 <h1>Tech News Digest</h1>
-<p class="updated">Last updated <time datetime="2026-11-03T10:15-06:00">2026-11-03 10:15 (UTC-6)</time></p>
+<p class="updated">Last updated <time id="news-updated" datetime=""></time></p>
 
+<section id="news-list"></section>
+</main>
+
+<footer class="site-footer">
+  <span>δ</span>
+  <span>MADE WITH CARE <span class="footer-dot" aria-hidden="true">·</span> 2026</span>
+</footer>
+
+<script>
+(function () {
+  const list = document.querySelector("#news-list");
+  const updated = document.querySelector("#news-updated");
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
+
+  function formatDate(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    }).format(date);
+  }
+
+  function renderNews(items) {
+    if (!items.length) {
+      list.insertAdjacentHTML("afterbegin", '<p class="empty-state">No tech news available right now.</p>');
+      return;
+    }
+
+    const groups = new Map();
+    for (const item of items) {
+      const date = item.published_at ? new Date(item.published_at) : new Date();
+      const key = date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    }
+
+    let html = "";
+    for (const [dateKey, dayItems] of groups) {
+      html += `<h2>${escapeHtml(dateKey)}</h2>`;
+      for (const item of dayItems) {
+        const timeStr = item.published_at ? formatDate(item.published_at) : "";
+        const body = item.body ? `<p>${escapeHtml(item.body)}</p>` : "";
+        const sourceName = escapeHtml(item.source_name || "Source");
+        const sourceUrl = item.source_url ? escapeHtml(item.source_url) : null;
+        const sourceHtml = sourceUrl
+          ? `<p class="source"><a href="${sourceUrl}">${sourceName} ↗</a></p>`
+          : `<p class="source">${sourceName}</p>`;
+        html += `
+<article>
+  <time datetime="${escapeHtml(item.published_at || "")}">${timeStr}</time>
+  <h3>${escapeHtml(item.headline || "Untitled")}</h3>
+  ${body}
+  ${sourceHtml}
+</article>`;
+      }
+    }
+    list.innerHTML = html;
+  }
+
+  function renderStaticFallback() {
+    const template = document.querySelector("#news-static");
+    if (!template) return;
+    list.innerHTML = template.innerHTML;
+    const time = template.querySelector("time[datetime]");
+    if (time && updated) {
+      updated.dateTime = time.getAttribute("datetime");
+      updated.textContent = time.textContent;
+    }
+  }
+
+  async function loadNews() {
+    try {
+      const response = await fetch("/api/news", { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error(`News request returned ${response.status}.`);
+      const { news } = await response.json();
+      const items = Array.isArray(news) ? news : [];
+      if (items.length) {
+        const newest = items[0].published_at || "";
+        if (newest && updated) {
+          updated.dateTime = newest;
+          updated.textContent = formatDate(newest);
+        }
+        renderNews(items);
+        return;
+      }
+      throw new Error("No news items available.");
+    } catch (error) {
+      console.error("Unable to load the news digest:", error);
+      renderStaticFallback();
+    }
+  }
+
+  loadNews();
+})();
+</script>
+
+<template id="news-static">
 <section>
 <h2>November 3, 2026</h2>
 
@@ -198,7 +308,7 @@
 </article>
 
 <article>
-<time datetime="2026-11-02T19:00-06:00">2026-11-02 19:00</time>
+<time datetime="2026-11-02T18:23-06:00">2026-11-02 18:23</time>
 <h3>MIT's Barzilay and Collins win 2026 Pritzker Prize for AI-enabled antibiotic discovery</h3>
 <p>Regina Barzilay and James Collins received the 2026 Pritzker Prize for AI in Science Research Excellence, awarded for the first time to a team, for using deep learning to discover novel antibiotics against drug-resistant "superbugs," beginning with halicin in 2020. Their work, a landmark for AI applied to medicine, now feeds a Phare Bio partnership targeting seven new antibiotic classes.</p>
 <p class="source"><a href="https://news.mit.edu/2026/regina-barzilay-jim-collins-win-pritzker-prize-ai-and-science-research-excellence-1102">MIT News</a></p>
@@ -359,11 +469,6 @@
 </article>
 
 </section>
-</main>
-
-<footer class="site-footer">
-  <span>δ</span>
-  <span>MADE WITH CARE <span class="footer-dot" aria-hidden="true">·</span> 2026</span>
-</footer>
+</template>
 </body>
 </html>
