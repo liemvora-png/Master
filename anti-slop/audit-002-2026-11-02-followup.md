@@ -39,6 +39,17 @@ The "Hourly tech news digest" automation (`56141f4a-391f-4f86-8243-bb54fc9adfe6`
 
 Impeccable flagged `single-font` on the inline `font-family` line: false positive. The page loads `/styles.css`, which styles `h1, h2` with `var(--serif)` (Playfair Display), so hierarchy comes from the shared stylesheet; the inline block only sets the body font.
 
+## Addendum: readability redesign (2026-11-03)
+
+Follow-up request: "make it more readable, clear buttons for links, light and dark mode to match home screen". Commit `837a13e`, deployed and verified live.
+
+- The page now carries the site chrome: `.site-header` (wordmark, nav, theme toggle, admin button) and `.site-footer` copied from `src/templates/home.html`, plus the theme-color meta, Google Fonts (DM Mono/DM Sans/Playfair), and `/assets/site.js` (defer). Body has no `data-page` attribute, so `loadManagedContent()` only refreshes nav; `initThemeToggle()` gives a working light/dark switch that persists to `localStorage`.
+- Source links are now bordered buttons (`p.source a`, min-height 36px, 1px `var(--line)`, `var(--olive)`, hover `var(--paper-deep)`, focus-visible outline, `↗` via `::after`), mirroring `.admin-entry-button`.
+- Typography matches the home news rows: Playfair `h3` (`clamp(1.15rem, 2.4vw, 1.4rem)`), mono timestamps at `.64rem` with `.08em` tracking, `1.15rem` article padding with `var(--line)` separators, digest column capped at 46rem.
+- Scraping contract intact: `main article`, `article time[datetime]`, `article h3`, `p.source a` unchanged; the home page "Latest news" section still renders 3 rows from the redesigned page.
+- Verified in `wrangler dev` and live: dark body 14.15:1, time 6.22:1, links 8.47:1; light body 13.30:1, time 5.52:1, links 5.83:1 (all AA). Toggle click flips theme and persists. 33/3 tests pass.
+- Automation prompt updated again: the digest job must not modify the head, header/footer, or style block on routine runs, keeps `p.source a` structure, and leaves no `data-page` on body.
+
 ## Still pending (pre-existing, unrelated)
 
 - D1 migrations `0005_meta_title_dashes.sql` and `0005_remove_tutoring_add_viola.sql` are in the repo but were not applied to the remote D1 in this session.
