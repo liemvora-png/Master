@@ -10,7 +10,9 @@ const validContent = {
     { label: "Projects", href: "/projects", page: "projects" },
     { label: "Accomplishments", href: "accomplishments.html", page: "accomplishments" },
     { label: "Arrangements", href: "arrangements.html", page: "arrangements" },
-    { label: "Services", href: "/services", page: "services" }
+  { label: "Services", href: "/services", page: "services" },
+  { label: "Gallery", href: "/gallery", page: "gallery" },
+  { label: "Tech News Digest", href: "/news", page: "news" }
   ],
   labels: {
     projectLink: "Visit website",
@@ -76,6 +78,16 @@ const validContent = {
       titleAccent: "",
       description: "A selection of photographs.",
       sectionTitle: "",
+      items: []
+    },
+    news: {
+      metaTitle: "Tech News Digest",
+      metaDescription: "A regularly updated digest of technology news.",
+      eyebrow: "Latest news",
+      title: "Tech News Digest",
+      titleAccent: "work.",
+      description: "Latest tech headlines.",
+      sectionTitle: "Latest news",
       items: []
     }
   },

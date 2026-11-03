@@ -1,4 +1,4 @@
-const PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements", "services", "gallery"];
+const PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements", "services", "gallery", "news"];
 const PAGE_FILES = new Set([
   "index.html",
   "projects.html",
@@ -31,7 +31,9 @@ function isLink(value, allowPageLinks = false) {
 function validItems(pageName, items) {
   if (!Array.isArray(items) || items.length > 100) return false;
   if (pageName === "home") return items.length === 0;
-  if (pageName === "services" || pageName === "gallery") return items.length === 0;
+  if (pageName === "services" || pageName === "gallery" || pageName === "news") {
+    return items.length === 0;
+  }
 
   return items.every((item) => {
     if (!isRecord(item)) return false;

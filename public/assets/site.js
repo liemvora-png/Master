@@ -326,49 +326,46 @@ async function loadHomeNews() {
   if (!section || !list) return;
 
   try {
-    const response = await fetch("/news/", { headers: { Accept: "text/html" } });
+    const response = await fetch("/api/news", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`News request returned ${response.status}.`);
-    const doc = new DOMParser().parseFromString(await response.text(), "text/html");
-    const articles = [...doc.querySelectorAll("main article")].slice(0, HOME_NEWS_LIMIT);
-    if (articles.length === 0) throw new Error("No news articles found in the digest.");
+    const { news } = await response.json();
+    const items = Array.isArray(news) ? news : [];
+    items.length = Math.min(items.length, HOME_NEWS_LIMIT);
 
     list.replaceChildren();
-    for (const article of articles) {
-      const headline = article.querySelector("h3")?.textContent?.trim();
-      if (!headline) continue;
+    if (items.length === 0) throw new Error("No news items available.");
 
+    for (const item of items) {
       const row = document.createElement("li");
       row.className = "home-news-item";
 
       const when = document.createElement("span");
       when.className = "home-news-time";
-      const timeEl = article.querySelector("time[datetime]");
-      const stamp = timeEl?.getAttribute("datetime") || "";
+      const stamp = item.published_at || "";
       if (stamp && !Number.isNaN(new Date(stamp).getTime())) {
         const time = document.createElement("time");
         time.dateTime = stamp;
         time.textContent = formatNewsDate(stamp);
         when.append(time);
       } else {
-        when.textContent = timeEl?.textContent?.trim() || "";
+        when.textContent = "";
       }
 
       const info = document.createElement("span");
       info.className = "home-news-info";
       const title = document.createElement("span");
       title.className = "home-news-title";
-      title.textContent = headline;
+      title.textContent = item.headline || "Untitled";
       info.append(title);
 
       row.append(when, info);
 
-      const sourceEl = article.querySelector("p.source a");
-      const sourceHref = safeHref(sourceEl?.getAttribute("href") || "");
+      const sourceHref = safeHref(item.source_url || "");
       if (sourceHref) {
         const source = document.createElement("a");
         source.className = "project-link home-news-source";
         source.href = sourceHref;
-        source.textContent = `${sourceEl.textContent.trim() || "Source"} ↗`;
+        source.textContent = `${item.source_name || "Source"} ↗`;
         row.append(source);
       }
 

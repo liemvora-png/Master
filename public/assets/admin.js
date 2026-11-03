@@ -11,7 +11,8 @@ const SECTIONS = [
   { id: "accomplishments", label: "Accomplishments" },
   { id: "arrangements", label: "Arrangements" },
   { id: "services", label: "Services page" },
-  { id: "gallery", label: "Gallery page" }
+  { id: "gallery", label: "Gallery page" },
+  { id: "news", label: "Tech news" }
 ];
 
 const PAGE_FIELDS = [
@@ -30,6 +31,7 @@ const HOME_FIELDS = [
 ];
 
 let content;
+let newsItems = [];
 let activeSection = "site";
 let dirty = false;
 let previewFrame;
@@ -167,7 +169,7 @@ function renderSiteSettings() {
 function renderPage(sectionId) {
   const page = content.pages[sectionId];
   const isHome = sectionId === "home";
-  const isStaticPage = ["home", "services", "gallery"].includes(sectionId);
+  const isStaticPage = ["home", "services", "gallery", "news"].includes(sectionId);
   const isProjects = sectionId === "projects";
   const isAccomplishments = sectionId === "accomplishments";
   const sectionTitle = sectionId === "services" ? "Services page"
@@ -291,6 +293,8 @@ function renderPreviewMarkup(page, sectionId) {
     section = '<section class="services-section"><p class="empty-state">Service details are edited in the Services &amp; bookings panel.</p></section>';
   } else if (sectionId === "gallery") {
     section = '<section><p class="empty-state">Gallery images are edited in the Services &amp; bookings panel.</p></section>';
+  } else if (sectionId === "news") {
+    section = '<section><p class="empty-state">Tech news items are edited below in this tab.</p></section>';
   }
 
   return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">${escapeHtml(content.brand)}</span></a><nav class="site-nav" aria-label="Main navigation">${navigation}</nav>${adminLink}</header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;
@@ -396,6 +400,82 @@ function renderItems(container, items, path, sectionId) {
   container.append(makeButton(addLabel, "add", path, "editor-button editor-button-add"));
 }
 
+function renderNewsSection() {
+  editor.append(makePanelHeading(
+    "Tech news",
+    "Headlines from the public tech news digest. Changes are saved separately from site content."
+  ));
+
+  const list = document.createElement("div");
+  list.className = "editor-item-list";
+
+  newsItems.forEach((item, index) => {
+    const itemPath = ["news", index];
+    const card = document.createElement("article");
+    card.className = "editor-item-card";
+
+    const top = document.createElement("div");
+    top.className = "editor-item-top";
+    const title = document.createElement("h4");
+    title.textContent = item.headline || `New news item`;
+    const order = document.createElement("span");
+    order.className = "editor-item-order";
+    order.textContent = String(index + 1).padStart(2, "0");
+    top.append(title, order);
+
+    const fields = document.createElement("div");
+    fields.className = "editor-item-fields";
+    const keys = ["headline", "body", "source_url", "source_name", "published_at"];
+    const labels = {
+      headline: "Headline",
+      body: "Body",
+      source_url: "Source URL",
+      source_name: "Source name",
+      published_at: "Published date"
+    };
+    for (const key of keys) {
+      fields.append(makeField({
+        label: labels[key],
+        value: item[key] ?? "",
+        path: [...itemPath, key],
+        multiline: key === "body",
+        type: key === "published_at" ? "datetime-local" : "text"
+      }));
+    }
+
+    fields.append(makeField({
+      label: "Active",
+      value: String(item.active),
+      path: [...itemPath, "active"],
+      type: "checkbox"
+    }));
+    card.append(top, fields);
+
+    const positionControl = document.createElement("div");
+    positionControl.className = "editor-item-fields";
+    positionControl.append(makeField({
+      label: "Position",
+      value: item.position ?? index + 1,
+      path: [...itemPath, "position"],
+      type: "number"
+    }));
+    card.append(positionControl);
+
+    const actions = document.createElement("div");
+    actions.className = "editor-item-actions";
+    const moveUp = makeButton("Move up", "news-move-up", itemPath);
+    const moveDown = makeButton("Move down", "news-move-down", itemPath);
+    moveUp.disabled = index === 0;
+    moveDown.disabled = index === newsItems.length - 1;
+    actions.append(moveUp, moveDown, makeButton("Remove", "news-remove", itemPath, "editor-button editor-button-danger"));
+    card.append(actions);
+    list.append(card);
+  });
+
+  editor.append(list);
+  editor.append(makeButton("Add news item", "news-add", ["news"], "editor-button editor-button-add"));
+}
+
 function renderEditor() {
   renderTabs();
   editor.replaceChildren();
@@ -403,6 +483,7 @@ function renderEditor() {
   editor.setAttribute("role", "tabpanel");
   editor.setAttribute("aria-labelledby", `tab-${activeSection}`);
   if (activeSection === "site") renderSiteSettings();
+  else if (activeSection === "news") renderNewsSection();
   else renderPage(activeSection);
 }
 
@@ -425,7 +506,7 @@ function newArrayItem(path) {
 }
 
 function updatePreview() {
-  if (activeSection !== "site") {
+  if (activeSection !== "site" && activeSection !== "news") {
     refreshPreviewFrame(activeSection);
   }
   const activeTab = tabs.querySelector('[aria-selected="true"]');
@@ -440,20 +521,55 @@ async function loadContent() {
   reloadButton.disabled = true;
   saveButton.disabled = true;
   try {
-    const response = await window.adminAuth.fetch("/api/content", {
-      headers: { Accept: "application/json" },
-      credentials: "same-origin"
-    });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
-    content = result.content;
+    await Promise.all([
+      (async () => {
+        const response = await window.adminAuth.fetch("/api/content", {
+          headers: { Accept: "application/json" },
+          credentials: "same-origin"
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
+        content = result.content;
+      })(),
+      (async () => {
+        const response = await window.adminAuth.fetch("/api/news", {
+          headers: { Accept: "application/json" },
+          credentials: "same-origin"
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
+        newsItems = result.news || [];
+      })()
+    ]);
     dirty = false;
     renderEditor();
-    setStatus(`All changes are saved. Last updated ${new Date(result.updatedAt).toLocaleString()}.`, "success");
+    setStatus(`All changes are saved. Last updated ${new Date(content.updatedAt).toLocaleString()}.`, "success");
   } catch (error) {
     setStatus(`Could not load content: ${error.message}`, "error");
   } finally {
     reloadButton.disabled = false;
+  }
+}
+
+async function saveNews() {
+  saveButton.disabled = true;
+  reloadButton.disabled = true;
+  setStatus("Saving tech news…");
+  try {
+    const response = await window.adminAuth.fetch("/api/admin/news", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      credentials: "same-origin",
+      body: JSON.stringify({ news: newsItems })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Save failed (${response.status}).`);
+    return result;
+  } catch (error) {
+    throw new Error(`Could not save news changes: ${error.message}`);
   }
 }
 
@@ -462,19 +578,26 @@ async function saveContent() {
   reloadButton.disabled = true;
   setStatus("Saving your changes…");
   try {
-    const response = await window.adminAuth.fetch("/api/admin/content", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      credentials: "same-origin",
-      body: JSON.stringify(content)
-    });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || `Save failed (${response.status}).`);
+    const results = await Promise.all([
+      (async () => {
+        const response = await window.adminAuth.fetch("/api/admin/content", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          credentials: "same-origin",
+          body: JSON.stringify(content)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `Save failed (${response.status}).`);
+        return result;
+      })(),
+      (async () => saveNews())()
+    ]);
+    const contentResult = results[0];
     dirty = false;
-    setStatus(`Changes saved successfully at ${new Date(result.updatedAt).toLocaleString()}.`, "success");
+    setStatus(`Changes saved successfully at ${new Date(contentResult.updatedAt).toLocaleString()}.`, "success");
   } catch (error) {
     setStatus(`Could not save changes: ${error.message}`, "error");
   } finally {
@@ -489,6 +612,37 @@ tabs.addEventListener("click", (event) => {
   activeSection = button.dataset.section;
   renderEditor();
 });
+
+editor.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button || !content) return;
+  const path = JSON.parse(button.dataset.path);
+  if (button.dataset.action.startsWith("news-")) {
+    const index = path.pop();
+    if (button.dataset.action === "news-remove") {
+      newsItems.splice(index, 1);
+    } else if (button.dataset.action === "news-add") {
+      newsItems.push({
+        id: `news-${Date.now()}`,
+        headline: "",
+        body: "",
+        source_url: "https://",
+        source_name: "",
+        published_at: new Date().toISOString(),
+        position: newsItems.length + 1,
+        active: true
+      });
+    } else if (button.dataset.action === "news-move-up" || button.dataset.action === "news-move-down") {
+      const items = getAtPath(path);
+      const offset = button.dataset.action === "news-move-up" ? -1 : 1;
+      const destination = index + offset;
+      if (destination < 0 || destination >= items.length) return;
+      [items[index], items[destination]] = [items[destination], items[index]];
+    }
+    renderEditor();
+    markDirty("Unsaved changes. Save to publish them to your site.");
+    return;
+  }
 
 tabs.addEventListener("keydown", (event) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
@@ -506,7 +660,15 @@ tabs.addEventListener("keydown", (event) => {
 editor.addEventListener("input", (event) => {
   const control = event.target.closest("[data-path]");
   if (!control || !content) return;
-  setAtPath(JSON.parse(control.dataset.path), control.value);
+  const path = JSON.parse(control.dataset.path);
+  if (control.type === "checkbox") {
+    path.pop();
+    const target = getAtPath(path);
+    const key = path.pop();
+    target[key] = control.checked;
+  } else {
+    setAtPath(path, control.value);
+  }
   markDirty();
   updatePreview();
 });

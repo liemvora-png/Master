@@ -79,6 +79,16 @@ const content = {
       description: "Selected photographs.",
       sectionTitle: "",
       items: []
+    },
+    news: {
+      metaTitle: "Tech News Digest",
+      metaDescription: "A regularly updated digest of technology news.",
+      eyebrow: "Latest news",
+      title: "Tech News Digest",
+      titleAccent: "",
+      description: "",
+      sectionTitle: "",
+      items: []
     }
   },
   footer: { label: "LIEM VORA", note: "MADE WITH CARE", year: "2026" }
@@ -104,7 +114,7 @@ test("writes pages, ordered JSON blocks, navigation, and settings", () => {
   assert.equal(statements[0].sql, "DELETE FROM blocks");
   assert.equal(statements[1].sql, "DELETE FROM nav_items");
   assert.equal(statements[2].sql, "DELETE FROM pages");
-  assert.equal(pages.length, 6);
+  assert.equal(pages.length, 7);
   assert.equal(blocks.length, 3);
   assert.equal(navigation.length, 5);
   assert.deepEqual(pages.map(({ values }) => values.slice(0, 2)), [
@@ -113,7 +123,8 @@ test("writes pages, ordered JSON blocks, navigation, and settings", () => {
     ["accomplishments", "accomplishments"],
     ["arrangements", "arrangements"],
     ["services", "services"],
-    ["gallery", "gallery"]
+    ["gallery", "gallery"],
+    ["news", "news"]
   ]);
   assert.deepEqual(blocks.map(({ values }) => values.slice(0, 3)), [
     ["projects", 1, "project"],

@@ -3,9 +3,11 @@ import { jsonResponse } from "../functions/_shared/content.js";
 import { onRequest as adminContent } from "../functions/api/admin/content.js";
 import { handleAdminBooking, onRequest as adminPortfolio } from "../functions/api/admin/portfolio.js";
 import { onRequest as adminGallery } from "../functions/api/admin/gallery.js";
+import { onRequest as adminNews } from "../functions/api/admin/news.js";
 import { onRequest as availabilityApi } from "../functions/api/availability.js";
 import { onRequest as bookingApi } from "../functions/api/bookings.js";
 import { onRequest as galleryApi } from "../functions/api/gallery.js";
+import { onRequest as newsApi } from "../functions/api/news.js";
 import { onRequest as publicContent } from "../functions/api/content.js";
 import { onRequest as servicesApi } from "../functions/api/services.js";
 
@@ -72,6 +74,8 @@ export function createWorker(templates) {
       if (pathname === "/api/bookings") return bookingApi({ request, env, context });
       if (pathname === "/api/admin/portfolio") return adminPortfolio({ request, env, context });
       if (pathname === "/api/admin/gallery") return adminGallery({ request, env, context });
+      if (pathname === "/api/news") return newsApi({ request, env, context });
+      if (pathname === "/api/admin/news") return adminNews({ request, env, context });
       if (pathname.startsWith("/api/admin/bookings/")) {
         return handleAdminBooking(request, env, pathname);
       }
