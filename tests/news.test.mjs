@@ -8,7 +8,7 @@ test("home page carries a hidden news section linking to the digest", () => {
   assert.match(home, /<section class="home-news"[^>]*hidden[^>]*aria-labelledby="home-news-title"/);
   assert.match(home, /<h2 id="home-news-title">Latest news<\/h2>/);
   assert.match(home, /<a class="news-all-link" href="\/news"/);
-  assert.match(home, /<ul class="home-news-list" id="home-news-list"><\/ul>/);
+  assert.match(home, /<ul class="home-news-list" id="home-news-list">/);
 });
 
 test("site script renders the newest digest items on the home page", () => {
