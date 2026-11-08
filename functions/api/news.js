@@ -7,9 +7,20 @@ export async function onRequest({ request, env }) {
   try {
     const result = await env.DB.prepare(
       "SELECT id, headline, body, source_url, source_name, published_at, position, active " +
-      "FROM news_items WHERE active = 1 ORDER BY position"
+      "FROM news_items WHERE active = 1"
     ).all();
-    return jsonResponse({ news: result.results || [] });
+
+    // Newest first so the site always leads with the latest D1 entries;
+    // position only breaks ties within the same timestamp.
+    const news = (result.results || []).sort((a, b) => {
+      const at = Date.parse(a.published_at);
+      const bt = Date.parse(b.published_at);
+      if (Number.isNaN(at) || Number.isNaN(bt)) {
+        return (Number.isNaN(at) - Number.isNaN(bt)) || a.position - b.position;
+      }
+      return bt - at || a.position - b.position;
+    });
+    return jsonResponse({ news });
   } catch (error) {
     console.error("Failed to read tech news from D1:", error);
     return jsonResponse({ error: "Tech news is temporarily unavailable." }, 503);
