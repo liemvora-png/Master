@@ -644,6 +644,7 @@ editor.addEventListener("click", (event) => {
     return;
   }
 
+});
 tabs.addEventListener("keydown", (event) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
   event.preventDefault();
