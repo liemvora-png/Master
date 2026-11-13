@@ -58,6 +58,6 @@
     // Clerk accounts allowed to edit the site. For more than one account use
     // CLERK_ADMIN_USER_IDS: "user_xxx,user_yyy". The admin editor shows the
     // rejected Clerk account id, which is what to put here.
-    "CLERK_ADMIN_USER_ID": "user_3LHhoblyTQd373Y2LFWRZy4f5aJ"
+    "CLERK_ADMIN_USER_ID": "user_3LHu9lXPwvZVoX3GEGv8qn85WEh"
   }
 }
