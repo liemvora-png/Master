@@ -111,14 +111,16 @@ a:focus-visible {
 }
 
 .site-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   min-height: 82px;
   border-bottom: 1px solid var(--line);
 }
 
 .site-header > .wordmark {
-  justify-self: start;
+  flex-shrink: 0;
 }
 
 .site-nav {
@@ -129,17 +131,12 @@ a:focus-visible {
   gap: clamp(1rem, 3vw, 2.2rem);
   color: var(--muted);
   font-size: 0.76rem;
-}
-
-.site-header > .site-nav {
-  justify-self: center;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .site-header > .header-actions {
-  justify-self: end;
-}
-
-.header-actions {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1209,33 +1206,32 @@ h1 span {
   }
 
   .site-header {
-    grid-template-columns: minmax(0, 1fr) auto;
+    flex-wrap: wrap;
     gap: 0.7rem 1rem;
     padding-block: 0.8rem;
   }
 
   .header-actions {
-      grid-column: 2;
-      grid-row: 1;
+    flex-shrink: 0;
   }
 
-    .admin-entry-button {
-      min-height: 36px;
-      padding: 0.45rem 0.65rem;
-    }
+  .admin-entry-button {
+    min-height: 36px;
+    padding: 0.45rem 0.65rem;
+  }
 
-    .theme-toggle {
-      min-height: 36px;
-      padding: 0.45rem 0.6rem;
-    }
+  .theme-toggle {
+    min-height: 36px;
+    padding: 0.45rem 0.6rem;
+  }
 
-    .site-nav {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      justify-self: stretch;
-      gap: 0.9rem;
-      font-size: 0.68rem;
-    }
+  .site-nav {
+    flex: 1 1 auto;
+    justify-self: stretch;
+    gap: 0.9rem;
+    font-size: 0.68rem;
+    min-width: 0;
+  }
 
   .intro {
     padding-block: 5.5rem 4.5rem;
