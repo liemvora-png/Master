@@ -122,6 +122,9 @@ export function validateContent(content) {
     const page = content.pages[pageName];
     const isHome = pageName === "home";
     const isCollectionPage = pageName === "services" || pageName === "gallery";
+    // Tech news renders without a heading accent, so its titleAccent may be
+    // empty, but its section title remains required.
+    const hasNoTitleAccent = pageName === "news";
     if (pageName === "arrangements" && isRecord(page)) {
       const arrangementsError = validateArrangements(page.items);
       if (arrangementsError) return arrangementsError;
@@ -132,8 +135,8 @@ export function validateContent(content) {
       || !isText(page.title, 160)
       || (!isHome && !isText(page.eyebrow, 120))
       || (isHome && page.eyebrow !== "")
-      || (!isHome && !isCollectionPage && !isText(page.titleAccent, 160))
-      || ((isHome || isCollectionPage) && page.titleAccent !== "")
+      || (!isHome && !(isCollectionPage || hasNoTitleAccent) && !isText(page.titleAccent, 160))
+      || ((isHome || isCollectionPage || hasNoTitleAccent) && page.titleAccent !== "")
       || (!isHome && !isText(page.description, 500))
       || (isHome && page.description !== "")
       || (!isHome && !isCollectionPage && !isText(page.sectionTitle, 120))
