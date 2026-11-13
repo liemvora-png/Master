@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../functions/_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../functions/_shared/clerk.js";
 import { jsonResponse } from "../functions/_shared/content.js";
 import { onRequest as adminContent } from "../functions/api/admin/content.js";
 import { handleAdminBooking, onRequest as adminPortfolio } from "../functions/api/admin/portfolio.js";
@@ -99,7 +99,7 @@ export function createWorker(templates) {
       if (pathname === "/admin" || pathname.startsWith("/admin/")) {
         const authorization = await authorizeAdmin(request, env);
         if (!authorization.ok) {
-          return jsonResponse({ error: authorization.message }, authorization.status);
+          return jsonResponse(authorizationBody(authorization), authorization.status);
         }
         return notFoundResponse();
       }

@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../../_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
 function isValidId(value) {
@@ -50,7 +50,7 @@ function validateNewsItem(item, index) {
 export async function onRequest({ request, env }) {
   const authorization = await authorizeAdmin(request, env);
   if (!authorization.ok) {
-    return jsonResponse({ error: authorization.message }, authorization.status);
+    return jsonResponse(authorizationBody(authorization), authorization.status);
   }
   if (!env.DB) return jsonResponse({ error: "News storage is not configured." }, 503);
   if (request.method !== "PUT") return jsonResponse({ error: "Method not allowed." }, 405);

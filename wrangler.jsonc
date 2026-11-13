@@ -51,8 +51,13 @@
   ],
   "vars": {
     "CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk",
+    // Clerk signs every admin session token with this issuer, and publishes the
+    // matching public keys at the JWKS url below.
     "CLERK_ISSUER": "https://clerk.liemvora.cc",
     "CLERK_JWKS_URL": "https://clerk.liemvora.cc/.well-known/jwks.json",
+    // Clerk accounts allowed to edit the site. For more than one account use
+    // CLERK_ADMIN_USER_IDS: "user_xxx,user_yyy". The admin editor shows the
+    // rejected Clerk account id, which is what to put here.
     "CLERK_ADMIN_USER_ID": "user_3LHhoblyTQd373Y2LFWRZy4f5aJ"
   }
 }
