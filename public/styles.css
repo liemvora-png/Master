@@ -168,6 +168,35 @@ a:focus-visible {
   gap: 0.55rem;
 }
 
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0;
+}
+
+.menu-toggle-line {
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  display: block;
+}
+
+.menu-toggle:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
+}
+
 .wordmark-symbol {
   font-family: var(--serif);
   font-size: 1.55rem;
@@ -1215,8 +1244,29 @@ h1 span {
     padding-block: 0.6rem;
   }
 
-  .header-actions {
-    flex-shrink: 0;
+  .menu-toggle {
+    display: flex;
+  }
+
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    display: none;
+    font-size: 0.68rem;
+    min-width: 0;
+  }
+
+  .site-nav.nav-open {
+    display: flex;
   }
 
   .admin-entry-button {
