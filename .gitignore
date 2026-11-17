@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Build / dev artifacts
+.wrangler/tmp/
+.impeccable/
+
+# OS
+.DS_Store
+Thumbs.db
