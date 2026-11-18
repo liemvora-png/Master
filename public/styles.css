@@ -200,7 +200,9 @@ a:focus-visible {
 }
 
 /* One authoritative burger rule set: fixed 44x44 box, identical in every
-   theme and state, so light/dark/pressed never change its dimensions. */
+   theme and state, so light/dark/pressed never change its dimensions.
+   Transparent background lets the page's theme color show through, the
+   same as the other header controls. */
 .menu-toggle {
   display: inline-flex;
   width: 44px;
@@ -214,7 +216,7 @@ a:focus-visible {
   flex-direction: column;
   gap: 0;
   padding: 0;
-  background: var(--surface);
+  background: transparent;
   color: var(--ink);
   cursor: pointer;
 }
