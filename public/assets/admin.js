@@ -35,6 +35,29 @@ let newsItems = [];
 let activeSection = "site";
 let dirty = false;
 let previewFrame;
+let menuOpen = false;
+
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  const nav = document.querySelector(".site-nav");
+  const toggle = document.querySelector(".menu-toggle");
+  if (!nav || !toggle) return;
+  nav.classList.toggle("nav-open", menuOpen);
+  toggle.setAttribute("aria-expanded", String(menuOpen));
+}
+
+function initMenu() {
+  const toggle = document.querySelector(".menu-toggle");
+  if (!toggle) return;
+  toggle.addEventListener("click", toggleMenu);
+  // Close menu when a nav link is clicked
+  document.addEventListener("click", (event) => {
+    if (!menuOpen) return;
+    if (event.target.closest(".site-nav a")) {
+      toggleMenu();
+    }
+  });
+}
 
 function setStatus(message, state = "") {
   status.textContent = message;
@@ -297,7 +320,7 @@ function renderPreviewMarkup(page, sectionId) {
     section = '<section><p class="empty-state">Tech news items are edited below in this tab.</p></section>';
   }
 
-  return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">${escapeHtml(content.brand)}</span></a><nav class="site-nav" aria-label="Main navigation">${navigation}</nav>${adminLink}</header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;
+  return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">${escapeHtml(content.brand)}</span></a><nav class="site-nav" id="site-navigation" aria-label="Main navigation" aria-hidden="true" inert>${navigation}</nav><div class="header-actions"><button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="site-navigation" aria-expanded="false"><span class="menu-toggle-lines" aria-hidden="true"><span class="menu-toggle-line"></span><span class="menu-toggle-line"></span><span class="menu-toggle-line"></span></span></button><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>${adminLink}</div></header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;
 }
 
 function safePreviewHref(value) {
@@ -543,6 +566,7 @@ async function loadContent() {
     ]);
     dirty = false;
     renderEditor();
+    initMenu();
     setStatus(`All changes are saved. Last updated ${new Date(content.updatedAt).toLocaleString()}.`, "success");
   } catch (error) {
     setStatus(`Could not load content: ${error.message}`, "error");
@@ -644,6 +668,7 @@ editor.addEventListener("click", (event) => {
     return;
   }
 
+});
 tabs.addEventListener("keydown", (event) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
   event.preventDefault();

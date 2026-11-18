@@ -25,7 +25,18 @@ test("every page uses the same header navigation order and includes Admin", () =
     else expectedNavigation = links;
 
     assert.match(template, /<a class="admin-entry-button" href="\/admin"/, `${templateName} should include Admin`);
+    assert.match(template, /<button class="menu-toggle"/, `${templateName} should include the always-visible menu button`);
+    assert.match(template, /aria-controls="site-navigation"/);
   }
+});
+
+test("desktop breakpoint exposes full navigation and hides the burger", () => {
+  const styles = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/assets/site.js", import.meta.url), "utf8");
+
+  assert.match(styles, /@media \(min-width: 1100px\)[\s\S]*\.menu-toggle\s*\{\s*display:\s*none;/);
+  assert.match(styles, /@media \(min-width: 1100px\)[\s\S]*\.site-header > \.site-nav[\s\S]*display:\s*flex/);
+  assert.match(script, /min-width: 1100px/);
 });
 
 test("home page welcomes visitors and displays its managed update time", () => {

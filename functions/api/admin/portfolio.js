@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../../_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
 function isText(value, maxLength, allowEmpty = false) {
@@ -123,7 +123,7 @@ function portfolioStatements(db, input) {
 
 export async function onRequest({ request, env }) {
   const authorization = await authorizeAdmin(request, env);
-  if (!authorization.ok) return jsonResponse({ error: authorization.message }, authorization.status);
+  if (!authorization.ok) return jsonResponse(authorizationBody(authorization), authorization.status);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
 
   if (request.method === "GET") {
@@ -156,7 +156,7 @@ export async function onRequest({ request, env }) {
 
 export async function handleAdminBooking(request, env, pathname) {
   const authorization = await authorizeAdmin(request, env);
-  if (!authorization.ok) return jsonResponse({ error: authorization.message }, authorization.status);
+  if (!authorization.ok) return jsonResponse(authorizationBody(authorization), authorization.status);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
   const id = pathname.slice("/api/admin/bookings/".length);
   if (!/^[\w-]{1,80}$/.test(id)) return jsonResponse({ error: "Booking not found." }, 404);

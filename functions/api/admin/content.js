@@ -1,11 +1,11 @@
-import { authorizeAdmin } from "../../_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse, validateContent } from "../../_shared/content.js";
 import { buildSiteContentStatements } from "../../_shared/site-storage.js";
 
 export async function onRequestPut({ request, env }) {
   const authorization = await authorizeAdmin(request, env);
   if (!authorization.ok) {
-    return jsonResponse({ error: authorization.message }, authorization.status);
+    return jsonResponse(authorizationBody(authorization), authorization.status);
   }
 
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);

@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../../_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
@@ -11,7 +11,7 @@ const IMAGE_TYPES = new Map([
 
 async function isAdmin(request, env) {
   const authorization = await authorizeAdmin(request, env);
-  return authorization.ok ? null : jsonResponse({ error: authorization.message }, authorization.status);
+  return authorization.ok ? null : jsonResponse(authorizationBody(authorization), authorization.status);
 }
 
 export async function onRequest({ request, env }) {

@@ -13,6 +13,7 @@
       document.documentElement.setAttribute("data-theme", theme);
     }
   })();
+
 </script>
 <meta name="description" content="Latest tech news digest: markets, memory prices, hardware releases, and research.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -22,8 +23,6 @@
 <link rel="stylesheet" href="/styles.css">
 <script src="/assets/site.js" defer></script>
 <style>
-  /* Colors and fonts come from the site design tokens in /styles.css so the
-     digest matches the home screen in both the light and dark themes. */
   .news-digest {
     max-width: 46rem;
     margin: 2.5rem auto 0;
@@ -71,7 +70,7 @@
   .news-digest .source { margin-top: .7rem; font-size: .85rem; }
   .news-digest .source a {
     display: inline-flex;
-    min-height: 36px;
+    min-height: 44px;
     align-items: center;
     gap: .4rem;
     padding: .45rem .8rem;
@@ -79,8 +78,6 @@
     border-radius: 2px;
     color: var(--olive);
     font-size: .72rem;
-    white-space: nowrap;
-    transition: background-color 180ms ease, border-color 180ms ease;
   }
   .news-digest .source a:hover {
     border-color: var(--olive);
@@ -94,6 +91,27 @@
     content: "\2197";
     font-size: .85em;
   }
+  .news-status {
+    min-height: 7rem;
+    margin: 1.5rem 0;
+    border: 1px solid var(--line);
+    padding: 1.25rem;
+  }
+  .news-status p {
+    color: var(--muted);
+  }
+  .news-status button {
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: .7rem .9rem;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .news-status button:hover {
+    border-color: var(--olive);
+    background: var(--paper-deep);
+  }
 </style>
 </head>
 <body>
@@ -101,7 +119,7 @@
 
 <header class="site-header">
   <a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">Liem Vora</span></a>
-  <nav class="site-nav" id="site-navigation" aria-label="Main navigation">
+  <nav class="site-nav" id="site-navigation" aria-label="Main navigation" aria-hidden="true" inert>
     <a href="/">Home</a>
     <a href="/projects">Projects</a>
     <a href="/accomplishments.html">Accomplishments</a>
@@ -111,7 +129,7 @@
     <a href="/news" aria-current="page">News</a>
   </nav>
   <div class="header-actions">
-    <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="site-navigation" aria-expanded="false"><span class="menu-toggle-line" aria-hidden="true"></span><span class="menu-toggle-line" aria-hidden="true"></span><span class="menu-toggle-line" aria-hidden="true"></span></button>
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="site-navigation" aria-expanded="false"><span class="menu-toggle-lines" aria-hidden="true"><span class="menu-toggle-line"></span><span class="menu-toggle-line"></span><span class="menu-toggle-line"></span></span></button>
     <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>
     <a class="admin-entry-button" href="/admin">Admin <span aria-hidden="true">↗</span></a>
   </div>
@@ -119,9 +137,13 @@
 
 <main class="news-digest" id="main">
 <h1>Tech News Digest</h1>
-<p class="updated">Last updated <time id="news-updated" datetime=""></time></p>
+<p class="updated">Last updated <time id="news-updated" datetime="">Loading...</time></p>
 
-<section id="news-list"></section>
+<section id="news-list" aria-busy="true">
+  <div class="news-status" role="status">
+    <p>Loading tech news...</p>
+  </div>
+</section>
 </main>
 
 <footer class="site-footer">
@@ -155,9 +177,22 @@
     }).format(date);
   }
 
+  function renderStatus(title, action) {
+    list.setAttribute("aria-busy", "false");
+    list.innerHTML = `
+      <div class="news-status" role="${action ? "alert" : "status"}">
+        <p>${escapeHtml(title)}</p>
+        ${action ? '<button type="button" data-news-retry>Try again</button>' : ""}
+      </div>`;
+    if (action) {
+      list.querySelector("[data-news-retry]").addEventListener("click", loadNews);
+    }
+  }
+
   function renderNews(items) {
+    list.setAttribute("aria-busy", "false");
     if (!items.length) {
-      list.insertAdjacentHTML("afterbegin", '<p class="empty-state">No tech news available right now.</p>');
+      renderStatus("No tech news is available right now.");
       return;
     }
 
@@ -192,18 +227,8 @@
     list.innerHTML = html;
   }
 
-  function renderStaticFallback() {
-    const template = document.querySelector("#news-static");
-    if (!template) return;
-    list.innerHTML = template.innerHTML;
-    const time = template.querySelector("time[datetime]");
-    if (time && updated) {
-      updated.dateTime = time.getAttribute("datetime");
-      updated.textContent = time.textContent;
-    }
-  }
-
   async function loadNews() {
+    list.setAttribute("aria-busy", "true");
     try {
       const response = await fetch("/api/news", { headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error(`News request returned ${response.status}.`);
@@ -218,582 +243,17 @@
         renderNews(items);
         return;
       }
-      throw new Error("No news items available.");
+      if (updated) updated.textContent = "Unavailable";
+      renderStatus("No tech news is available right now.");
     } catch (error) {
       console.error("Unable to load the news digest:", error);
-      renderStaticFallback();
+      if (updated) updated.textContent = "Unavailable";
+      renderStatus("Tech news could not be loaded.", true);
     }
   }
 
   loadNews();
 })();
 </script>
-
-<template id="news-static">
-<section>
-<h2>November 7, 2026</h2>
-
-<article>
-<time datetime="2026-11-07T10:00-06:00">2026-11-07 10:00</time>
-<h3>Google Research AI flags hypertension from a regular smartwatch, no cuff required</h3>
-<p>In a Nature paper, Google Research describes an AI model (AI-PPG-ACC-HTN) trained on roughly 500,000 hours of smartwatch photoplethysmography and motion data that detects signs of chronic hypertension in a 196-adult study. It reached 65.8% sensitivity versus 55.3% for in-office cuff screening, with no cuff calibration needed, pointing toward passive large-scale screening.</p>
-<p class="source"><a href="https://research.google/blog/detecting-signs-of-hypertension-using-wearable-sensors/">Google Research Blog</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T10:00-06:00">2026-11-07 10:00</time>
-<h3>Microchip CEO: AI customers "took over the whole factory," lead times stretch to 32 weeks</h3>
-<p>On its Q2 earnings call, Microchip Technology said AI buyers absorbed so much foundry capacity that standard chip lead times jumped from 4–8 weeks to 6–32 weeks, with unfilled orders slipping into later quarters. CEO Steve Sanghi said AI companies "came in and took over the whole factory. They pushed everybody out," and the stock fell about 10% as December guidance stepped down.</p>
-<p class="source"><a href="https://finance.yahoo.com/technology/ai/articles/chip-shortage-back-microchip-says-134647000.html">Yahoo Finance</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T10:00-06:00">2026-11-07 10:00</time>
-<h3>OpenAI, Arm and Qualcomm executives play down the post-midterm AI sell-off</h3>
-<p>After the post-midterm rout erased more than $2.5T from tech and pushed the Nasdaq down over 5.5%, Arm CEO Rene Haas called the panic "very, very short-term thinking" and OpenAI CFO Sarah Friar pledged continued data-center investment, saying "We will never raise your electricity bill." The executives argued that new data-center rules and local opposition will not derail AI demand.</p>
-<p class="source"><a href="https://longbridge.com/en/news/304679134">Longbridge (CNBC)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T10:00-06:00">2026-11-07 10:00</time>
-<h3>FDA approval of bepirovirsen delivers the first "functional cure" option for chronic hepatitis B</h3>
-<p>The FDA approved GSK's Hibsago (bepirovirsen) on October 20, the first antisense therapy able to functionally cure chronic hepatitis B in some patients: in the pivotal B-Well Phase 3 trials, 19% of patients with HBsAg at or below 3,000 IU/mL kept the virus suppressed for 24 weeks after stopping all treatment, versus under 1% on standard therapy. Science Times covered the milestone on November 6.</p>
-<p class="source"><a href="https://www.sciencetimes.com/articles/62860/20261106/fda-approves-bepirovirsen-first-treatment-offering-functional-cure-chronic-hepatitis-b.htm">Science Times</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>AWS splits one GPU into seven for SageMaker multi-model endpoints</h3>
-<p>Amazon SageMaker Inference now supports NVIDIA Multi-Instance GPU partitioning on real-time endpoints, letting teams carve a single accelerator into up to seven hardware-isolated slices, each with its own memory and compute. AWS says an H100 MIG partition outperformed a full A100-40GB on tested workloads and delivered 18–34% cost savings per million output tokens; the feature runs on P4d, P5, G7 and G7e instances.</p>
-<p class="source"><a href="https://www.unite.ai/aws-adds-nvidia-gpu-partitioning-to-sagemaker-inference-endpoints/">Unite.AI</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>Ramp data shows enterprise AI spending stalled just as Anthropic nears its IPO</h3>
-<p>Ramp's card data shows enterprise AI token spending grew only 1.5% across August and September, down from 42% growth in July, with October partially recovering at 8.9%. The flattening, driven by model price cuts and tighter customer cost controls, lands as Anthropic's indicated IPO valuation slid from about $2T to $1.2–1.3T.</p>
-<p class="source"><a href="https://techcrunch.com/2026/11/06/ramp-data-shows-ai-spending-stalling-just-as-anthropic-nears-its-ipo/">TechCrunch</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>DeepMind says AI agents found two weaknesses in legacy 1024-bit RSA</h3>
-<p>Google DeepMind reported that AI agents guided by cryptanalysts Nadia Heninger and Emmanuel Thomé produced two advances against 1024-bit RSA in a matter of weeks: a signature forgery attack roughly 1,600x more efficient against short-digest signatures, and a batch factoring algorithm that cuts the marginal cost of attacking related keys by about 30x. Modern RSA-2048 deployments are not affected.</p>
-<p class="source"><a href="https://cryptobriefing.com/google-deepmind-ai-rsa-1024-bit-weaknesses/">Crypto Briefing</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>Check Point: autonomous ARTEX agents stole 300+ Apple iOS signing certs for about $1,500</h3>
-<p>Check Point Research found a single operator ran ARTEX AI agents for two weeks in October to steal more than 300 Apple iOS code-signing certificates and 190,000+ gaming credentials from 13 gray-market backends, consuming roughly 36 billion tokens of DeepSeek and Kimi models for an estimated $700–1,500. Most attacks ran fully autonomous after the operator set the initial goal.</p>
-<p class="source"><a href="https://research.checkpoint.com/2026/hacking-on-autopilot-inside-artex-cybercrime-campaigns/">Check Point Research</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>Alibaba teases Qwen4 with a cryptic Zhuangzi poster, no date or benchmarks</h3>
-<p>Alibaba's Qwen team posted a November 6 image of birds forming a fish above a dark sea, paired with a 2,300-year-old Zhuangzi passage missing its final character and the line "The becoming begins." No model name, release date or benchmark was disclosed, leaving Qwen4's open-weight timeline a matter of speculation.</p>
-<p class="source"><a href="https://asiatimes.com/2026/11/what-alibaba-left-blank-about-qwen4/">Asia Times</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>Huawei launches Qingyun HM650, certified as China's first 100% domestic desktop</h3>
-<p>Unveiled at the HarmonyOS Office Industry Summit in Wuhan, the HM650 pairs Huawei's Kirin X90 10-core/20-thread processor and Maleoon 910 GPU with HarmonyOS V1.0, with every component from processor to memory domestically sourced. Enterprise (HM650) and government (HM650G) variants target finance and energy fleets; Huawei says 21,000+ apps now run on HarmonyOS PCs and has shipped over 1 million of them.</p>
-<p class="source"><a href="https://cryptobriefing.com/huawei-qingyun-hm650-harmonyos-desktop/">Crypto Briefing</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>AiMOGA opens global pre-orders for Mobo, a home-companion humanoid robot</h3>
-<p>AiMOGA Robotics opened worldwide pre-orders for Mobo, a consumer humanoid built on its MoAgent AI brain, with autonomous navigation, dynamic obstacle avoidance, voice-and-vision conversation and 22 degrees of freedom. The Chery-backed company says it has shipped more than 3,000 robots to over 60 countries; no price was disclosed.</p>
-<p class="source"><a href="https://manilatimes.net/2026/11/07/tmt-newswire/pr-newswire/home-companion-robot-mobo-to-debut-globally-and-open-pre-orders-as-aimoga-showcases-its-robot-family-at-the-2026-omoda-jaecoo-international-user-summit/2464446">Manila Times (PR Newswire)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T09:00-06:00">2026-11-07 09:00</time>
-<h3>ADA Space files for $127M Hong Kong IPO to fund AI compute satellites</h3>
-<p>The Chengdu company, which launched what it calls the world's first 12-satellite AI compute constellation in May 2025 and an eight-satellite second constellation in October 2026, expects to list on November 13. The raise would bankroll China's space-based inference layer as Beijing tightens domestic chip access.</p>
-<p class="source"><a href="https://www.caproasia.com/2026/11/07/china-ai-satellite-company-ada-space-hong-kong-ipo-to-raise-127-million-with-expected-ipo-listing-on-13th-november-2026-founded-in-2018/">Caproasia</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T09:16-06:00">2026-11-06 09:16</time>
-<h3>AEYE Health's autonomous diabetic eye exam AI wins 2026 Prix Galien USA</h3>
-<p>AEYE-DS, an FDA-cleared fully autonomous retinal screening tool that reads fundus camera images without a physician, took the 2026 Prix Galien USA award for Best Digital Health Solution, one of the most prestigious distinctions in healthcare innovation. The Israeli-American company is now building AEYE-X, a new retinal platform designed to assess more than 100 health indications beyond eye disease.</p>
-<p class="source"><a href="https://www.jpost.com/health-and-wellness/article-914057">Jerusalem Post</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T06:40-06:00">2026-11-06 06:40</time>
-<h3>Hundreds of activists occupy Microsoft's Amsterdam data center site in Europe-wide protest</h3>
-<p>Geef Tegengas and allies including Extinction Rebellion entered Microsoft's under-construction Sloterdijk data center site in Amsterdam on November 6, with a spokesperson saying around 500 people got onto the grounds; police intervened and made multiple arrests. The action kicked off a two-day "Stop Dirty Data Centres" campaign across 15 European countries with roughly 85 planned actions.</p>
-<p class="source"><a href="https://nltimes.nl/2026/11/06/protesters-break-onto-site-planned-microsoft-data-center-adam-police-intervene">NL Times</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T08:00-06:00">2026-11-07 08:00</time>
-<h3>Axon invests $1.2 billion in Skydio, becomes exclusive public-safety drone distributor</h3>
-<p>Axon announced an additional $1.2 billion investment in Skydio at a $5.2 billion pre-money valuation, adding roughly 20% to its fully diluted ownership and making Axon the exclusive Skydio distributor for public safety in the US and Canada. Axon estimates the drone-as-first-responder market at about $13 billion, and says drones arrive before officers on roughly 80% of calls where they are deployed.</p>
-<p class="source"><a href="https://www.prnewswire.com/news-releases/axon-invests-1-2-billion-in-skydio-to-build-the-future-of-drone-as-first-responder-302930993.html">PR Newswire (Axon press release)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T08:00-06:00">2026-11-07 08:00</time>
-<h3>Justice Department launches Super Intelligence Task Force to counter AI misuse</h3>
-<p>The DOJ announced the Super Intelligence Task Force (DOJ-SITF) on November 5, co-chaired by Associate Attorney General Stanley Woodward and Associate Deputy Attorney General Stephen Weiss, to protect the department from malicious AI use by foreign state actors, criminal organizations and fraudsters. It follows President Trump's September executive order directing federal agencies to call artificial intelligence "super intelligence".</p>
-<p class="source"><a href="https://www.nextgov.com/artificial-intelligence/2026/11/department-justice-forms-ai-task-force/417074/">Nextgov/FCW</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T08:00-06:00">2026-11-07 08:00</time>
-<h3>Google will turn off Search and Gemini by default for K-12 student accounts in 2027</h3>
-<p>Starting in early 2027, Google Search, Gemini and Gemini Notebook will be off by default for student Workspace for Education accounts, with schools enabling each service individually. There is no AI-free Search option: schools that enable search choose between AI Overviews with chat or a Guided Learning mode, and critics called the all-or-nothing design coercive given Google's dominance of US school technology.</p>
-<p class="source"><a href="https://the-decoder.com/schools-that-turn-off-googles-ai-will-lose-search-too-starting-in-2027/">The Decoder</a> (original report: New York Times)</p>
-</article>
-
-<article>
-<time datetime="2026-11-07T08:00-06:00">2026-11-07 08:00</time>
-<h3>"sshole" flaw lets attackers log into password-disabled accounts on musl Linux systems</h3>
-<p>A vulnerability dating to 2016 lets anyone log into Alpine Linux, OpenWrt and other musl-based systems that block password logins with an asterisk in /etc/shadow by submitting a password longer than 256 bytes, because musl's crypt() returns "*" when hashing fails. It is fixed in OpenSSH 10.6p2; glibc-based systems and PAM-enabled configurations are not affected.</p>
-<p class="source"><a href="https://www.bleepingcomputer.com/news/security/openssh-flaw-lets-attackers-log-into-password-disabled-linux-accounts/">BleepingComputer</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T08:00-06:00">2026-11-07 08:00</time>
-<h3>Falling Walls names CAR-T reprogramming of the immune system a 2026 science breakthrough</h3>
-<p>FAU researcher Georg Schett won the Falling Walls Science Breakthrough of the Year 2026 in Life Sciences for using CAR-T cells to eliminate disease-causing immune cells and "reprogram" the immune system in autoimmune diseases such as lupus, scleroderma and arthritis. Winners present at the Falling Walls Science Summit in Berlin November 6–9; UCLA's Yu Huang took the Engineering award for a hydrogel fuel cell innovation.</p>
-<p class="source"><a href="https://www.bio-m.org/en/media-center/news/news/falling-walls-science-breakthrough-of-the-year-2026-geht-an-fau-forscher-georg-schett">Falling Walls / bio-m.org</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-07T05:02-06:00">2026-11-07 05:02</time>
-<h3>WoW Forever launch night ran on 251,136 GB of RAM and 70,480 CPU cores</h3>
-<p>Blizzard leaned on 3,924 virtual machines carrying a combined 251,136 GB of RAM and 70,480 CPU cores to survive launch night for World of Warcraft: Forever, according to TweakTown's look at the infrastructure behind the simultaneous content releases.</p>
-<p class="source"><a href="https://www.tweaktown.com/news/114533/wow-forever-ran-on-251136gb-of-ram-and-70480-cpu-cores-to-survive-its-launch-night/index.html">TweakTown</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T15:15-06:00">2026-11-06 15:15</time>
-<h3>Copilot is coming to the reworked Windows 11 search box, but only as an opt-in</h3>
-<p>Microsoft confirmed Copilot will appear in the redesigned Windows 11 search box while claiming the AI answers will be an opt-in feature, a notable reversal from the forced AI integration that drew backlash in earlier Windows 11 rollouts.</p>
-<p class="source"><a href="https://www.tweaktown.com/news/114521/copilot-is-coming-to-the-reworked-windows-11-search-box-but-microsoft-claims-it-will-be-an-opt-in-feature/index.html">TweakTown</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T13:15-06:00">2026-11-06 13:15</time>
-<h3>Google confirms detachable screens are the next step for Googlebooks</h3>
-<p>Google says detachable-screen designs are the next form factor it is pushing for its Googlebook laptops, with Lenovo among the early hardware partners for the ChromeOS-based line that targets Windows and macOS machines.</p>
-<p class="source"><a href="https://www.tweaktown.com/news/114517/google-confirms-detachable-screens-are-the-next-step-for-googlebooks/index.html">TweakTown</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T04:10-06:00">2026-11-06 04:10</time>
-<h3>TrendForce spot tracker: DDR5 16Gb chips hold around $60 as weekly moves stay modest</h3>
-<p>TrendForce's DRAM spot price tracker, last updated November 6, shows DDR5 16Gb chips averaging about $60.17 (down 0.82% on the session) and DDR4 16Gb 3200 at about $80.82 (down 1.06%). The linked page is the live tracker rather than a single article; contract pricing is expected to stay tight into 2027 as HBM absorbs DRAM capacity.</p>
-<p class="source"><a href="https://www.trendforce.com/price/dram/dram_spot">TrendForce (DRAM spot price tracker)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T02:28-06:00">2026-11-06 02:28</time>
-<h3>Nvidia's RTX PRO 5500 is China's most wanted GPU, and almost nobody is getting one soon</h3>
-<p>Chinese buyers have placed roughly 6 million orders, worth about $70 billion, for Nvidia's China-oriented RTX PRO 5500, but TweakTown reports only about 1% of those units are expected to ship soon as export approvals remain stalled.</p>
-<p class="source"><a href="https://www.tweaktown.com/news/114529/nvidias-rtx-pro-5500-is-chinas-most-wanted-gpu-and-almost-nobody-is-getting-one-soon/index.html">TweakTown</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T00:02-06:00">2026-11-06 00:02</time>
-<h3>AMD Medusa Point APU with 10 Zen 6 cores and RDNA 4 graphics spotted in Geekbench</h3>
-<p>A Geekbench listing surfaced an AMD Medusa Point APU with 10 Zen 6 cores and RDNA 4 mobile graphics, expected to land in the Ryzen AI 500 series as the successor to Strix Point.</p>
-<p class="source"><a href="https://www.tweaktown.com/news/114526/amds-medusa-point-apu-with-10-zen-6-cores-and-rdna-4-mobile-graphics-spotted/index.html">TweakTown</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-05T19:52-06:00">2026-11-05 19:52</time>
-<h3>TeamGroup and Apple warn the memory crisis could peak in 2027 with no relief until late 2028</h3>
-<p>Module maker TeamGroup and Apple both signaled that DRAM and NAND shortages could peak in 2027 and persist into late 2028, as AI demand keeps memory supply tight and Apple flags rising memory costs as a margin pressure.</p>
-<p class="source"><a href="https://www.tweaktown.com/news/114494/teamgroup-and-apple-warn-memory-crisis-could-peak-in-2027-with-no-relief-until-late-2028/index.html">TweakTown</a></p>
-</article>
-</section>
-
-<section>
-<h2>November 6, 2026</h2>
-
-<article>
-<time datetime="2026-11-06T20:00-06:00">2026-11-06 20:00</time>
-<h3>October jobs report blows past expectations, lifting odds of a December Fed rate hike</h3>
-<p>The Labor Department reported Friday that US employers added 165,000 jobs in October, trouncing the 65,000 economists expected and the revised 60,000 added in September. The blowout number strengthened expectations that the Federal Reserve raises rates again in December and capped a turbulent week: the Nasdaq rebounded more than 1% on Friday, the S&P 500 gained 0.3% and the Dow slipped 0.4%, but the S&P still logged its worst week since June.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-earnings-135953863.html">Yahoo Finance (market live blog)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T20:00-06:00">2026-11-06 20:00</time>
-<h3>Thinking Machines launches Inkling 2 Small, a 594B MoE built for long agentic work</h3>
-<p>Thinking Machines released Inkling 2 Small, a 594-billion-parameter mixture-of-experts model with 17B active parameters, image input support and variable reasoning effort. It scores 31 on the Artificial Analysis Intelligence Index (up from 13 for the prior small model) and is initially hosted on Tinker with closed weights; the company plans an Apache 2.0 weight release next week after external safety testing and red-teaming.</p>
-<p class="source"><a href="https://thinkingmachines.ai/news/inkling-2-small/">Thinking Machines Lab</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T20:00-06:00">2026-11-06 20:00</time>
-<h3>Nous Research ships Arete-27B, a Qwen fine-tune that cuts propaganda-style answers from 22% to 1%</h3>
-<p>Nous Research released Arete-27B, a supervised fine-tune of Alibaba's Qwen base model aimed at reinforcing Western values in a Chinese-trained foundation. The company says its post-training cut the model's measured "propaganda rate" from 22% to about 1% with no significant regression in general performance, and named the model after the classical Greek concept of virtue and excellence.</p>
-<p class="source"><a href="https://cryptobriefing.com/nous-research-arete-27b-western-values-qwen/">Crypto Briefing</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T20:00-06:00">2026-11-06 20:00</time>
-<h3>China's space station creates the coldest man-made matter at about 10 picokelvins</h3>
-<p>Scientists aboard China's Tiangong space station cooled a Bose-Einstein condensate to roughly 10 picokelvins (9.7 trillionths of a kelvin above absolute zero), a world record for the coldest man-made matter. The all-optical cooling experiment ran in the Mengtian module and supports ultra-cold atom physics and quantum technology research in microgravity.</p>
-<p class="source"><a href="https://www.sciencenews.org/article/lowest-temperature-china-space-station">Science News</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T20:00-06:00">2026-11-06 20:00</time>
-<h3>SLAC researchers report conclusive proof of altermagnetism, the third type of magnetism</h3>
-<p>Researchers at SLAC National Accelerator Laboratory reported direct experimental proof of altermagnetism, a magnetic phase that combines traits of ferromagnetism and antiferromagnetism. Observing a characteristic handed asymmetry in manganese telluride settled a puzzle that has stood for decades, and the finding could enable faster, denser spintronic memory and data storage.</p>
-<p class="source"><a href="https://phys.org/news/2026-10-altermagnetism-geometric-experimental-proof.html">Phys.org</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T19:00-06:00">2026-11-06 19:00</time>
-<h3>Oklo jumps about 22% on narrower Q3 loss as the nuclear-for-AI trade rebounds</h3>
-<p>Oklo shares surged roughly 22% on Friday, closing at $23.55, after the advanced reactor developer posted a Q3 loss of $0.22 per share (vs. $0.27 expected) and revenue of $1.86M (vs. $1.01M expected). The company reaffirmed its FY2026 guidance ($120M to $150M operating cash use, $400M to $500M capex, $3.13B in cash) and signed a strategic manufacturing deal with U.S. Forged Rings for Aurora reactor components.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/stocks/articles/oklo-stock-rises-q3-earnings-212737144.html">Yahoo Finance / TipRanks</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T19:00-06:00">2026-11-06 19:00</time>
-<h3>Transcend's chairman says DRAM and NAND shortages could run through 2028</h3>
-<p>Transcend chairman Chung-Won Shu says the memory crunch is not a cyclical boom like the PC and smartphone eras but a structural shift on par with the steam engine or the electricity revolution, with tight DRAM and NAND supply possibly lasting through 2028. He points to roughly $700B in 2026 AI spending by the four major US cloud providers, hyperscalers paying deposits for deliveries two to three years out, DDR4 and MLC NAND discontinuations, and DDR5 capacity lost to HBM.</p>
-<p class="source"><a href="https://www.memorymarket.com/a/14751">Memory Market</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T19:00-06:00">2026-11-06 19:00</time>
-<h3>Constellation Software posts 19% revenue growth in Q3, commits $673M to more acquisitions</h3>
-<p>Constellation Software (TSX:CSU) reported Q3 revenue up 19% year over year to CA$3.51B with net income of CA$212M (CA$10.01 diluted EPS), and CA$609M in total consideration for acquisitions completed in the quarter. Free cash flow available to shareholders fell 16% to CA$443M as deferred payments grew; the company also declared a CA$1.00 dividend and flagged CA$673M in additional acquisitions completed or committed since quarter end.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/stocks/articles/constellation-software-inc-announces-results-220800875.html">Yahoo Finance (GlobeNewswire)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T18:00-06:00">2026-11-06 18:00</time>
-<h3>Google ships Gemini Omni 1.2 Flash: 15-second AI video clips at $0.07 per second</h3>
-<p>Google moved Gemini Omni 1.2 Flash to general availability, extending native AI video clips to 15 seconds (up from 10) and adding conversational multi-turn editing so users can change backgrounds, products or lighting without regenerating an entire clip. 720p generation now costs $0.07 per second, 30% less than the previous model, outputs carry the SynthID watermark, and the model is live in the Gemini API, Gemini app, Google Vids and Flow.</p>
-<p class="source"><a href="https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemini-omni-1-2-flash/">Google Blog</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T18:00-06:00">2026-11-06 18:00</time>
-<h3>Meta rolls out real-time voice calls with customizable Muse avatars to all US users</h3>
-<p>Meta is bringing real-time voice conversations to its Muse AI agent in the Muse app on mobile, web and Mac, fronted by an animated avatar (default character "Jolly") that mirrors the tone of the conversation with facial expressions and gestures. Users can interrupt mid-response and choose from hundreds of voices and accents, and Meta says the feature is coming to Ray-Ban smart glasses and the upcoming Muse Charm wearable.</p>
-<p class="source"><a href="https://about.fb.com/news/2026/11/introducing-muse-ai-voice-expressive-avatars/">Meta Newsroom</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T18:00-06:00">2026-11-06 18:00</time>
-<h3>Counterpoint: Samsung's DRAM share hits a record 38% as the super-cycle nears $200B</h3>
-<p>Counterpoint Research reports Samsung kept its DRAM crown in Q3 2026 with a record 38% shipment share, ahead of SK hynix at 29%, Micron at 21% and CXMT at 9%. Each new HBM generation resets the leadership order (Samsung reclaimed the top with HBM4), HBM prices are catching up with conventional DRAM under long-term agreements, and the shortage will persist because major new fabs don't enter service until 2028.</p>
-<p class="source"><a href="https://www.sammyfans.com/2026-11-05/samsung-sk-hynix-global-dram-q3-2026-counterpoint-research/">SammyFans (Counterpoint Research data)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T18:00-06:00">2026-11-06 18:00</time>
-<h3>NASA unveils the X-70 Fractal, a modular crewed X-plane for rapid flight-control research</h3>
-<p>NASA revealed its newest X-plane, the X-70 Fractal, at the UP.Summit at Kennedy Space Center. The crewed aircraft has a 10,000-pound max takeoff weight, Mach 0.75 cruise, a 45,000-foot ceiling and a 1,726-mile range, and it carries up to 2,000 pounds of internal and external payloads with rapidly reconfigurable flight-control software, letting NASA swap experiments between flights instead of building a dedicated airframe per program. First flight is expected within two years.</p>
-<p class="source"><a href="https://www.nasa.gov/news-release/nasa-announces-x-70-experimental-aircraft-to-advance-flight-research/">NASA</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T18:00-06:00">2026-11-06 18:00</time>
-<h3>Tencent releases full Hy4, a 770B open-source model that drives desktop software</h3>
-<p>Tencent launched the full version of Hy4, a 770-billion-parameter mixture-of-experts model that adds native visual understanding and computer use (command line and graphical interfaces, including Blender and CAD tools) to its earlier text-only preview, with a context window over 1 million tokens. It is available via Tencent Cloud and OpenRouter at $0.834 per million input tokens, with open weights and system cards promised in the coming days.</p>
-<p class="source"><a href="https://www.techrepublic.com/article/news-tencent-hy4-ai-model-vision-computer-use/">TechRepublic</a> (also announced via <a href="https://www.prnewswire.com/apac/news-releases/tencent-launches-hy4-joining-the-ranks-of-the-worlds-leading-open-source-ai-models-302929177.html">PR Newswire</a>)</p>
-</article>
-
-<article>
-<time datetime="2026-11-06T17:10-06:00">2026-11-06 17:10</time>
-<h3>Apple's first touchscreen MacBook Pros, M6 iMac and OLED iPad mini go on sale</h3>
-<p>Five products announced in October reached stores and customers today: the 14- and 16-inch MacBook Pros with PROLED XDR tandem-OLED touch displays, a 14-inch MacBook Pro with the M6 chip, the M6 iMac and the redesigned OLED iPad mini. It is one of Apple's busiest single release days of 2026, with the fourth-gen Apple TV 4K and HomeView display following November 13.</p>
-<p class="source"><a href="https://www.theapplepost.com/2026-11-04/73804/apple-launches-five-new-products-on-november-6-heres-whats-arriving/">The Apple Post</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T17:10-06:00">2026-11-06 17:10</time>
-<h3>Microsoft lets 2023 Oracle AI cloud deal lapse over aging Nvidia chips</h3>
-<p>Microsoft declined to renew a 2023 contract that supplied Oracle capacity for AI-powered Bing search, saying the rented servers run older Nvidia chips that no longer match its workloads, Bloomberg reports. Oracle shares fell about 3% and now sit more than 50% below their June peak, while Microsoft reassesses more than $80B in outside-cloud commitments with CoreWeave, Nscale and Nebius.</p>
-<p class="source"><a href="https://thenextweb.com/news/microsoft-winds-down-oracle-ai-cloud-capacity-deal">The Next Web</a> (Bloomberg broke the story)</p>
-</article>
-
-<article>
-<time datetime="2026-11-06T17:10-06:00">2026-11-06 17:10</time>
-<h3>AI research system proves 18-year-old Aaronson-Ambainis conjecture in quantum computing</h3>
-<p>Physical Superintelligence says an internal research system running a non-public Anthropic model produced a complete proof of the Aaronson-Ambainis conjecture, open since 2008, with every step verified in the Lean proof assistant. The result settles one of quantum complexity theory's central open problems by bounding when quantum computers can achieve exponential speedups over classical ones on random inputs.</p>
-<p class="source"><a href="https://psi.inc/research/aaronson-ambainis/">Physical Superintelligence</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T17:10-06:00">2026-11-06 17:10</time>
-<h3>Boson AI ships Higgs Realtime Duplex, a 45B full-duplex voice-and-video model</h3>
-<p>Boson AI released Higgs Realtime Duplex, a 45-billion-parameter mixture-of-experts model that listens, watches and talks in 160 ms chunks while thinking, calling tools and delegating to a larger back model without pausing the conversation. Trained on roughly 2 trillion tokens, it scored 98.9% on Big Bench Audio and 94.1% on IFEval, with API access coming via waitlist.</p>
-<p class="source"><a href="https://www.boson.ai/blog/higgs-realtime-duplex">Boson AI</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T16:35-06:00">2026-11-06 16:35</time>
-<h3>Nasdaq rebounds 1.1% as chip stocks recover from worst selloff since April 2025</h3>
-<p>Wall Street bounced Friday: the Nasdaq closed up 1.09% at 24,579.42 and the S&amp;P 500 rose 0.31% to 7,376.86, while the Dow slipped 237.33 points (-0.46%) to 51,285.73. Semiconductor shares led the recovery with the SOX index up 4.2%, AMD gaining 11%, Intel 7.7% and Micron 5.1%. The October jobs report showed 165,000 payrolls added, well above the 65,000 expected, with unemployment easing to 4.1%.</p>
-<p class="source"><a href="https://www.foxbusiness.com/markets/stocks-11-6-2026">Fox Business</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T16:35-06:00">2026-11-06 16:35</time>
-<h3>OpenAI unveils GPT-6 Cyber, a security-specialized model rated Critical</h3>
-<p>OpenAI released GPT-6 Cyber, a variant of its GPT-6 Astra model post-trained for defensive cybersecurity. It scored 48.5% on the ExploitGym benchmark, a 51% relative gain over the 32.1% baseline, and during internal testing found 81 Firefox vulnerabilities and reproduced 948 Linux kernel privilege-escalation exploits. OpenAI rated it Critical under its Preparedness Framework and is limiting access to vetted defenders through its Daybreak Red tier.</p>
-<p class="source"><a href="https://thehackernews.com/2026/11/openai-launches-gpt-6-cyber-after-ai.html">The Hacker News</a> (also covered by <a href="https://www.securityweek.com/openai-says-new-gpt-6-cyber-model-hunts-flaws-without-crossing-the-line/">SecurityWeek</a>)</p>
-</article>
-
-<article>
-<time datetime="2026-11-06T14:13-06:00">2026-11-06 14:13</time>
-<h3>TSMC weighs building 3D DRAM at Nvidia's request as memory shortage bites</h3>
-<p>The Information reports TSMC is drafting plans to produce vertically stacked 3D DRAM at the behest of its largest customer Nvidia, a break from its pure-play foundry model amid severe HBM and DRAM shortages that have pushed hardware costs sharply higher. TSMC ADRs surged 7.7% in early trading Friday on the news, but any output is years away, so near-term supply relief is unlikely.</p>
-<p class="source"><a href="https://finance.yahoo.com/technology/ai/articles/tsmc-rises-report-potential-push-151300006.html">Yahoo Finance / Investing.com</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T07:12-06:00">2026-11-06 07:12</time>
-<h3>Anthropic IPO buyers talk $1.2T to $1.3T valuation, down from $2T in October</h3>
-<p>Ahead of formal IPO marketing next week, prospective buyers are discussing a $1.2–1.3 trillion valuation for Anthropic, with some weighing as low as $1.1 trillion, according to Bloomberg. Expectations have slid from $1.4–1.5 trillion last week and as high as $2 trillion in early October, after Thursday's AI rout wiped $2.3 trillion of Nasdaq-100 value in a single session.</p>
-<p class="source"><a href="https://www.bloomberg.com/news/articles/2026-11-06/anthropic-ipo-valuation-expectations-pressured-after-ai-rout">Bloomberg</a></p>
-</article>
-
-</section>
-
-<section>
-<h2>November 5, 2026</h2>
-
-<article>
-<time datetime="2026-11-05T18:34-06:00">2026-11-05 18:34</time>
-<h3>Nasdaq posts worst day since April 2025 as Democratic midterm sweep stokes AI regulation fears</h3>
-<p>Stocks melted down Thursday after Democrats swept the midterm elections: the S&amp;P 500 fell 4.3%, the Nasdaq 100 dropped 6.3% (about $2.3 trillion in market value) and the Philadelphia Semiconductor Index plunged 12%. Investors priced in the risk of stricter regulation of the AI sector that had powered the 2026 rally, pushing the Nasdaq into correction territory.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/live/stock-market-today-thursday-november-5-dow-sp-500-nasdaq-plunge-chip-stocks-melt-down-193726491.html">Yahoo Finance</a> (also covered by <a href="https://www.foxbusiness.com/markets/stocks-nov-5-2026">Fox Business</a>)</p>
-</article>
-
-<article>
-<time datetime="2026-11-06T16:35-06:00">2026-11-06 16:35</time>
-<h3>November hardware wave: Motorola Signature 27, Asus Zenbook 14 and Vivo X500 land this month</h3>
-<p>Motorola launched the Signature 27 globally on November 5, joining the Asus Zenbook 14 refresh that went on sale in India the same day. Vivo's X500 series is slated for late November, rounding out a busy month of phone and laptop launches.</p>
-<p class="source"><a href="https://www.cnbctv18.com/technology/november-2026-tech-launches-motorola-signature-27-asus-zenbook-14-and-vivo-x500-series-20023117.htm">CNBCTV18</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-06T16:35-06:00">2026-11-06 16:35</time>
-<h3>Mars orbiter detects hydrogen chloride pulses above fissures at Alba Mons</h3>
-<p>ESA's ExoMars Trace Gas Orbiter has detected seasonal bursts of hydrogen chloride gas above fracture zones near Alba Mons, according to a study published in Science Advances on November 4. Because HCl is destroyed quickly by sunlight, the pulses imply ongoing or recent volcanic outgassing, fresh evidence that Mars may still be volcanically active.</p>
-<p class="source"><a href="https://phys.org/news/2026-11-european-orbiter-fresh-hints-volcanic.html">Phys.org</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-05T12:59-06:00">2026-11-05 12:59</time>
-<h3>Google Research's SwarmEvolve runs 450 latent-reasoning agents and beats AlphaEvolve</h3>
-<p>A paper posted to arXiv Thursday describes SwarmEvolve, a framework in which swarms of lightweight agents reason in latent space and exchange KV caches instead of writing out chains of thought. On 21 problems in mathematical discovery and scientific computing it reached, in a median of 3 to 8 minutes, the scores other frameworks need 60 minutes to reach, and running the open Qwen3-8B model it improved on solutions AlphaEvolve first found with frontier Gemini models.</p>
-<p class="source"><a href="https://arxiv.org/abs/2611.08483">arXiv</a></p>
-</article>
-
-</section>
-
-<section>
-<h2>November 2, 2026</h2>
-
-<article>
-<time datetime="2026-11-02T20:00-06:00">2026-11-02 20:00</time>
-<h3>SpaceX in talks to buy Boost Mobile from EchoStar to power its own wireless service</h3>
-<p>The Washington Post reports Elon Musk has held talks with EchoStar chairman Charlie Ergen about buying Boost Mobile or gaining access to its network after Verizon, AT&amp;T and T-Mobile all rebuffed requests to host Starlink Mobile (now 13.6M subscribers). SpaceX already bought $17B of EchoStar spectrum, but any deal would need AT&amp;T and T-Mobile consent for Boost's MVNO leases; SpaceX rose ~4% on the report while AST SpaceMobile fell more than 10%.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/stocks/article/spacex-weighs-boost-mobile-deal-in-push-for-starlink-phone-service-report-160901851.html">Yahoo Finance</a> (also covered by <a href="https://www.datacenterdynamics.com/en/news/spacex-in-talks-to-buy-echostars-boost-mobile-report/">Data Center Dynamics</a>)</p>
-</article>
-
-<article>
-<time datetime="2026-11-02T19:00-06:00">2026-11-02 19:00</time>
-<h3>Apple reverses course in after-hours, falling as much as 4.5% on weak margin guidance</h3>
-<p>After briefly trading up on its earnings beat, Apple shares dropped as much as 4.5% in extended trading Monday as December-quarter gross-margin guidance of 45–46% came in below the 46.3% consensus, a squeeze Apple attributes to surging memory-chip costs. Revenue of $114.48B and EPS of $2.10 both topped estimates, with China sales up 21% to $17.5B but still about $1B shy of expectations.</p>
-<p class="source"><a href="https://www.cnbctv18.com/market/apple-q4-2026-results-iphone-mac-revenue-margin-guidance-for-q1-2027-share-price-reaction-20025391.htm">CNBCTV18</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T19:00-06:00">2026-11-02 19:00</time>
-<h3>South Korea launches "Hangang," a 614.7-petaflop supercomputer built on ~8,500 Nvidia GPUs</h3>
-<p>South Korea's sixth national supercomputer, "Hangang," was formally launched Monday at KISTI in Daejeon after a 382.5 billion won ($276M) build. With roughly 8,500 Nvidia GH200 Grace Hopper superchips, 205 petabytes of storage and 614.7 petaflops of theoretical peak performance, it delivers 24x the compute of its 2018 predecessor Nurion and enters full service in December, with plans to link it to a quantum computer in 2027.</p>
-<p class="source"><a href="https://www.koreatimes.co.kr/business/tech-science/20261102/korea-unveils-276-mil-hangang-supercomputer">The Korea Times</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T19:00-06:00">2026-11-02 19:00</time>
-<h3>AT&amp;T and AST SpaceMobile complete first call handoff between terrestrial and satellite networks</h3>
-<p>AT&amp;T and AST SpaceMobile handed off a voice call from AT&amp;T's ground network to AST's direct-to-device satellite network without interruption using an unmodified smartphone, an industry first, with Ericsson and Nokia tech cutting the transition from seconds to milliseconds. AST shares still fell more than 11% Monday on fresh news of SpaceX's mobile ambitions.</p>
-<p class="source"><a href="https://broadbandbreakfast.com/at-t-ast-complete-first-handoff-between-terrestrial-and-satellite-networks/">Broadband Breakfast</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:23-06:00">2026-11-02 18:23</time>
-<h3>MIT's Barzilay and Collins win 2026 Pritzker Prize for AI-enabled antibiotic discovery</h3>
-<p>Regina Barzilay and James Collins received the 2026 Pritzker Prize for AI in Science Research Excellence, awarded for the first time to a team, for using deep learning to discover novel antibiotics against drug-resistant "superbugs," beginning with halicin in 2020. Their work, a landmark for AI applied to medicine, now feeds a Phare Bio partnership targeting seven new antibiotic classes.</p>
-<p class="source"><a href="https://news.mit.edu/2026/regina-barzilay-jim-collins-win-pritzker-prize-ai-and-science-research-excellence-1102">MIT News</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:23-06:00">2026-11-02 18:23</time>
-<h3>OpenAI to put ChatGPT and Codex on a shared usage allowance starting December</h3>
-<p>OpenAI says eligible Plus, Pro and Business plan usage will draw from one token-based allowance shared across ChatGPT and Codex beginning in December, as it folds agentic capabilities into the main ChatGPT experience. Instant chats won't count against the allowance, and users can track remaining usage and reset times in Settings.</p>
-<p class="source"><a href="https://help.openai.com/en/articles/20001625-understanding-chatgpt-and-codex-usage-limits">OpenAI Help Center</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:23-06:00">2026-11-02 18:23</time>
-<h3>"Weight-Space Programming": GPT-6 Astra edits another model's weights from plain-English instructions</h3>
-<p>In Monday's blog post "Sparks of Weight-Space Programming," researchers associated with MIT CSAIL report that OpenAI's GPT-6 Astra can read the raw weights of another neural network and edit them directly from natural-language instructions, with no gradient descent or retraining. Editing just 0.016% of Alibaba's Qwen3.5-0.8B weights raised its MATH-500 score from 7.9% to 48.1%. The work is early-stage and not yet peer-reviewed.</p>
-<p class="source"><a href="https://startupfortune.com/mit-researchers-show-gpt-6-astra-can-rewrite-another-ais-brain-without-training-it/">Startup Fortune</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:23-06:00">2026-11-02 18:23</time>
-<h3>Oracle files for $20B raise: $10B in bonds and $10B in stock to fund AI data centers</h3>
-<p>SEC filings show Oracle plans to sell $10 billion of common stock and issue $10 billion in senior notes, its second $20B financing this year, to bankroll AI and cloud infrastructure serving customers including OpenAI, Meta and Nvidia. Shares fell more than 6% Monday; Oracle carried $125.3B of debt as of Aug. 31.</p>
-<p class="source"><a href="https://www.rttnews.com/3707364/oracle-to-raise-20-bln-through-stock-and-bond-offerings-to-fund-ai-expansion.aspx">RTTNews</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:00-06:00">2026-11-02 18:00</time>
-<h3>Apple's memory inventory surges 154% year over year as chip costs climb</h3>
-<p>On new CEO John Ternus's first earnings call, Apple disclosed that inventory jumped 154% year over year, largely from stockpiling DRAM and NAND ahead of further price increases. Ternus warned of "even higher memory costs" in the December quarter and said the benefit of the current stockpile will diminish over time; Apple has already raised prices on several iPhones and Macs.</p>
-<p class="source"><a href="https://euronewshorn.com/article/282247">Euro News Horn</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:00-06:00">2026-11-02 18:00</time>
-<h3>Samsung, SK hynix and Micron pour capex into HBM as 2026 supply sells out</h3>
-<p>All three memory majors are accelerating high-bandwidth-memory investment: Samsung's semiconductor capex tops $57B in 2026 and SK hynix is spending over 4x prior guidance, with most 2027 HBM output already locked under long-term contracts. DRAM is now sold allocation-only, contract prices have surged 58–98% quarter over quarter, and meaningful new supply isn't expected until new fabs come online in 2028.</p>
-<p class="source"><a href="https://www.upi.com/Top_News/World-News/2026-11-02/samsung-sk-hynix-micron-ai-chips/9561793657408/">UPI</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:00-06:00">2026-11-02 18:00</time>
-<h3>Meituan ships LongCat-2.5, a 1.6-trillion-parameter multimodal agent model trained on Chinese chips</h3>
-<p>Meituan released LongCat-2.5, a mixture-of-experts model (1.6T total, ~48B active parameters) with native multimodality, a 1M-token context window and long-horizon reinforcement learning for agentic coding tasks. Notably it was trained on domestic Chinese silicon rather than Nvidia GPUs; API access is live with open weights promised soon.</p>
-<p class="source"><a href="https://pandaily.com/meituan-longcat-2-5-official-release-1-6t-native-multimodal-long-horizon-agentic-coding-w4a4">Pandaily</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T18:00-06:00">2026-11-02 18:00</time>
-<h3>OpenAI signs four Abu Dhabi deals spanning energy, government, investment and education</h3>
-<p>ADNOC will become the world's first energy company to deploy OpenAI frontier models on in-country infrastructure, under one of four agreements witnessed by Abu Dhabi's crown prince. Others launch a "machine-readable government" pilot (food-import assessments first), an AI investment-analysis program with sovereign fund Mubadala, and a five-year education adoption plan.</p>
-<p class="source"><a href="https://www.mediaoffice.abudhabi/en/crown-prince-news/khaled-bin-mohamed-bin-zayed-meets-sam-altman-and-witnesses-signing-of-agreements-with-openai/">Abu Dhabi Government Media Office</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T17:34-06:00">2026-11-02 17:34</time>
-<h3>Backblaze jumps ~37% after hours on Q3 beat; B2 storage revenue up 47%</h3>
-<p>Backblaze reported Q3 revenue of $47M, up 26% year over year and $2M above the high end of guidance, with B2 Cloud Storage revenue up 47%, its strongest growth in 10 quarters, and adjusted EBITDA margin expanding 1,000 basis points to 33%. The company raised its full-year revenue guidance to $177.8–178.2M; shares jumped nearly 37% after the close.</p>
-<p class="source"><a href="https://finance.biggo.com/quote/BLZE/earnings-call/US_BLZE_2026-11-02">BigGo Finance (Q3 FY2026 earnings call)</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T17:07-06:00">2026-11-02 17:07</time>
-<h3>Anthropic's amended S-1 shows nearly $17B Q3 revenue ahead of planned Nasdaq IPO</h3>
-<p>In an amended S-1 published Monday, Anthropic disclosed Q3 2026 revenue of nearly $17B, about 12x year over year, and $33.2B for the first nine months, alongside $895.4B of purchase and lease commitments tied almost entirely to compute and infrastructure. The filing also shows a $104B nine-month net loss. Anthropic proposes to list on Nasdaq under the ticker "ANT."</p>
-<p class="source"><a href="https://thenextweb.com/news/anthropic-ipo-filing-17bn-revenue-commitments">TNW</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T17:07-06:00">2026-11-02 17:07</time>
-<h3>Tokyo Electron guides FY operating profit up 87% on AI capex boom, adds ¥150B buyback</h3>
-<p>Tokyo Electron reported first-half revenue up 41% to ¥1.67T and now forecasts full-year operating profit of ¥1.169T (up 87% year over year) on relentless AI server and data-center equipment demand. The chip-equipment maker also announced a buyback of up to ¥150B running through March; shares jumped about 6%.</p>
-<p class="source"><a href="https://finance.yahoo.com/technology/ai/articles/tokyo-electron-q2-profit-jumps-072721135.html">Yahoo Finance</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Apple posts record September-quarter revenue as iPhone hits $57.6B</h3>
-<p>Reporting after Monday's market close, Apple posted Q4 fiscal 2026 revenue of $114.5B (up 12% year over year), with iPhone revenue reaching a September-quarter record of $57.6B (+17.5%) and services hitting a record $31.6B. Revenue from the new foldable iPhone Duo will be recognized next quarter.</p>
-<p class="source"><a href="https://www.forbes.com/sites/fionariley/2026-11-02/apples-iphone-sales-hit-576-billion-in-fourth-quarter-topping-estimates/">Forbes</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Nasdaq extends tech slide: Marvell falls 13% on $115B Lumentum deal, Oracle drops 8%</h3>
-<p>The Nasdaq Composite closed down 1.07% at 25,164.32 and the S&amp;P 500 slipped 0.51% to 7,541.40, while the Dow rose 0.41% to 51,983.98 as investors kept rotating away from AI-heavy names. Marvell slid nearly 13% after announcing a $115B acquisition of Lumentum, and Oracle fell 8% after disclosing plans for substantial stock and bond sales to fund its AI buildout.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/live/stock-market-today-monday-november-2-dow-sp-500-nasdaq-091835095.html">Yahoo Finance</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>DRAM chip spot prices surpass module prices as NAND wafer spot jumps 17% in a week</h3>
-<p>In a rare inversion that historically precedes module price surges, DRAM chip spot prices have moved above module prices, with DDR5 outpacing DDR4 on AI-server demand. TLC NAND 512Gb wafer spot prices jumped 17.07% week over week to $6.455, and analysts expect no meaningful supply relief before 2027 as capacity shifts to HBM.</p>
-<p class="source"><a href="https://siliconanalysts.com/analysis/dram-spot-price-signals-2026">Silicon Analysts</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Apple's PROLED MacBook Pro, M6 iMac and OLED iPad mini begin shipping November 6</h3>
-<p>The MacBook Pro with the new tandem-OLED PROLED XDR display (touch support and a Dynamic Island), the M6 iMac, and the OLED iPad mini all start shipping November 6, with the fourth-generation Apple TV 4K and the new HomeView display following November 13.</p>
-<p class="source"><a href="https://www.macworld.com/article/3273463/apples-probably-done-announcing-new-hardware-but-november-is-still-pretty-jammed.html">Macworld</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Motorola Signature 27 and Asus Zenbook 14 launch November 5; Vivo X500 series due later this month</h3>
-<p>Motorola's Signature 27 goes global November 5 after debuting at Snapdragon Summit, and Asus's refreshed Zenbook 14, with its new "Ceraluminum" chassis and Snapdragon, Ryzen AI 7, or Intel Core Ultra 9 options, arrives the same day. Vivo's camera-focused X500 lineup is expected by the end of November.</p>
-<p class="source"><a href="https://www.cnbctv18.com/technology/november-2026-tech-launches-motorola-signature-27-asus-zenbook-14-and-vivo-x500-series-20023117.htm">CNBCTV18</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>IceCube snags neutrinos with energies 10 billion times typical solar neutrinos</h3>
-<p>The IceCube neutrino observatory has detected neutrinos with energies roughly 10 billion times those of typical solar neutrinos, opening a new window on the universe's most violent environments.</p>
-<p class="source"><a href="https://www.sciencedaily.com/news/">ScienceDaily</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Blood tests can predict Alzheimer's risk a decade before symptoms</h3>
-<p>New blood-based tests can flag elevated Alzheimer's risk up to ten years before symptoms appear, enabling much earlier intervention in clinical care and trials.</p>
-<p class="source"><a href="https://www.sciencedaily.com/news/">ScienceDaily</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Single psilocybin dose eased depression within 48 hours in Swedish trial</h3>
-<p>A Swedish trial found that a single dose of psilocybin improved depressive symptoms within 48 hours for some patients, pointing to rapid-acting alternatives to standard antidepressants.</p>
-<p class="source"><a href="https://scitechdaily.com/">SciTechDaily</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:43-06:00">2026-11-02 16:43</time>
-<h3>Perovskite-silicon tandem solar cells top 34% conversion efficiency</h3>
-<p>Perovskite-silicon tandem solar cells have exceeded 34% power conversion efficiency, beating conventional silicon panels and promising stronger small-scale renewable installations for homes and vehicles by late 2026.</p>
-<p class="source"><a href="https://www.cas.org/resources/cas-insights/scientific-breakthroughs-2026-emerging-trends-watch">CAS</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:22-06:00">2026-11-02 16:22</time>
-<h3>Ternus: iPhone Duo shortages have "no end date," deliveries slip into January</h3>
-<p>Following earnings, CEO John Ternus told Reuters Apple can't say when iPhone Duo supply and demand will balance: "Duo is constrained as of today. The ramp is going well, and we're working hard to get it to as many customers as quickly as possible, but at this point, we're not able to predict when supply and demand will be in balance." New orders show delivery estimates into January, and he said a "very small percentage" of units have been returned over display issues, with replacements offered through AppleCare.</p>
-<p class="source"><a href="https://appleinsider.com/articles/26/11/02/apple-still-cant-meet-iphone-duo-demand-and-ternus-wont-say-when-it-will">AppleInsider</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T16:12-06:00">2026-11-02 16:12</time>
-<h3>Remarkably, AAPL rises after hours on earnings beat</h3>
-<p>Apple closed Monday down $6.31 at $338.32, but once Q4 results landed the stock climbed to $340.07 (up $2.26) by 4:10 PM ET, an atypical positive after-hours reaction, as strong iPhone and Mac results offset margin and product-miss concerns.</p>
-<p class="source"><a href="https://appleinsider.com/articles/26/11/02/remarkably-aapl-is-up-after-hours-post-earnings">AppleInsider</a></p>
-</article>
-
-<article>
-<time datetime="2026-11-02T15:05-06:00">2026-11-02 15:05</time>
-<h3>Palantir posts 96% revenue growth as U.S. commercial business tops government for the first time</h3>
-<p>Palantir's Q3 2026 results were its best ever: revenue of $2.31B (up 96% year over year), EPS of $0.44, and U.S. commercial revenue of $984M (up 148%), passing U.S. government revenue for the first time. CEO Alex Karp touted the "Sovereign AI" moment, and FY26 guidance was raised to about $8.53B; shares still slipped about 3% after hours on profit-taking.</p>
-<p class="source"><a href="https://finance.yahoo.com/markets/stocks/articles/palantir-reports-q3-2026-u-210500819.html">Yahoo Finance / Business Wire</a></p>
-</article>
-
-</section>
-</template>
 </body>
 </html>

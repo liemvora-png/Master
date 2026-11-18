@@ -31,6 +31,19 @@ test("news rows are styled with the shared theme tokens", () => {
   assert.match(styles, /\.home-news-title\s*\{[^}]*font-family: var\(--serif\)/);
 });
 
+test("news page uses D1 and has no static fallback", () => {
+  const page = readFileSync(new URL("../public/news/index.html", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /news-static|renderStaticFallback/);
+  assert.match(page, /fetch\("\/api\/news"[^)]*\)/);
+  assert.match(page, /class="menu-toggle"/);
+  assert.match(page, /aria-controls="site-navigation"/);
+  assert.match(page, /Loading tech news/);
+  assert.match(page, /No tech news is available right now/);
+  assert.match(page, /Tech news could not be loaded/);
+  assert.match(page, /data-news-retry/);
+});
+
 test("news API returns the newest D1 items first regardless of position", async () => {
   const rows = [
     { id: "older-top", published_at: "2026-11-07T16:30-06:00", position: 1 },
