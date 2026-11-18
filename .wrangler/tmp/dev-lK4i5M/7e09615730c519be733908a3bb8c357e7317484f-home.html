@@ -13,8 +13,8 @@
         }
       })();
     </script>
-    <meta name="description" content="Selected accomplishments across music, athletics, and coaching.">
-    <title>Liem Vora: Accomplishments</title>
+    <meta name="description" content="Welcome to Liem Vora's portfolio.">
+    <title>Liem Vora: Portfolio</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,41 +22,42 @@
     <link rel="stylesheet" href="/styles.css">
     <script src="/assets/site.js" defer></script>
   </head>
-  <body data-page="accomplishments">
+  <body data-page="home">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
       <a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">Liem Vora</span></a>
-      <nav class="site-nav" aria-label="Main navigation">
-        <a href="/">Home</a>
+      <nav class="site-nav" id="site-navigation" aria-label="Main navigation">
+        <a href="/" aria-current="page">Home</a>
         <a href="/projects">Projects</a>
-        <a href="/accomplishments.html" aria-current="page">Accomplishments</a>
+        <a href="/accomplishments.html">Accomplishments</a>
         <a href="/arrangements.html">Arrangements</a>
         <a href="/services">Services</a>
         <a href="/gallery">Gallery</a>
+        <a href="/news">News</a>
       </nav>
       <div class="header-actions">
+        <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="site-navigation" aria-expanded="false"><span class="menu-toggle-line" aria-hidden="true"></span><span class="menu-toggle-line" aria-hidden="true"></span><span class="menu-toggle-line" aria-hidden="true"></span></button>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>
         <a class="admin-entry-button" href="/admin">Admin <span aria-hidden="true">↗</span></a>
       </div>
     </header>
 
     <main id="main">
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Selected highlights</p>
-        <h1 id="page-title">Built through<br><span>practice and play.</span></h1>
-        <p class="intro-copy">A few milestones across music, athletics, and teaching.</p>
+      <section class="intro home-intro" id="top" aria-labelledby="page-title">
+        <h1 id="page-title">Welcome to my<br><span>portfolio.</span></h1>
+        <p class="home-update-status" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Last updated <time id="home-last-updated">checking…</time></span>
+        </p>
       </section>
 
-      <section aria-labelledby="accomplishments-title">
+      <section class="home-news" id="news" hidden aria-labelledby="home-news-title">
         <div class="section-heading">
-          <h2 id="accomplishments-title">Accomplishments</h2>
-          <span class="project-count">05 HIGHLIGHTS</span>
+          <h2 id="home-news-title">Latest news</h2>
+          <a class="news-all-link" href="/news">ALL NEWS <span aria-hidden="true">↗</span></a>
         </div>
-
-        <ul class="accomplishment-list" aria-live="polite">
-          <li class="empty-state">Accomplishments will be added here.</li>
-        </ul>
+        <ul class="home-news-list" id="home-news-list"></ul>
       </section>
     </main>
 

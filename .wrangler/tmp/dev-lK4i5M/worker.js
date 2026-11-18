@@ -2,13 +2,13 @@ var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
 // src/worker.js
-import home from "./a2a4f176b76a0145aea11d806d4fa818e3d9cbd5-home.html";
-import accomplishments from "./5b58c12537e2dc7bb6571f928e8f2025c7a3de0e-accomplishments.html";
-import admin from "./c24f930eb07dd73f909f4556d08b861bffcbde95-admin.html";
-import arrangements from "./20f05186fb4881eae88645332d5c481cf8d45c53-arrangements.html";
-import gallery from "./515a8c2a7e9dddb1a8bf34dc40c4723df0a3f5f9-gallery.html";
-import projects from "./8b0566989175a22b100b8e1ee13e8a7ff0e03dee-projects.html";
-import services from "./22717b8dc231af3d45930b4cda21de4c813fe4fb-services.html";
+import home from "./7e09615730c519be733908a3bb8c357e7317484f-home.html";
+import accomplishments from "./c42c0f422e8763759e4738764151ef0eef2ced7e-accomplishments.html";
+import admin from "./e96e1a8acd67dbefc74a40e22ec20c0fdf762228-admin.html";
+import arrangements from "./aeade51a7f69718ad83adf12ce5ff19b36547873-arrangements.html";
+import gallery from "./5a5a188b6a27f3fe5e9eea3e58dfd4ebd47620d5-gallery.html";
+import projects from "./5fed2d0794f8d6a12ec06db469279a5e82a8d283-projects.html";
+import services from "./a1de4dce107d767c7eccc5433f6ca82c3c407ccc-services.html";
 
 // functions/_shared/clerk.js
 var cachedKeys;
@@ -88,7 +88,7 @@ async function authorizeAdmin(request, env) {
 __name(authorizeAdmin, "authorizeAdmin");
 
 // functions/_shared/content.js
-var PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements", "services", "gallery"];
+var PAGE_NAMES = ["home", "projects", "accomplishments", "arrangements", "services", "gallery", "news"];
 var PAGE_FILES = /* @__PURE__ */ new Set([
   "index.html",
   "projects.html",
@@ -119,7 +119,9 @@ __name(isLink, "isLink");
 function validItems(pageName, items) {
   if (!Array.isArray(items) || items.length > 100) return false;
   if (pageName === "home") return items.length === 0;
-  if (pageName === "services" || pageName === "gallery") return items.length === 0;
+  if (pageName === "services" || pageName === "gallery" || pageName === "news") {
+    return items.length === 0;
+  }
   return items.every((item) => {
     if (!isRecord(item)) return false;
     if (pageName === "projects") {
@@ -206,7 +208,8 @@ var PAGE_SLUGS = {
   accomplishments: "accomplishments",
   arrangements: "arrangements",
   services: "services",
-  gallery: "gallery"
+  gallery: "gallery",
+  news: "news"
 };
 var BLOCK_TYPES = {
   home: null,
@@ -214,7 +217,8 @@ var BLOCK_TYPES = {
   accomplishments: "accomplishment",
   arrangements: "arrangement",
   services: null,
-  gallery: null
+  gallery: null,
+  news: null
 };
 function rows(result) {
   return result?.results || [];
@@ -671,6 +675,106 @@ async function onRequest3({ request, env }) {
 }
 __name(onRequest3, "onRequest");
 
+// functions/api/admin/news.js
+function isValidId(value) {
+  return typeof value === "string" && /^[\w-]{3,128}$/.test(value);
+}
+__name(isValidId, "isValidId");
+function isValidHeadline(value) {
+  return typeof value === "string" && value.trim().length > 0 && value.length <= 240;
+}
+__name(isValidHeadline, "isValidHeadline");
+function isValidBody(value) {
+  return typeof value === "string" && value.trim().length > 0 && value.length <= 2e3;
+}
+__name(isValidBody, "isValidBody");
+function isValidUrl(value) {
+  if (typeof value !== "string" || value.length > 2048) return false;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+__name(isValidUrl, "isValidUrl");
+function isValidSourceName(value) {
+  return typeof value === "string" && value.length <= 120;
+}
+__name(isValidSourceName, "isValidSourceName");
+function isValidTimestamp(value) {
+  if (typeof value !== "string") return false;
+  const date = new Date(value);
+  return !Number.isNaN(date.getTime());
+}
+__name(isValidTimestamp, "isValidTimestamp");
+function validateNewsItem(item, index) {
+  const entry = `News item ${index + 1}`;
+  if (!isValidId(item.id)) return `${entry} needs a valid id.`;
+  if (!isValidHeadline(item.headline)) return `${entry} needs a headline (up to 240 characters).`;
+  if (!isValidBody(item.body)) return `${entry} needs a body (up to 2000 characters).`;
+  if (!isValidUrl(item.source_url)) return `${entry} needs an HTTPS source URL.`;
+  if (!isValidSourceName(item.source_name)) return `${entry} source name must be 120 characters or fewer.`;
+  if (!isValidTimestamp(item.published_at)) return `${entry} needs a valid published date.`;
+  if (typeof item.position !== "number" || !Number.isInteger(item.position) || item.position < 1 || item.position > 1e3) {
+    return `${entry} needs a valid position between 1 and 1000.`;
+  }
+  if (typeof item.active !== "boolean") return `${entry} needs an active flag.`;
+  return null;
+}
+__name(validateNewsItem, "validateNewsItem");
+async function onRequest4({ request, env }) {
+  const authorization = await authorizeAdmin(request, env);
+  if (!authorization.ok) {
+    return jsonResponse({ error: authorization.message }, authorization.status);
+  }
+  if (!env.DB) return jsonResponse({ error: "News storage is not configured." }, 503);
+  if (request.method !== "PUT") return jsonResponse({ error: "Method not allowed." }, 405);
+  let input;
+  try {
+    input = await request.json();
+  } catch {
+    return jsonResponse({ error: "Request body must be valid JSON." }, 400);
+  }
+  if (!input || !Array.isArray(input.news) || input.news.length > 1e3) {
+    return jsonResponse({ error: "Check the news item list." }, 400);
+  }
+  const seenIds = /* @__PURE__ */ new Set();
+  const seenPositions = /* @__PURE__ */ new Set();
+  for (const [index, item] of input.news.entries()) {
+    const error = validateNewsItem(item, index);
+    if (error) return jsonResponse({ error }, 400);
+    if (seenIds.has(item.id)) return jsonResponse({ error: `Duplicate news id ${item.id}.` }, 400);
+    if (seenPositions.has(item.position)) return jsonResponse({ error: `Duplicate position ${item.position}.` }, 400);
+    seenIds.add(item.id);
+    seenPositions.add(item.position);
+  }
+  try {
+    const statements = [env.DB.prepare("DELETE FROM news_items")];
+    for (const item of input.news) {
+      statements.push(
+        env.DB.prepare(
+          "INSERT INTO news_items (id, headline, body, source_url, source_name, published_at, position, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        ).bind(
+          item.id,
+          item.headline.trim(),
+          item.body.trim(),
+          item.source_url,
+          item.source_name.trim(),
+          item.published_at,
+          item.position,
+          item.active ? 1 : 0
+        )
+      );
+    }
+    await env.DB.batch(statements);
+    return jsonResponse({ saved: true });
+  } catch (error) {
+    console.error("Failed to update tech news in D1:", error);
+    return jsonResponse({ error: "Could not save news changes." }, 503);
+  }
+}
+__name(onRequest4, "onRequest");
+
 // functions/api/availability.js
 var LESSON_MINUTES = 60;
 function isDate3(value) {
@@ -715,7 +819,7 @@ async function getAvailableSlots(db, date) {
   return [...available].sort().map((time) => ({ time }));
 }
 __name(getAvailableSlots, "getAvailableSlots");
-async function onRequest4({ request, env }) {
+async function onRequest5({ request, env }) {
   if (request.method !== "GET") return jsonResponse({ error: "Method not allowed." }, 405);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
   const date = new URL(request.url).searchParams.get("date");
@@ -730,7 +834,7 @@ async function onRequest4({ request, env }) {
     return jsonResponse({ error: "Availability is temporarily unavailable." }, 503);
   }
 }
-__name(onRequest4, "onRequest");
+__name(onRequest5, "onRequest");
 
 // functions/api/bookings.js
 function isDate4(value) {
@@ -747,7 +851,7 @@ function emailText(value) {
   return String(value ?? "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 __name(emailText, "emailText");
-async function onRequest5({ request, env }) {
+async function onRequest6({ request, env }) {
   if (request.method !== "POST") return jsonResponse({ error: "Method not allowed." }, 405);
   if (!env.DB) return jsonResponse({ error: "Booking storage is not configured." }, 503);
   let input;
@@ -835,10 +939,10 @@ async function onRequest5({ request, env }) {
     }, 202);
   }
 }
-__name(onRequest5, "onRequest");
+__name(onRequest6, "onRequest");
 
 // functions/api/gallery.js
-async function onRequest6({ request, env }) {
+async function onRequest7({ request, env }) {
   if (request.method !== "GET") return jsonResponse({ error: "Method not allowed." }, 405);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
   try {
@@ -851,7 +955,31 @@ async function onRequest6({ request, env }) {
     return jsonResponse({ error: "The photography gallery is temporarily unavailable." }, 503);
   }
 }
-__name(onRequest6, "onRequest");
+__name(onRequest7, "onRequest");
+
+// functions/api/news.js
+async function onRequest8({ request, env }) {
+  if (request.method !== "GET") return jsonResponse({ error: "Method not allowed." }, 405);
+  if (!env.DB) return jsonResponse({ error: "News storage is not configured." }, 503);
+  try {
+    const result = await env.DB.prepare(
+      "SELECT id, headline, body, source_url, source_name, published_at, position, active FROM news_items WHERE active = 1"
+    ).all();
+    const news = (result.results || []).sort((a, b) => {
+      const at = Date.parse(a.published_at);
+      const bt = Date.parse(b.published_at);
+      if (Number.isNaN(at) || Number.isNaN(bt)) {
+        return Number.isNaN(at) - Number.isNaN(bt) || a.position - b.position;
+      }
+      return bt - at || a.position - b.position;
+    });
+    return jsonResponse({ news });
+  } catch (error) {
+    console.error("Failed to read tech news from D1:", error);
+    return jsonResponse({ error: "Tech news is temporarily unavailable." }, 503);
+  }
+}
+__name(onRequest8, "onRequest");
 
 // functions/api/content.js
 async function onRequestGet({ env }) {
@@ -880,14 +1008,14 @@ async function onRequestGet({ env }) {
   return jsonResponse(site);
 }
 __name(onRequestGet, "onRequestGet");
-async function onRequest7({ request, env }) {
+async function onRequest9({ request, env }) {
   if (request.method === "GET") return onRequestGet({ env });
   return jsonResponse({ error: "Use the public read endpoint or the protected admin endpoint." }, 405);
 }
-__name(onRequest7, "onRequest");
+__name(onRequest9, "onRequest");
 
 // functions/api/services.js
-async function onRequest8({ request, env }) {
+async function onRequest10({ request, env }) {
   if (request.method !== "GET") return jsonResponse({ error: "Method not allowed." }, 405);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
   try {
@@ -908,7 +1036,7 @@ async function onRequest8({ request, env }) {
     return jsonResponse({ error: "Services are temporarily unavailable." }, 503);
   }
 }
-__name(onRequest8, "onRequest");
+__name(onRequest10, "onRequest");
 
 // src/worker-handler.js
 var PAGE_ROUTES = /* @__PURE__ */ new Map([
@@ -958,17 +1086,19 @@ function createWorker(templates) {
       const { pathname } = new URL(request.url);
       const isAdminPage = pathname === "/admin" || pathname === "/admin.html";
       if (pathname === "/api/content") {
-        return onRequest7({ request, env, context });
+        return onRequest9({ request, env, context });
       }
       if (pathname === "/api/admin/content") {
         return onRequest({ request, env, context });
       }
-      if (pathname === "/api/services") return onRequest8({ request, env, context });
-      if (pathname === "/api/gallery") return onRequest6({ request, env, context });
-      if (pathname === "/api/availability") return onRequest4({ request, env, context });
-      if (pathname === "/api/bookings") return onRequest5({ request, env, context });
+      if (pathname === "/api/services") return onRequest10({ request, env, context });
+      if (pathname === "/api/gallery") return onRequest7({ request, env, context });
+      if (pathname === "/api/availability") return onRequest5({ request, env, context });
+      if (pathname === "/api/bookings") return onRequest6({ request, env, context });
       if (pathname === "/api/admin/portfolio") return onRequest2({ request, env, context });
       if (pathname === "/api/admin/gallery") return onRequest3({ request, env, context });
+      if (pathname === "/api/news") return onRequest8({ request, env, context });
+      if (pathname === "/api/admin/news") return onRequest4({ request, env, context });
       if (pathname.startsWith("/api/admin/bookings/")) {
         return handleAdminBooking(request, env, pathname);
       }
@@ -1027,7 +1157,7 @@ __name(createWorker, "createWorker");
 // src/worker.js
 var worker_default = createWorker({ home, projects, accomplishments, arrangements, services, gallery, admin });
 
-// ../AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
+// ../AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
 var drainBody = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx) => {
   try {
     return await middlewareCtx.next(request, env);
@@ -1045,7 +1175,7 @@ var drainBody = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "drainBody");
 var middleware_ensure_req_body_drained_default = drainBody;
 
-// ../AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/wrangler/templates/middleware/middleware-miniflare3-json-error.ts
+// ../AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-miniflare3-json-error.ts
 function reduceError(e) {
   return {
     name: e?.name,
@@ -1074,14 +1204,14 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-soeNsn/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-w2nfof/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
 ];
 var middleware_insertion_facade_default = worker_default;
 
-// ../AppData/Local/npm-cache/_npx/32026684e21afda6/node_modules/wrangler/templates/middleware/common.ts
+// ../AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/common.ts
 var __facade_middleware__ = [];
 function __facade_register__(...args) {
   __facade_middleware__.push(...args.flat());
@@ -1106,7 +1236,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-soeNsn/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-w2nfof/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

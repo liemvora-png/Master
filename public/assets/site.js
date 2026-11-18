@@ -443,6 +443,53 @@ function initThemeToggle() {
   }
 }
 
+function initMobileMenu() {
+  const toggle = document.querySelector(".menu-toggle");
+  const nav = document.querySelector(".site-nav");
+  if (!toggle || !nav) return;
+
+  const setMenuOpen = (open) => {
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
+    nav.classList.toggle("nav-open", open);
+  };
+
+  toggle.addEventListener("click", () => {
+    setMenuOpen(toggle.getAttribute("aria-expanded") !== "true");
+  });
+
+  nav.addEventListener("click", (event) => {
+    if (event.target.closest("a")) setMenuOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      setMenuOpen(false);
+      toggle.focus();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (
+      toggle.getAttribute("aria-expanded") === "true"
+      && !event.target.closest(".site-header")
+    ) {
+      setMenuOpen(false);
+    }
+  });
+
+  const desktop = window.matchMedia("(min-width: 701px)");
+  const closeAtDesktop = (event) => {
+    if (event.matches) setMenuOpen(false);
+  };
+  if (typeof desktop.addEventListener === "function") {
+    desktop.addEventListener("change", closeAtDesktop);
+  } else if (typeof desktop.addListener === "function") {
+    desktop.addListener(closeAtDesktop);
+  }
+}
+
 initThemeToggle();
+initMobileMenu();
 loadManagedContent();
 loadHomeNews();

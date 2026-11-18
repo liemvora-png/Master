@@ -13,55 +13,47 @@
         }
       })();
     </script>
-    <meta name="description" content="Welcome to Liem Vora's portfolio.">
-    <title>Liem Vora: Portfolio</title>
+    <meta name="description" content="A selection of photography by Liem Vora.">
+    <title>Liem Vora: Photography gallery</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <script src="/assets/site.js" defer></script>
+    <script src="/assets/gallery.js" defer></script>
   </head>
-  <body data-page="home">
+  <body data-page="gallery">
     <a class="skip-link" href="#main">Skip to content</a>
-
     <header class="site-header">
       <a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">Liem Vora</span></a>
-      <nav class="site-nav" aria-label="Main navigation">
-        <a href="/" aria-current="page">Home</a>
+      <nav class="site-nav" id="site-navigation" aria-label="Main navigation">
+        <a href="/">Home</a>
         <a href="/projects">Projects</a>
         <a href="/accomplishments.html">Accomplishments</a>
         <a href="/arrangements.html">Arrangements</a>
         <a href="/services">Services</a>
-        <a href="/gallery">Gallery</a>
+        <a href="/gallery" aria-current="page">Gallery</a>
+        <a href="/news">News</a>
       </nav>
       <div class="header-actions">
+        <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="site-navigation" aria-expanded="false"><span class="menu-toggle-line" aria-hidden="true"></span><span class="menu-toggle-line" aria-hidden="true"></span><span class="menu-toggle-line" aria-hidden="true"></span></button>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>
         <a class="admin-entry-button" href="/admin">Admin <span aria-hidden="true">↗</span></a>
       </div>
     </header>
-
     <main id="main">
-      <section class="intro home-intro" id="top" aria-labelledby="page-title">
-        <h1 id="page-title">Welcome to my<br><span>portfolio.</span></h1>
-        <p class="home-update-status" role="status" aria-live="polite">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>Last updated <time id="home-last-updated">checking…</time></span>
-        </p>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Selected work</p>
+        <h1 id="page-title">Photography</h1>
+        <p class="intro-copy">A selection of photographs.</p>
       </section>
-
-      <section class="home-news" id="news" hidden aria-labelledby="home-news-title">
-        <div class="section-heading">
-          <h2 id="home-news-title">Latest news</h2>
-          <a class="news-all-link" href="/news">ALL NEWS <span aria-hidden="true">↗</span></a>
+      <section aria-label="Photography gallery">
+        <div id="gallery-grid" class="gallery-grid" aria-live="polite">
+          <p class="empty-state">Loading photographs…</p>
         </div>
-        <ul class="home-news-list" id="home-news-list"></ul>
       </section>
     </main>
-
-    <footer class="site-footer">
-      <span>δ</span>
-      <span>MADE WITH CARE <span class="footer-dot" aria-hidden="true">·</span> 2026</span>
-    </footer>
+    <footer class="site-footer"><span>δ</span><span>MADE WITH CARE <span class="footer-dot" aria-hidden="true">·</span> 2026</span></footer>
   </body>
 </html>
