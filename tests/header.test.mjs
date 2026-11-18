@@ -39,6 +39,24 @@ test("desktop breakpoint exposes full navigation and hides the burger", () => {
   assert.match(script, /min-width: 1100px/);
 });
 
+test("burger button keeps identical dimensions and never recolors", () => {
+  const styles = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+
+  assert.match(
+    styles,
+    /\.menu-toggle\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px;/,
+    "the burger button should declare an explicit 44px square box"
+  );
+  assert.ok(
+    !/\.menu-toggle(?::hover|:active)[^{]*\{/.test(styles),
+    "the burger button should not recolor on hover or press"
+  );
+  assert.ok(
+    (styles.match(/\.menu-toggle-line\s*\{[^}]*height:/g) || []).length === 1,
+    "there should be exactly one burger line size rule so all lines share the same weight"
+  );
+});
+
 test("home page welcomes visitors and displays its managed update time", () => {
   const home = readFileSync(new URL("../src/templates/home.html", import.meta.url), "utf8");
   const siteScript = readFileSync(new URL("../public/assets/site.js", import.meta.url), "utf8");
