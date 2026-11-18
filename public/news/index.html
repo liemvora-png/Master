@@ -230,10 +230,10 @@
   async function loadNews() {
     list.setAttribute("aria-busy", "true");
     try {
-      const response = await fetch("/api/news", { headers: { Accept: "application/json" } });
+        const response = await fetch("/api/news?limit=1", { headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error(`News request returned ${response.status}.`);
-      const { news } = await response.json();
-      const items = Array.isArray(news) ? news : [];
+        const data = await response.json();
+        const items = Array.isArray(data.news) ? data.news : [];
       if (items.length) {
         const newest = items[0].published_at || "";
         if (newest && updated) {
