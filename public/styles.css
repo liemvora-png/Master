@@ -199,11 +199,17 @@ a:focus-visible {
   gap: 0.5rem;
 }
 
+/* One authoritative burger rule set: fixed box matching the theme-toggle
+   button's 40px height, identical in every theme and state, so
+   light/dark/pressed never change its dimensions. Transparent background
+   lets the page's theme color show through, the same as the other header
+   controls. */
 .menu-toggle {
   display: inline-flex;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
   border: 1px solid var(--line);
   border-radius: 2px;
   align-items: center;
@@ -211,25 +217,30 @@ a:focus-visible {
   flex-direction: column;
   gap: 0;
   padding: 0;
-  background: var(--surface);
+  background: transparent;
   color: var(--ink);
+  cursor: pointer;
 }
 
+/* Line height 2.4px and gap 5.2px put every line edge on whole device
+   pixels at 125% display scaling and make the icon block 17.6px tall,
+   exactly as wide as the lines, so the space between the icon and the
+   button border is equal on all four sides (2.4px line = 3 device px). */
 .menu-toggle-lines {
   display: flex;
-  width: 18px;
-  height: 18px;
+  width: 17.6px;
+  height: 17.6px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5.2px;
 }
 
 .menu-toggle-line {
   display: block;
-  width: 18px;
-  height: 2px;
-  border-radius: 1px;
+  width: 17.6px;
+  height: 2.4px;
+  border-radius: 1.2px;
   background: currentColor;
   transition: transform 180ms ease, opacity 180ms ease;
 }
@@ -238,8 +249,10 @@ a:focus-visible {
   display: none;
 }
 
+/* Line centers sit 7.6px apart (2.4px line + 5.2px gap), so the strokes
+   cross exactly at the middle. The button box itself never changes. */
 .menu-toggle.is-active .menu-toggle-line:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
+  transform: translateY(7.6px) rotate(45deg);
 }
 
 .menu-toggle.is-active .menu-toggle-line:nth-child(2) {
@@ -247,13 +260,7 @@ a:focus-visible {
 }
 
 .menu-toggle.is-active .menu-toggle-line:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
-}
-
-.menu-toggle:hover {
-  border-color: var(--olive);
-  background: var(--hover);
-  color: var(--olive);
+  transform: translateY(-7.6px) rotate(-45deg);
 }
 
 @media (min-width: 1100px) {
@@ -320,29 +327,6 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-}
-
-.menu-toggle {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  background: var(--paper);
-  color: var(--ink);
-  cursor: pointer;
-  padding: 0;
-}
-
-.menu-toggle-line {
-  width: 16px;
-  height: 2px;
-  background: currentColor;
-  border-radius: 1px;
-  display: block;
 }
 
 .menu-toggle:focus-visible {
@@ -1417,6 +1401,10 @@ h1 span {
 
     .menu-toggle {
       display: inline-flex;
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
+      min-height: 36px;
     }
 
   .admin-entry-button {
