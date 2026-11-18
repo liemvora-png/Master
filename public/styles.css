@@ -222,22 +222,23 @@ a:focus-visible {
   cursor: pointer;
 }
 
-/* Line height 2.4px and gap 3.2px put every line edge on whole device
-   pixels at 125% display scaling, so all three lines render at the exact
-   same weight (this is the user's actual dpr, 1.25). */
+/* Line height 2.4px and gap 5.2px put every line edge on whole device
+   pixels at 125% display scaling and make the icon block 17.6px tall,
+   exactly as wide as the lines, so the space between the icon and the
+   button border is equal on all four sides (2.4px line = 3 device px). */
 .menu-toggle-lines {
   display: flex;
-  width: 18px;
-  height: 18px;
+  width: 17.6px;
+  height: 17.6px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3.2px;
+  gap: 5.2px;
 }
 
 .menu-toggle-line {
   display: block;
-  width: 18px;
+  width: 17.6px;
   height: 2.4px;
   border-radius: 1.2px;
   background: currentColor;
@@ -248,10 +249,10 @@ a:focus-visible {
   display: none;
 }
 
-/* Line centers sit 5.6px apart (2.4px line + 3.2px gap), so the strokes
+/* Line centers sit 7.6px apart (2.4px line + 5.2px gap), so the strokes
    cross exactly at the middle. The button box itself never changes. */
 .menu-toggle.is-active .menu-toggle-line:nth-child(1) {
-  transform: translateY(5.6px) rotate(45deg);
+  transform: translateY(7.6px) rotate(45deg);
 }
 
 .menu-toggle.is-active .menu-toggle-line:nth-child(2) {
@@ -259,7 +260,7 @@ a:focus-visible {
 }
 
 .menu-toggle.is-active .menu-toggle-line:nth-child(3) {
-  transform: translateY(-5.6px) rotate(-45deg);
+  transform: translateY(-7.6px) rotate(-45deg);
 }
 
 @media (min-width: 1100px) {
