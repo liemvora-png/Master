@@ -199,16 +199,17 @@ a:focus-visible {
   gap: 0.5rem;
 }
 
-/* One authoritative burger rule set: fixed 44x44 box, identical in every
-   theme and state, so light/dark/pressed never change its dimensions.
-   Transparent background lets the page's theme color show through, the
-   same as the other header controls. */
+/* One authoritative burger rule set: fixed box matching the theme-toggle
+   button's 40px height, identical in every theme and state, so
+   light/dark/pressed never change its dimensions. Transparent background
+   lets the page's theme color show through, the same as the other header
+   controls. */
 .menu-toggle {
   display: inline-flex;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
   border: 1px solid var(--line);
   border-radius: 2px;
   align-items: center;
@@ -1399,6 +1400,10 @@ h1 span {
 
     .menu-toggle {
       display: inline-flex;
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
+      min-height: 36px;
     }
 
   .admin-entry-button {

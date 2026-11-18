@@ -44,8 +44,8 @@ test("burger button keeps identical dimensions and never recolors", () => {
 
   assert.match(
     styles,
-    /\.menu-toggle\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px;/,
-    "the burger button should declare an explicit 44px square box"
+    /\.menu-toggle\s*\{[^}]*width:\s*40px;[^}]*height:\s*40px;/,
+    "the burger button should declare an explicit square box matching the theme-toggle's 40px size"
   );
   assert.ok(
     !/\.menu-toggle(?::hover|:active)[^{]*\{/.test(styles),
