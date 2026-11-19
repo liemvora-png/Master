@@ -21,7 +21,7 @@ async function readPortfolio(db) {
   const [services, subjects, gallery, availability, bookings] = await Promise.all([
     db.prepare("SELECT id, title, description, price, position, active FROM services ORDER BY position").all(),
     db.prepare("SELECT id, service_id, test_name, subject, position FROM test_prep_options ORDER BY test_name, position").all(),
-    db.prepare("SELECT id, image_url, alt_text, caption, position, active FROM photo_gallery ORDER BY position").all(),
+    db.prepare("SELECT id, image_url, preview_url, medium_url, alt_text, caption, position, active FROM photo_gallery ORDER BY position").all(),
     db.prepare("SELECT id, day_of_week, start_time, end_time, exception_date, is_available FROM availability ORDER BY day_of_week, exception_date, start_time").all(),
     db.prepare(
       "SELECT id, service_id, name, email, note, lesson_date, lesson_time, status, created_at " +

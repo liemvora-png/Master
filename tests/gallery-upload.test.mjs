@@ -6,6 +6,10 @@ import {
   MAX_IMAGE_SIZE,
   MAX_INPUT_BYTES,
   REENCODE_INPUT_BYTES,
+  PREVIEW_LONG_EDGE,
+  PREVIEW_QUALITY,
+  MEDIUM_LONG_EDGE,
+  MEDIUM_QUALITY,
   altTextFromFilename,
   describeFileRejection,
   describeItemRejection,
@@ -72,4 +76,11 @@ test("file sizes read the way the queue shows them", () => {
   assert.equal(formatSize(512), "512 bytes");
   assert.equal(formatSize(2048), "2 KB");
   assert.equal(formatSize(MAX_IMAGE_SIZE), "20.0 MB");
+});
+
+test("progressive preview dimensions are intentionally smaller than the original quality tier", () => {
+  assert.equal(PREVIEW_LONG_EDGE, 32);
+  assert.equal(PREVIEW_QUALITY, 0.38);
+  assert.equal(MEDIUM_LONG_EDGE, 960);
+  assert.equal(MEDIUM_QUALITY, 0.72);
 });

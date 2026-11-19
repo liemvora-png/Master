@@ -307,6 +307,14 @@ test("Worker serves private page templates and falls back to public assets", asy
         calls.push(new URL(request.url).pathname);
         return new Response("static page");
       }
+    },
+    GALLERY: {
+      async get(key) {
+        return {
+          body: new Blob(["image"], { type: "image/webp" }).stream(),
+          httpMetadata: { contentType: "image/webp" }
+        };
+      }
     }
   };
 
@@ -370,6 +378,21 @@ test("Worker serves private page templates and falls back to public assets", asy
     await adminResponse.text(),
     "<html>private editor \"pk_live_Y2xlcmsubGllbXZvcmEuY2Mk\"</html>"
   );
+
+  const previewResponse = await worker.fetch(
+    new Request("https://www.liemvora.cc/gallery-images/12345678-1234-1234-1234-123456789abc.low.webp"),
+    env,
+    {}
+  );
+  assert.equal(previewResponse.status, 200);
+  assert.equal(previewResponse.headers.get("Content-Type"), "image/webp");
+
+  const invalidVariant = await worker.fetch(
+    new Request("https://www.liemvora.cc/gallery-images/not-a-gallery-image.low.webp"),
+    env,
+    {}
+  );
+  assert.equal(invalidVariant.status, 404);
 
   const staticResponse = await worker.fetch(
     new Request("https://www.liemvora.cc/assets/site.js"),

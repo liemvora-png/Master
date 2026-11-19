@@ -250,7 +250,14 @@ test("service and gallery APIs only expose active public content", async () => {
         async all() {
           if (/FROM services/.test(query)) return { results: [{ id: "piano", title: "Piano", active: 1 }] };
           if (/FROM test_prep_options/.test(query)) return { results: [] };
-          if (/FROM photo_gallery/.test(query)) return { results: [{ id: "photo1", image_url: "/gallery-images/abc.jpg", alt_text: "A view", caption: "" }] };
+          if (/FROM photo_gallery/.test(query)) return { results: [{
+            id: "photo1",
+            image_url: "/gallery-images/abc.jpg",
+            preview_url: "/gallery-images/abc.low.webp",
+            medium_url: "/gallery-images/abc.medium.webp",
+            alt_text: "A view",
+            caption: ""
+          }] };
           return { results: [] };
         }
       };
@@ -266,7 +273,10 @@ test("service and gallery APIs only expose active public content", async () => {
     request: new Request("https://example.com/api/gallery"),
     env: { DB: db }
   });
-  assert.deepEqual((await gallery.json()).images[0].alt_text, "A view");
+  const image = (await gallery.json()).images[0];
+  assert.equal(image.alt_text, "A view");
+  assert.equal(image.preview_url, "/gallery-images/abc.low.webp");
+  assert.equal(image.medium_url, "/gallery-images/abc.medium.webp");
 });
 
 test("portfolio, gallery, and booking admin APIs require Clerk authentication", async () => {
