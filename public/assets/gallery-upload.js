@@ -1,6 +1,20 @@
 // Staged multi-photo uploader for the admin gallery. Limits mirror functions/api/admin/gallery.js.
 
-export const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+// Cloudflare rejects request bodies over 100 MB on Free/Pro plans before any
+// code runs, and multipart adds overhead, so full-size inputs stop at 90 MB.
+export const MAX_INPUT_BYTES = 90 * 1024 * 1024;
+// Uploaded payloads (the processed file, or a pass-through GIF) fit this cap,
+// which matches the server's MAX_IMAGE_SIZE.
+export const MAX_IMAGE_SIZE = 12 * 1024 * 1024;
+// Anything above this is decoded and re-encoded in the browser before upload.
+export const REENCODE_INPUT_BYTES = 2 * 1024 * 1024;
+export const TARGET_LONG_EDGE = 2560;
+export const ENCODE_STEPS = [
+  { longEdge: TARGET_LONG_EDGE, quality: 0.86 },
+  { longEdge: TARGET_LONG_EDGE, quality: 0.75 },
+  { longEdge: 1920, quality: 0.75 },
+  { longEdge: 1600, quality: 0.7 }
+];
 export const MAX_BATCH = 20;
 export const MAX_ALT_LENGTH = 240;
 export const MAX_CAPTION_LENGTH = 300;
@@ -9,6 +23,7 @@ export const ACCEPTED_TYPES = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
   ["image/webp", "webp"],
+  ["image/avif", "avif"],
   ["image/gif", "gif"]
 ]);
 
@@ -33,15 +48,35 @@ export function isSameFile(one, two) {
   return one.name === two.name && one.size === two.size && one.lastModified === two.lastModified;
 }
 
-export function describeFileRejection(file, stagedCount = 0, stagedFiles = []) {
+// Staged photos carry the processed file, so duplicate checks compare the
+// original file the admin picked, not the re-encoded upload.
+export function sourceRef(file) {
+  return { name: file.name, size: file.size, lastModified: file.lastModified };
+}
+
+// GIFs pass through untouched to keep animation; every other accepted format
+// is re-encoded when it is big enough to matter.
+export function needsReEncode(file) {
+  return file.type !== "image/gif" && file.size > REENCODE_INPUT_BYTES;
+}
+
+export function processedName(originalName, mime) {
+  const base = String(originalName ?? "").replace(/\.[^.]*$/, "");
+  return `${base || "photo"}${mime === "image/webp" ? ".webp" : ".jpg"}`;
+}
+
+export function describeFileRejection(file, stagedCount = 0, stagedSources = []) {
   if (!file) return "That file could not be read.";
-  if (!ACCEPTED_TYPES.has(file.type)) return `${file.name} is not a JPEG, PNG, WebP, or GIF image.`;
+  if (!ACCEPTED_TYPES.has(file.type)) return `${file.name} is not a JPEG, PNG, WebP, AVIF, or GIF image.`;
   if (!file.size) return `${file.name} is empty.`;
-  if (file.size > MAX_IMAGE_SIZE) {
-    return `${file.name} is ${formatSize(file.size)}, over the 8 MB limit.`;
+  if (file.type === "image/gif" && file.size > MAX_IMAGE_SIZE) {
+    return `${file.name} is ${formatSize(file.size)}. GIFs upload as-is, up to ${formatSize(MAX_IMAGE_SIZE)}.`;
+  }
+  if (file.size > MAX_INPUT_BYTES) {
+    return `${file.name} is ${formatSize(file.size)}, over the ${formatSize(MAX_INPUT_BYTES)} upload limit.`;
   }
   if (stagedCount >= MAX_BATCH) return `Only ${MAX_BATCH} photos upload at a time.`;
-  if (stagedFiles.some((staged) => isSameFile(staged, file))) return `${file.name} is already staged.`;
+  if (stagedSources.some((source) => isSameFile(source, file))) return `${file.name} is already staged.`;
   return "";
 }
 
@@ -90,6 +125,46 @@ function carriesFiles(event) {
   return Array.from(types || []).includes("Files");
 }
 
+async function encodeBitmap(bitmap, step) {
+  const maxDim = Math.max(bitmap.width, bitmap.height);
+  const scale = Math.min(1, step.longEdge / maxDim);
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, width, height);
+  for (const [mime, quality] of [["image/webp", step.quality], ["image/jpeg", step.quality]]) {
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, mime, quality));
+    // Browsers without WebP encoding answer with PNG; treat that as no-WebP.
+    if (blob && blob.type === mime) return blob;
+  }
+  return null;
+}
+
+async function prepareFile(file) {
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return { error: `${file.name}: your browser could not open this image. Export it as JPEG from your photo editor and upload that.` };
+  }
+  try {
+    for (const step of ENCODE_STEPS) {
+      const blob = await encodeBitmap(bitmap, step);
+      if (!blob) {
+        return { error: `${file.name}: your browser could not re-encode this image. Upload a JPEG under ${formatSize(MAX_IMAGE_SIZE)} instead.` };
+      }
+      if (blob.size <= MAX_IMAGE_SIZE) {
+        return { file: new File([blob], processedName(file.name, blob.type), { type: blob.type }) };
+      }
+    }
+    return { error: `${file.name} stayed over ${formatSize(MAX_IMAGE_SIZE)} after compressing. Export a smaller JPEG and upload that.` };
+  } finally {
+    bitmap.close?.();
+  }
+}
+
 export function createUploader({ upload, setStatus, onUploaded }) {
   // A manager re-render rebuilds this block, so the queue is carried across renders.
   const stage = activeStage ?? [];
@@ -101,7 +176,7 @@ export function createUploader({ upload, setStatus, onUploaded }) {
   const fileField = fileLabel("Photos");
   dropzone.append(
     fileField.wrapper,
-    element("p", "editor-help", `Drag photos here or choose files. JPEG, PNG, WebP, and GIF, 8 MB each, up to ${MAX_BATCH} at a time.`)
+    element("p", "editor-help", `Drag photos here or choose files. JPEG, PNG, WebP, AVIF, and GIF, up to ${formatSize(MAX_INPUT_BYTES)} each. Photos over ${formatSize(REENCODE_INPUT_BYTES)} are resized to ${TARGET_LONG_EDGE} px WebP in your browser before upload, up to ${MAX_BATCH} at a time.`)
   );
 
   const notices = element("p", "gallery-notices");
@@ -175,22 +250,51 @@ export function createUploader({ upload, setStatus, onUploaded }) {
   function addFiles(fileList) {
     const files = Array.from(fileList || []);
     if (!files.length) return;
-    const stagedFiles = stage.map((item) => item.file);
+    const stagedSources = stage.map((item) => item.source);
     const rejections = [];
+    const accepted = [];
     for (const file of files) {
-      const problem = describeFileRejection(file, stage.length, stagedFiles);
+      const problem = describeFileRejection(file, stage.length + accepted.length, stagedSources);
       if (problem) {
         rejections.push(problem);
         continue;
       }
-      stagedFiles.push(file);
-      stage.push({
-        file,
+      stagedSources.push(sourceRef(file));
+      accepted.push(file);
+    }
+    processAndStage(accepted, rejections);
+  }
+
+  async function processAndStage(accepted, rejections) {
+    if (!accepted.length) {
+      finishStaging([], rejections);
+      return;
+    }
+    const staged = [];
+    for (const file of accepted) {
+      let uploadFile = file;
+      if (needsReEncode(file)) {
+        setStatus(`Compressing ${file.name} in your browser…`);
+        const prepared = await prepareFile(file);
+        if (prepared.error) {
+          rejections.push(prepared.error);
+          continue;
+        }
+        uploadFile = prepared.file;
+      }
+      staged.push({
+        file: uploadFile,
+        source: sourceRef(file),
         altText: altTextFromFilename(file.name),
         caption: "",
-        previewUrl: URL.createObjectURL(file)
+        previewUrl: URL.createObjectURL(uploadFile)
       });
     }
+    finishStaging(staged, rejections);
+  }
+
+  function finishStaging(staged, rejections) {
+    stage.push(...staged);
     renderStage();
     if (rejections.length) {
       setNotice(rejections.join(" "));
