@@ -1,11 +1,12 @@
 import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
-const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
 const IMAGE_TYPES = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
   ["image/webp", "webp"],
+  ["image/avif", "avif"],
   ["image/gif", "gif"]
 ]);
 
@@ -31,7 +32,7 @@ export async function onRequest({ request, env }) {
     const altText = form.get("altText");
     const caption = form.get("caption");
     if (!(file instanceof File) || file.size < 1 || file.size > MAX_IMAGE_SIZE) {
-      return jsonResponse({ error: "Choose an image up to 8 MB." }, 400);
+      return jsonResponse({ error: "Choose an image up to 20 MB." }, 400);
     }
     const extension = IMAGE_TYPES.get(file.type);
     if (!extension) {
@@ -126,7 +127,7 @@ export async function onRequest({ request, env }) {
       ).bind(id).first();
       if (!image) return jsonResponse({ error: "Gallery image not found." }, 404);
       const filename = image.image_url.split("/").pop();
-      if (!/^[\w-]{36}\.(jpg|png|webp|gif)$/.test(filename)) {
+      if (!/^[\w-]{36}\.(jpg|png|webp|avif|gif)$/.test(filename)) {
         throw new Error("Stored gallery image path is invalid.");
       }
       await env.GALLERY.delete(`gallery/${filename}`);

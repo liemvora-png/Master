@@ -4,11 +4,15 @@ import {
   MAX_ALT_LENGTH,
   MAX_BATCH,
   MAX_IMAGE_SIZE,
+  MAX_INPUT_BYTES,
+  REENCODE_INPUT_BYTES,
   altTextFromFilename,
   describeFileRejection,
   describeItemRejection,
   formatSize,
-  isSameFile
+  isSameFile,
+  needsReEncode,
+  processedName
 } from "../public/assets/gallery-upload.js";
 
 function photo(name, size = 1024, type = "image/jpeg", lastModified = 1700000000000) {
@@ -22,11 +26,30 @@ test("alt text is prefilled from the photo file name", () => {
   assert.equal(altTextFromFilename("x".repeat(400)).length, MAX_ALT_LENGTH);
 });
 
-test("oversized, unsupported, and empty files are refused before uploading", () => {
-  assert.match(describeFileRejection(photo("big.jpg", MAX_IMAGE_SIZE + 600 * 1024)), /is 8\.6 MB, over the 8 MB limit/);
-  assert.match(describeFileRejection(photo("notes.pdf", 1024, "application/pdf")), /notes\.pdf is not a JPEG, PNG, WebP, or GIF image/);
+test("input files are refused on type, emptiness, and Cloudflare's upload cap", () => {
+  assert.match(
+    describeFileRejection(photo("scan.jpg", MAX_INPUT_BYTES + 5 * 1024 * 1024)),
+    /is 95\.0 MB, over the 90\.0 MB upload limit/
+  );
+  assert.match(
+    describeFileRejection(photo("loop.gif", MAX_IMAGE_SIZE + 1024 * 1024, "image/gif")),
+    /GIFs upload as-is, up to 20\.0 MB/
+  );
+  assert.match(describeFileRejection(photo("notes.pdf", 1024, "application/pdf")), /notes\.pdf is not a JPEG, PNG, WebP, AVIF, or GIF image/);
+  assert.match(describeFileRejection(photo("raw.nef", 1024, "image/x-nikon-nef")), /not a JPEG, PNG, WebP, AVIF, or GIF image/);
   assert.match(describeFileRejection(photo("empty.png", 0, "image/png")), /is empty/);
-  assert.equal(describeFileRejection(photo("ok.webp", MAX_IMAGE_SIZE, "image/webp")), "");
+  assert.equal(describeFileRejection(photo("full-res.jpg", 60 * 1024 * 1024)), "");
+  assert.equal(describeFileRejection(photo("ok.avif", MAX_IMAGE_SIZE, "image/avif")), "");
+});
+
+test("big photos re-encode in the browser, GIFs and smaller files pass through", () => {
+  assert.equal(needsReEncode(photo("export.jpg", REENCODE_INPUT_BYTES + 1)), true);
+  assert.equal(needsReEncode(photo("medium.jpg", REENCODE_INPUT_BYTES)), false);
+  assert.equal(needsReEncode(photo("small.png", 3 * 1024 * 1024, "image/png")), false);
+  assert.equal(needsReEncode(photo("animation.gif", 8 * 1024 * 1024, "image/gif")), false);
+  assert.equal(processedName("IMG_2026-05-12.png", "image/webp"), "IMG_2026-05-12.webp");
+  assert.equal(processedName("street.jpg", "image/jpeg"), "street.jpg");
+  assert.equal(processedName(".png", "image/webp"), "photo.webp");
 });
 
 test("a full batch and duplicate photos are refused", () => {
@@ -48,5 +71,5 @@ test("a staged photo without alt text cannot upload", () => {
 test("file sizes read the way the queue shows them", () => {
   assert.equal(formatSize(512), "512 bytes");
   assert.equal(formatSize(2048), "2 KB");
-  assert.equal(formatSize(MAX_IMAGE_SIZE), "8.0 MB");
+  assert.equal(formatSize(MAX_IMAGE_SIZE), "20.0 MB");
 });

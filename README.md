@@ -66,7 +66,7 @@ Keep the admin routes protected by Clerk regardless of the hostname used to reac
 
 ## Editing content
 
-Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
+Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads accept JPEG, PNG, WebP, AVIF, and GIF up to 90 MB each; photos up to 20 MB upload at full quality, photos over 20 MB are resized to 2560 px WebP in the browser before upload, and alt text is required.
 
 For Clerk application-domain redirects, use `https://www.liemvora.cc/admin` for sign-in and sign-up, and `https://www.liemvora.cc/` after sign-out. Keep sign-up restricted to the intended admin account.
 
