@@ -2,8 +2,7 @@
   const authSection = document.querySelector("#admin-auth");
   const authStatus = document.querySelector("#admin-auth-status");
   const signInButton = document.querySelector("#admin-sign-in");
-  const editor = document.querySelector("#admin-editor");
-  const manager = document.querySelector(".portfolio-admin");
+  const workspace = document.querySelector("#admin-workspace");
   const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
   const clerkScript = document.querySelector('script[src*="@clerk/clerk-js@"]');
 
@@ -37,14 +36,12 @@
       signInButton.addEventListener("click", () => clerk.openSignIn({
         fallbackRedirectUrl: "/admin"
       }));
-      editor.hidden = true;
-      manager.hidden = true;
+      workspace.hidden = true;
       return null;
     }
 
     authSection.hidden = true;
-    editor.hidden = false;
-    manager.hidden = false;
+    workspace.hidden = false;
     clerk.mountUserButton(document.querySelector("#clerk-user-button"), {
       afterSignOutUrl: "/"
     });
@@ -52,8 +49,7 @@
   }).catch((error) => {
     authStatus.textContent = error.message;
     signInButton.hidden = true;
-    editor.hidden = true;
-    manager.hidden = true;
+    workspace.hidden = true;
     throw error;
   });
 

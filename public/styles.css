@@ -647,8 +647,7 @@ h1 span {
 }
 
 .services-section,
-.booking-section,
-.portfolio-admin {
+.booking-section {
   margin-top: 3rem;
 }
 
@@ -770,8 +769,8 @@ h1 span {
 }
 
 .portfolio-admin {
+  margin-top: 0;
   padding-top: 2rem;
-  border-top: 1px solid var(--line);
 }
 
 .portfolio-admin-group {
@@ -940,6 +939,55 @@ h1 span {
 
 .admin-main {
   max-width: 1100px;
+}
+
+.admin-workspace {
+  margin-top: 2rem;
+}
+
+.admin-workspace-tabs {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  scrollbar-width: thin;
+}
+
+.admin-workspace-tab {
+  display: inline-flex;
+  min-height: 52px;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.admin-workspace-tab:hover,
+.admin-workspace-tab[aria-selected="true"] {
+  color: var(--ink);
+}
+
+.admin-workspace-tab[aria-selected="true"] {
+  border-bottom-color: var(--olive);
+}
+
+.admin-workspace-tab:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: -3px;
+}
+
+.admin-workspace-panel {
+  min-width: 0;
+}
+
+.admin-workspace-panel[hidden] {
+  display: none;
 }
 
 .admin-back-link {
@@ -1705,6 +1753,12 @@ h1 span {
 
   .editor-tab {
     padding-inline: 0.65rem;
+    font-size: 0.72rem;
+  }
+
+  .admin-workspace-tab {
+    min-height: 48px;
+    padding-inline: 0.7rem;
     font-size: 0.72rem;
   }
 }

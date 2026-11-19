@@ -71,30 +71,59 @@
         <button id="admin-sign-in" class="editor-button" type="button" hidden>Sign in with Clerk</button>
       </section>
 
-      <section id="admin-editor" aria-labelledby="editor-title" hidden>
-        <div class="section-heading">
-          <h2 id="editor-title">Site editor</h2>
-          <span class="project-count">VISUAL EDITOR</span>
+      <div id="admin-workspace" class="admin-workspace" hidden>
+        <div id="admin-workspace-tabs" class="admin-workspace-tabs" role="tablist" aria-label="Admin workspace areas">
+          <button class="admin-workspace-tab" id="workspace-tab-content" type="button" role="tab" aria-controls="page-content-panel" aria-selected="true" tabindex="0" data-workspace="content">Page content</button>
+          <button class="admin-workspace-tab" id="workspace-tab-services" type="button" role="tab" aria-controls="services-panel" aria-selected="false" tabindex="-1" data-workspace="services">Services</button>
+          <button class="admin-workspace-tab" id="workspace-tab-gallery" type="button" role="tab" aria-controls="gallery-panel" aria-selected="false" tabindex="-1" data-workspace="gallery">Gallery</button>
+          <button class="admin-workspace-tab" id="workspace-tab-bookings" type="button" role="tab" aria-controls="bookings-panel" aria-selected="false" tabindex="-1" data-workspace="bookings">Bookings</button>
         </div>
-        <p id="editor-help" class="editor-help">Choose a section to edit its text and entries. Changes are saved to the live site when you select Save changes.</p>
-        <div id="editor-tabs" class="editor-tabs" role="tablist" aria-label="Site content sections" aria-describedby="editor-help"></div>
-        <div id="content-editor" class="content-editor" aria-describedby="editor-help editor-status"></div>
-        <p id="editor-status" class="editor-status" role="status" aria-live="polite">Loading site content…</p>
-        <div class="editor-actions">
-          <button class="editor-button editor-button-secondary" id="reload-content" type="button">Reload</button>
-          <button class="editor-button" id="save-content" type="button" disabled>Save changes</button>
-        </div>
-      </section>
 
-      <section class="portfolio-admin" aria-labelledby="portfolio-admin-title">
-        <div class="section-heading">
-          <h2 id="portfolio-admin-title">Services, gallery &amp; bookings</h2>
-          <span class="project-count">SERVICE MANAGER</span>
-        </div>
-        <p class="editor-help">Manage public offerings and subjects, lesson availability, gallery photos, and private booking requests.</p>
-        <p id="portfolio-admin-status" class="editor-status" role="status" aria-live="polite">Loading service manager…</p>
-        <div id="portfolio-admin-content"></div>
-      </section>
+        <section id="page-content-panel" class="admin-workspace-panel" role="tabpanel" aria-labelledby="workspace-tab-content">
+          <div class="section-heading">
+            <h2 id="editor-title">Site editor</h2>
+            <span class="project-count">VISUAL EDITOR</span>
+          </div>
+          <p id="editor-help" class="editor-help">Choose a section to edit its text and entries. Changes are saved to the live site when you select Save changes.</p>
+          <div id="editor-tabs" class="editor-tabs" role="tablist" aria-label="Site content sections" aria-describedby="editor-help"></div>
+          <div id="content-editor" class="content-editor" aria-describedby="editor-help editor-status"></div>
+          <p id="editor-status" class="editor-status" role="status" aria-live="polite">Loading site content…</p>
+          <div class="editor-actions">
+            <button class="editor-button editor-button-secondary" id="reload-content" type="button">Reload</button>
+            <button class="editor-button" id="save-content" type="button" disabled>Save changes</button>
+          </div>
+        </section>
+
+        <section id="services-panel" class="admin-workspace-panel portfolio-admin" aria-labelledby="services-panel-title" hidden>
+          <div class="section-heading">
+            <h2 id="services-panel-title">Services</h2>
+            <span class="project-count">SERVICE MANAGER</span>
+          </div>
+          <p class="editor-help">Manage public offerings and lesson availability.</p>
+          <p id="portfolio-admin-services-status" class="editor-status" role="status" aria-live="polite">Loading services…</p>
+          <div id="portfolio-admin-services-content"></div>
+        </section>
+
+        <section id="gallery-panel" class="admin-workspace-panel portfolio-admin" aria-labelledby="gallery-panel-title" hidden>
+          <div class="section-heading">
+            <h2 id="gallery-panel-title">Gallery</h2>
+            <span class="project-count">PHOTO MANAGER</span>
+          </div>
+          <p class="editor-help">Upload, order, update, and publish gallery photos.</p>
+          <p id="portfolio-admin-gallery-status" class="editor-status" role="status" aria-live="polite">Loading gallery…</p>
+          <div id="portfolio-admin-gallery-content"></div>
+        </section>
+
+        <section id="bookings-panel" class="admin-workspace-panel portfolio-admin" aria-labelledby="bookings-panel-title" hidden>
+          <div class="section-heading">
+            <h2 id="bookings-panel-title">Bookings</h2>
+            <span class="project-count">PRIVATE REQUESTS</span>
+          </div>
+          <p class="editor-help">Review lesson requests and update their status.</p>
+          <p id="portfolio-admin-bookings-status" class="editor-status" role="status" aria-live="polite">Loading bookings…</p>
+          <div id="portfolio-admin-bookings-content"></div>
+        </section>
+      </div>
     </main>
 
     <footer class="site-footer">

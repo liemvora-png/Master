@@ -56,8 +56,6 @@ export function describeItemRejection(item) {
 }
 
 let activeStage;
-let activeUploader;
-let documentDragHandlers = false;
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -260,36 +258,37 @@ export function createUploader({ upload, setStatus, onUploaded }) {
     fileField.input.value = "";
   });
 
-  activeUploader = { dropzone, addFiles };
+  // Scoped to this block on purpose: the manager now shows one panel at a time,
+  // so a document-level handler would swallow drops meant for other panels.
+  let dragDepth = 0;
+  const setHighlight = (on) => dropzone.classList.toggle("is-dragging", on);
+  // The file input accepts drops on its own; adding here too would double-stage.
+  const isFileInput = (event) => event.target === fileField.input;
 
-  if (!documentDragHandlers) {
-    documentDragHandlers = true;
-    let dragDepth = 0;
-    const highlight = (on) => {
-      if (activeUploader) activeUploader.dropzone.classList.toggle("is-dragging", on);
-    };
-    document.addEventListener("dragenter", (event) => {
-      if (!carriesFiles(event) || !activeUploader) return;
-      dragDepth += 1;
-      highlight(true);
-    });
-    document.addEventListener("dragover", (event) => {
-      if (!carriesFiles(event) || !activeUploader) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "copy";
-    });
-    document.addEventListener("dragleave", () => {
-      dragDepth = Math.max(0, dragDepth - 1);
-      if (!dragDepth) highlight(false);
-    });
-    document.addEventListener("drop", (event) => {
-      if (!carriesFiles(event) || !activeUploader) return;
-      event.preventDefault();
-      dragDepth = 0;
-      highlight(false);
-      activeUploader.addFiles(event.dataTransfer.files);
-    });
-  }
+  dropzone.addEventListener("dragenter", (event) => {
+    if (!carriesFiles(event) || isFileInput(event)) return;
+    dragDepth += 1;
+    setHighlight(true);
+  });
+
+  dropzone.addEventListener("dragover", (event) => {
+    if (!carriesFiles(event) || isFileInput(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  });
+
+  dropzone.addEventListener("dragleave", () => {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (!dragDepth) setHighlight(false);
+  });
+
+  dropzone.addEventListener("drop", (event) => {
+    if (!carriesFiles(event) || isFileInput(event)) return;
+    event.preventDefault();
+    dragDepth = 0;
+    setHighlight(false);
+    addFiles(event.dataTransfer.files);
+  });
 
   renderStage();
   return root;
