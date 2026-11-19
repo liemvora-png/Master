@@ -319,6 +319,43 @@ function formatNewsDate(value) {
   }).format(new Date(value));
 }
 
+function renderHomeNewsRow(item) {
+  const row = document.createElement("li");
+  row.className = "home-news-item";
+
+  const when = document.createElement("span");
+  when.className = "home-news-time";
+  const stamp = item.published_at || "";
+  if (stamp && !Number.isNaN(new Date(stamp).getTime())) {
+    const time = document.createElement("time");
+    time.dateTime = stamp;
+    time.textContent = formatNewsDate(stamp);
+    when.append(time);
+  } else {
+    when.textContent = "";
+  }
+
+  const info = document.createElement("span");
+  info.className = "home-news-info";
+  const title = document.createElement("span");
+  title.className = "home-news-title";
+  title.textContent = item.headline || "Untitled";
+  info.append(title);
+
+  row.append(when, info);
+
+  const sourceHref = safeHref(item.source_url || "");
+  if (sourceHref) {
+    const source = document.createElement("a");
+    source.className = "project-link home-news-source";
+    source.href = sourceHref;
+    source.textContent = `${item.source_name || "Source"} ↗`;
+    row.append(source);
+  }
+
+  return row;
+}
+
 async function loadHomeNews() {
   if (document.body.dataset.page !== "home") return;
   const section = document.querySelector(".home-news");
@@ -326,52 +363,30 @@ async function loadHomeNews() {
   if (!section || !list) return;
 
   try {
-    const response = await fetch("/api/news", { headers: { Accept: "application/json" } });
+    const response = await fetch("/api/news?limit=1", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`News request returned ${response.status}.`);
     const { news } = await response.json();
     const items = Array.isArray(news) ? news : [];
-    items.length = Math.min(items.length, HOME_NEWS_LIMIT);
-
-    list.replaceChildren();
     if (items.length === 0) throw new Error("No news items available.");
 
-    for (const item of items) {
-      const row = document.createElement("li");
-      row.className = "home-news-item";
-
-      const when = document.createElement("span");
-      when.className = "home-news-time";
-      const stamp = item.published_at || "";
-      if (stamp && !Number.isNaN(new Date(stamp).getTime())) {
-        const time = document.createElement("time");
-        time.dateTime = stamp;
-        time.textContent = formatNewsDate(stamp);
-        when.append(time);
-      } else {
-        when.textContent = "";
-      }
-
-      const info = document.createElement("span");
-      info.className = "home-news-info";
-      const title = document.createElement("span");
-      title.className = "home-news-title";
-      title.textContent = item.headline || "Untitled";
-      info.append(title);
-
-      row.append(when, info);
-
-      const sourceHref = safeHref(item.source_url || "");
-      if (sourceHref) {
-        const source = document.createElement("a");
-        source.className = "project-link home-news-source";
-        source.href = sourceHref;
-        source.textContent = `${item.source_name || "Source"} ↗`;
-        row.append(source);
-      }
-
-      list.append(row);
-    }
+    // Render the newest item immediately so the digest appears fast,
+    // then stream in the rest one at a time.
+    list.replaceChildren();
+    list.append(renderHomeNewsRow(items[0]));
     section.hidden = false;
+
+    let loaded = 1;
+    while (loaded < HOME_NEWS_LIMIT) {
+      const next = await fetch(`/api/news?limit=1&offset=${loaded}`, {
+        headers: { Accept: "application/json" }
+      });
+      if (!next.ok) break;
+      const nextData = await next.json();
+      const nextItems = Array.isArray(nextData.news) ? nextData.news : [];
+      if (nextItems.length === 0) break;
+      list.append(renderHomeNewsRow(nextItems[0]));
+      loaded += 1;
+    }
   } catch (error) {
     console.error("Unable to load the news digest:", error);
     section.hidden = true;
