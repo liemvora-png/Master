@@ -1,3 +1,5 @@
+import { createUploader } from "./gallery-upload.js";
+
 const manager = document.querySelector("#portfolio-admin-content");
 const managerStatus = document.querySelector("#portfolio-admin-status");
 const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -130,24 +132,15 @@ function renderAvailability(root) {
 }
 
 function renderGallery(root) {
-  const group = makeGroup("Photography gallery", "Upload up to 8 MB per image. Every photo needs alt text. Unpublished images remain available here for later use.");
-  const upload = document.createElement("form");
-  upload.className = "gallery-upload";
-  upload.enctype = "multipart/form-data";
-  const image = field("Image file", "", { type: "file" });
-  image.querySelector("input").accept = "image/jpeg,image/png,image/webp,image/gif";
-  image.querySelector("input").required = true;
-  const altText = field("Alt text", "", { maxLength: 240 });
-  altText.querySelector("input").required = true;
-  const caption = field("Caption (optional)", "", { maxLength: 300 });
-  upload.append(image, altText, caption);
-  const submit = document.createElement("button");
-  submit.className = "editor-button";
-  submit.type = "submit";
-  submit.textContent = "Upload photo";
-  upload.append(submit);
-  upload.addEventListener("submit", uploadPhoto);
-  group.append(upload);
+  const group = makeGroup(
+    "Photography gallery",
+    "Staged photos get alt text before they upload. Every photo needs alt text. Unpublished images remain available here for later use."
+  );
+  group.append(createUploader({
+    upload: (data) => requestJson("/api/admin/gallery", { method: "POST", body: data }),
+    setStatus: setManagerStatus,
+    onUploaded: loadManager
+  }));
 
   gallery.forEach((photo, index) => {
     const row = createElement("article", "portfolio-row portfolio-gallery-row");
@@ -261,23 +254,6 @@ async function savePortfolio() {
     setManagerStatus("Services and availability saved.", "success");
   } catch (error) {
     setManagerStatus(`Could not save service settings: ${error.message}`, "error");
-  }
-}
-
-async function uploadPhoto(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const data = new FormData();
-  data.set("image", form.querySelector('[type="file"]').files[0]);
-  data.set("altText", form.querySelectorAll("input")[1].value);
-  data.set("caption", form.querySelectorAll("input")[2].value);
-  setManagerStatus("Uploading photo…");
-  try {
-    await requestJson("/api/admin/gallery", { method: "POST", body: data });
-    await loadManager();
-    setManagerStatus("Photo uploaded.", "success");
-  } catch (error) {
-    setManagerStatus(`Could not upload photo: ${error.message}`, "error");
   }
 }
 

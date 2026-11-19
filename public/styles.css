@@ -805,8 +805,8 @@ h1 span {
 .portfolio-row input,
 .portfolio-row select,
 .portfolio-row textarea,
-.gallery-upload input,
-.gallery-upload textarea {
+.gallery-uploader input,
+.gallery-uploader textarea {
   width: 100%;
   min-width: 0;
   min-height: 40px;
@@ -818,8 +818,7 @@ h1 span {
 }
 
 .portfolio-row .full-width,
-.portfolio-image,
-.gallery-upload {
+.portfolio-image {
   grid-column: 1 / -1;
 }
 
@@ -827,6 +826,100 @@ h1 span {
   width: min(100%, 20rem);
   max-height: 12rem;
   object-fit: cover;
+}
+
+.gallery-uploader {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.gallery-dropzone {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 1px dashed var(--brown-line);
+  background: var(--paper);
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.gallery-dropzone.is-dragging {
+  border-style: solid;
+  border-color: var(--olive);
+  background: var(--hover);
+}
+
+.gallery-dropzone .content-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.gallery-dropzone input[type="file"] {
+  min-height: 44px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--surface);
+  font: 400 0.82rem/1.5 var(--sans);
+  cursor: pointer;
+}
+
+.gallery-dropzone input[type="file"]:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
+}
+
+.gallery-notices {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.gallery-empty {
+  margin: 0;
+  padding-block: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+.gallery-stage-item {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  gap: 0.9rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.gallery-stage-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--paper-deep);
+}
+
+.gallery-stage-fields {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.gallery-stage-file {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.gallery-stage-item .content-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.75rem;
 }
 
 .portfolio-actions {
@@ -1562,9 +1655,12 @@ h1 span {
   .booking-submit,
   .booking-status,
   .portfolio-row .full-width,
-  .portfolio-image,
-  .gallery-upload {
+  .portfolio-image {
     grid-column: auto;
+  }
+
+  .gallery-stage-item {
+    grid-template-columns: 1fr;
   }
 
   .header-actions {
