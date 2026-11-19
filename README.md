@@ -60,6 +60,8 @@ Create an R2 bucket named `portfolio-gallery` to match the `GALLERY` binding in 
 
 For booking email, configure Cloudflare Email Service (outbound sending) in addition to any Email Routing you use for inbound mail. Onboard/verify a sender domain with Email Service, and verify the Gmail destination address as an allowed recipient. Add Worker secrets named `BOOKING_EMAIL_TO` (your verified Gmail destination) and `BOOKING_EMAIL_FROM` (an address on the verified sending domain). The destination and sender are not included in the repository, and the Gmail address is never displayed publicly. Without these values, the Worker still saves the request as pending but reports that email notification is not configured.
 
+Tech news is stored in the D1 `news_items` table and served only through `/api/news`. The News and Home pages do not contain static article fallback content. Use the admin Tech news editor or insert/update `news_items` directly to publish or remove digest entries.
+
 Keep the admin routes protected by Clerk regardless of the hostname used to reach the Worker. The API does not trust browser cookies or the visibility of the admin page; every admin request must include a valid Clerk bearer token.
 
 ## Editing content

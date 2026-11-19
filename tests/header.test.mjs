@@ -25,7 +25,36 @@ test("every page uses the same header navigation order and includes Admin", () =
     else expectedNavigation = links;
 
     assert.match(template, /<a class="admin-entry-button" href="\/admin"/, `${templateName} should include Admin`);
+    assert.match(template, /<button class="menu-toggle"/, `${templateName} should include the always-visible menu button`);
+    assert.match(template, /aria-controls="site-navigation"/);
   }
+});
+
+test("desktop breakpoint exposes full navigation and hides the burger", () => {
+  const styles = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/assets/site.js", import.meta.url), "utf8");
+
+  assert.match(styles, /@media \(min-width: 1100px\)[\s\S]*\.menu-toggle\s*\{\s*display:\s*none;/);
+  assert.match(styles, /@media \(min-width: 1100px\)[\s\S]*\.site-header > \.site-nav[\s\S]*display:\s*flex/);
+  assert.match(script, /min-width: 1100px/);
+});
+
+test("burger button keeps identical dimensions and never recolors", () => {
+  const styles = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+
+  assert.match(
+    styles,
+    /\.menu-toggle\s*\{[^}]*width:\s*40px;[^}]*height:\s*40px;/,
+    "the burger button should declare an explicit square box matching the theme-toggle's 40px size"
+  );
+  assert.ok(
+    !/\.menu-toggle(?::hover|:active)[^{]*\{/.test(styles),
+    "the burger button should not recolor on hover or press"
+  );
+  assert.ok(
+    (styles.match(/\.menu-toggle-line\s*\{[^}]*height:/g) || []).length === 1,
+    "there should be exactly one burger line size rule so all lines share the same weight"
+  );
 });
 
 test("home page welcomes visitors and displays its managed update time", () => {
