@@ -3,11 +3,12 @@
 // Cloudflare rejects request bodies over 100 MB on Free/Pro plans before any
 // code runs, and multipart adds overhead, so full-size inputs stop at 90 MB.
 export const MAX_INPUT_BYTES = 90 * 1024 * 1024;
-// Uploaded payloads (the processed file, or a pass-through GIF) fit this cap,
-// which matches the server's MAX_IMAGE_SIZE.
-export const MAX_IMAGE_SIZE = 12 * 1024 * 1024;
-// Anything above this is decoded and re-encoded in the browser before upload.
-export const REENCODE_INPUT_BYTES = 2 * 1024 * 1024;
+// Uploaded payloads (the processed file, or a pass-through photo/GIF) fit this
+// cap, which matches the server's MAX_IMAGE_SIZE.
+export const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+// Anything above this is decoded and re-encoded in the browser before upload;
+// smaller photos upload untouched at full quality.
+export const REENCODE_INPUT_BYTES = 20 * 1024 * 1024;
 export const TARGET_LONG_EDGE = 2560;
 export const ENCODE_STEPS = [
   { longEdge: TARGET_LONG_EDGE, quality: 0.86 },

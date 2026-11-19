@@ -1,7 +1,7 @@
 import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
-const MAX_IMAGE_SIZE = 12 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
 const IMAGE_TYPES = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
@@ -32,7 +32,7 @@ export async function onRequest({ request, env }) {
     const altText = form.get("altText");
     const caption = form.get("caption");
     if (!(file instanceof File) || file.size < 1 || file.size > MAX_IMAGE_SIZE) {
-      return jsonResponse({ error: "Choose an image up to 12 MB." }, 400);
+      return jsonResponse({ error: "Choose an image up to 20 MB." }, 400);
     }
     const extension = IMAGE_TYPES.get(file.type);
     if (!extension) {

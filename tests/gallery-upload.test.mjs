@@ -33,7 +33,7 @@ test("input files are refused on type, emptiness, and Cloudflare's upload cap", 
   );
   assert.match(
     describeFileRejection(photo("loop.gif", MAX_IMAGE_SIZE + 1024 * 1024, "image/gif")),
-    /GIFs upload as-is, up to 12\.0 MB/
+    /GIFs upload as-is, up to 20\.0 MB/
   );
   assert.match(describeFileRejection(photo("notes.pdf", 1024, "application/pdf")), /notes\.pdf is not a JPEG, PNG, WebP, AVIF, or GIF image/);
   assert.match(describeFileRejection(photo("raw.nef", 1024, "image/x-nikon-nef")), /not a JPEG, PNG, WebP, AVIF, or GIF image/);
@@ -42,9 +42,10 @@ test("input files are refused on type, emptiness, and Cloudflare's upload cap", 
   assert.equal(describeFileRejection(photo("ok.avif", MAX_IMAGE_SIZE, "image/avif")), "");
 });
 
-test("big photos re-encode in the browser, GIFs and small files pass through", () => {
+test("big photos re-encode in the browser, GIFs and smaller files pass through", () => {
   assert.equal(needsReEncode(photo("export.jpg", REENCODE_INPUT_BYTES + 1)), true);
-  assert.equal(needsReEncode(photo("small.png", REENCODE_INPUT_BYTES, "image/png")), false);
+  assert.equal(needsReEncode(photo("medium.jpg", REENCODE_INPUT_BYTES)), false);
+  assert.equal(needsReEncode(photo("small.png", 3 * 1024 * 1024, "image/png")), false);
   assert.equal(needsReEncode(photo("animation.gif", 8 * 1024 * 1024, "image/gif")), false);
   assert.equal(processedName("IMG_2026-05-12.png", "image/webp"), "IMG_2026-05-12.webp");
   assert.equal(processedName("street.jpg", "image/jpeg"), "street.jpg");
@@ -70,5 +71,5 @@ test("a staged photo without alt text cannot upload", () => {
 test("file sizes read the way the queue shows them", () => {
   assert.equal(formatSize(512), "512 bytes");
   assert.equal(formatSize(2048), "2 KB");
-  assert.equal(formatSize(MAX_IMAGE_SIZE), "12.0 MB");
+  assert.equal(formatSize(MAX_IMAGE_SIZE), "20.0 MB");
 });
