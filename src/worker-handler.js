@@ -117,7 +117,7 @@ export function createWorker(templates) {
           return jsonResponse({ error: "Method not allowed." }, 405);
         }
         const filename = pathname.slice("/gallery-images/".length);
-        if (!/^[\w-]{36}\.(jpg|png|webp|avif|gif)$/.test(filename) || !env.GALLERY) {
+        if (!/^[\w-]{36}(?:\.(?:low|medium)\.webp|\.(?:jpg|png|webp|avif|gif))$/.test(filename) || !env.GALLERY) {
           return notFoundResponse();
         }
         const object = await env.GALLERY.get(`gallery/${filename}`);

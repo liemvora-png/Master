@@ -165,7 +165,7 @@ function renderGallery(root) {
     const row = createElement("article", "portfolio-row portfolio-gallery-row");
     const preview = createElement("div", "portfolio-image");
     const img = document.createElement("img");
-    img.src = photo.image_url;
+    img.src = photo.preview_url || photo.image_url;
     img.alt = photo.alt_text;
     img.loading = "lazy";
     preview.append(img);

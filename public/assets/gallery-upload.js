@@ -16,6 +16,10 @@ export const ENCODE_STEPS = [
   { longEdge: 1920, quality: 0.75 },
   { longEdge: 1600, quality: 0.7 }
 ];
+export const PREVIEW_LONG_EDGE = 32;
+export const PREVIEW_QUALITY = 0.38;
+export const MEDIUM_LONG_EDGE = 960;
+export const MEDIUM_QUALITY = 0.72;
 export const MAX_BATCH = 20;
 export const MAX_ALT_LENGTH = 240;
 export const MAX_CAPTION_LENGTH = 300;
@@ -166,6 +170,34 @@ async function prepareFile(file) {
   }
 }
 
+async function createVariants(file) {
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return { error: `${file.name}: your browser could not create compressed previews. Upload a JPEG, PNG, or WebP instead.` };
+  }
+  try {
+    const preview = await encodeBitmap(bitmap, {
+      longEdge: PREVIEW_LONG_EDGE,
+      quality: PREVIEW_QUALITY
+    });
+    const medium = await encodeBitmap(bitmap, {
+      longEdge: MEDIUM_LONG_EDGE,
+      quality: MEDIUM_QUALITY
+    });
+    if (!preview || !medium) {
+      return { error: `${file.name}: your browser could not create compressed previews. Upload a JPEG, PNG, or WebP instead.` };
+    }
+    return {
+      preview: new File([preview], "preview.webp", { type: "image/webp" }),
+      medium: new File([medium], "medium.webp", { type: "image/webp" })
+    };
+  } finally {
+    bitmap.close?.();
+  }
+}
+
 export function createUploader({ upload, setStatus, onUploaded }) {
   // A manager re-render rebuilds this block, so the queue is carried across renders.
   const stage = activeStage ?? [];
@@ -283,8 +315,22 @@ export function createUploader({ upload, setStatus, onUploaded }) {
         }
         uploadFile = prepared.file;
       }
+      let preview = null;
+      let medium = null;
+      if (file.type !== "image/gif") {
+        setStatus(`Creating previews for ${file.name}…`);
+        const variants = await createVariants(uploadFile);
+        if (variants.error) {
+          setStatus(variants.error);
+        } else {
+          preview = variants.preview;
+          medium = variants.medium;
+        }
+      }
       staged.push({
         file: uploadFile,
+        preview,
+        medium,
         source: sourceRef(file),
         altText: altTextFromFilename(file.name),
         caption: "",
@@ -324,6 +370,8 @@ export function createUploader({ upload, setStatus, onUploaded }) {
       setStatus(`Uploading photo ${index + 1} of ${batch.length}…`);
       const data = new FormData();
       data.set("image", item.file, item.file.name);
+      if (item.preview) data.set("preview", item.preview, "preview.webp");
+      if (item.medium) data.set("medium", item.medium, "medium.webp");
       data.set("altText", item.altText.trim());
       data.set("caption", item.caption.trim());
       try {

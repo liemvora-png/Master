@@ -6,7 +6,7 @@ export async function onRequest({ request, env }) {
 
   try {
     const result = await env.DB.prepare(
-      "SELECT id, image_url, alt_text, caption, position FROM photo_gallery " +
+      "SELECT id, image_url, preview_url, medium_url, alt_text, caption, position FROM photo_gallery " +
       "WHERE active = 1 ORDER BY position"
     ).all();
     return jsonResponse({ images: result.results || [] });
