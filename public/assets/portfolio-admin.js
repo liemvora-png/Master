@@ -1,12 +1,31 @@
-const manager = document.querySelector("#portfolio-admin-content");
-const managerStatus = document.querySelector("#portfolio-admin-status");
+const managerContent = {
+  services: document.querySelector("#portfolio-admin-services-content"),
+  gallery: document.querySelector("#portfolio-admin-gallery-content"),
+  bookings: document.querySelector("#portfolio-admin-bookings-content")
+};
+const managerStatuses = {
+  services: document.querySelector("#portfolio-admin-services-status"),
+  gallery: document.querySelector("#portfolio-admin-gallery-status"),
+  bookings: document.querySelector("#portfolio-admin-bookings-status")
+};
 const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 let portfolio;
 let gallery;
+let activePanel = "services";
 
 function setManagerStatus(message, state = "") {
-  managerStatus.textContent = message;
-  managerStatus.dataset.state = state;
+  const status = managerStatuses[activePanel];
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.state = state;
+}
+
+function setAllManagerStatuses(message, state = "") {
+  Object.values(managerStatuses).forEach((status) => {
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.state = state;
+  });
 }
 
 function createElement(tag, className, text) {
@@ -214,12 +233,16 @@ function renderBookings(root) {
 }
 
 function renderManager() {
-  manager.replaceChildren();
-  if (!portfolio || !gallery) return;
-  renderServiceSettings(manager);
-  renderAvailability(manager);
-  renderGallery(manager);
-  renderBookings(manager);
+  Object.values(managerContent).forEach((root) => root?.replaceChildren());
+  if (!portfolio || !gallery || !managerContent[activePanel]) return;
+  if (activePanel === "services") {
+    renderServiceSettings(managerContent.services);
+    renderAvailability(managerContent.services);
+  } else if (activePanel === "gallery") {
+    renderGallery(managerContent.gallery);
+  } else if (activePanel === "bookings") {
+    renderBookings(managerContent.bookings);
+  }
 }
 
 async function requestJson(url, options = {}) {
@@ -234,14 +257,14 @@ async function requestJson(url, options = {}) {
 }
 
 async function loadManager() {
-  setManagerStatus("Loading services, gallery, and requests…");
+  setAllManagerStatuses("Loading admin data…");
   try {
     portfolio = await requestJson("/api/admin/portfolio");
     gallery = portfolio.gallery;
     renderManager();
-    setManagerStatus("Service manager is ready.", "success");
+    setAllManagerStatuses("Admin data is ready.", "success");
   } catch (error) {
-    setManagerStatus(`Could not load services and requests: ${error.message}`, "error");
+    setAllManagerStatuses(`Could not load admin data: ${error.message}`, "error");
   }
 }
 
@@ -350,3 +373,13 @@ async function deleteBooking(id) {
 }
 
 window.adminAuth.ready.then(() => loadManager()).catch(() => {});
+
+document.addEventListener("admin-workspace-change", (event) => {
+  if (!["services", "gallery", "bookings"].includes(event.detail?.workspace)) {
+    activePanel = "content";
+    renderManager();
+    return;
+  }
+  activePanel = event.detail.workspace;
+  renderManager();
+});
