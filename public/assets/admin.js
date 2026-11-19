@@ -1,5 +1,6 @@
 const editor = document.querySelector("#content-editor");
 const tabs = document.querySelector("#editor-tabs");
+const workspaceTabs = document.querySelector("#admin-workspace-tabs");
 const status = document.querySelector("#editor-status");
 const saveButton = document.querySelector("#save-content");
 const reloadButton = document.querySelector("#reload-content");
@@ -13,6 +14,12 @@ const SECTIONS = [
   { id: "services", label: "Services page" },
   { id: "gallery", label: "Gallery page" },
   { id: "news", label: "Tech news" }
+];
+const WORKSPACE_AREAS = [
+  { id: "content", panel: "page-content-panel" },
+  { id: "services", panel: "services-panel" },
+  { id: "gallery", panel: "gallery-panel" },
+  { id: "bookings", panel: "bookings-panel" }
 ];
 
 const PAGE_FIELDS = [
@@ -36,6 +43,48 @@ let activeSection = "site";
 let dirty = false;
 let previewFrame;
 let menuOpen = false;
+let activeWorkspace = "content";
+
+function setWorkspacePanel(workspaceId, focus = false) {
+  const area = WORKSPACE_AREAS.find((item) => item.id === workspaceId);
+  if (!area || !workspaceTabs) return;
+  activeWorkspace = area.id;
+
+  for (const tab of workspaceTabs.querySelectorAll("[role='tab']")) {
+    const isActive = tab.dataset.workspace === activeWorkspace;
+    tab.setAttribute("aria-selected", String(isActive));
+    tab.tabIndex = isActive ? 0 : -1;
+    if (focus && isActive) tab.focus();
+  }
+
+  for (const panel of document.querySelectorAll(".admin-workspace-panel")) {
+    panel.hidden = panel.id !== area.panel;
+  }
+
+  document.dispatchEvent(new CustomEvent("admin-workspace-change", {
+    detail: { workspace: activeWorkspace }
+  }));
+}
+
+function initWorkspaceTabs() {
+  if (!workspaceTabs) return;
+  workspaceTabs.addEventListener("click", (event) => {
+    const tab = event.target.closest("[data-workspace]");
+    if (!tab) return;
+    setWorkspacePanel(tab.dataset.workspace);
+  });
+  workspaceTabs.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const buttons = [...workspaceTabs.querySelectorAll("[role='tab']")];
+    const current = buttons.findIndex((button) => button.dataset.workspace === activeWorkspace);
+    const next = event.key === "Home" ? 0
+      : event.key === "End" ? buttons.length - 1
+        : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+    setWorkspacePanel(buttons[next].dataset.workspace, true);
+  });
+  setWorkspacePanel(activeWorkspace);
+}
 
 function toggleMenu() {
   menuOpen = !menuOpen;
@@ -734,4 +783,5 @@ reloadButton.addEventListener("click", () => {
 });
 saveButton.addEventListener("click", saveContent);
 
+initWorkspaceTabs();
 loadContent();
