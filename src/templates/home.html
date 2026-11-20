@@ -3,24 +3,28 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f4f1e9">
+    <meta name="theme-color" content="#eae7de">
     <script>
       (function () {
         var theme = null;
         try { theme = localStorage.getItem("theme"); } catch (e) {}
+        try {
+          var forced = new URLSearchParams(window.location.search).get("theme");
+          if (forced === "dark" || forced === "light") theme = forced;
+        } catch (e) {}
         if (theme === "dark" || theme === "light") {
           document.documentElement.setAttribute("data-theme", theme);
         }
       })();
     </script>
     <meta name="description" content="Welcome to Liem Vora's portfolio.">
-    <title>Liem Vora: Portfolio</title>
+    <title>Liem Vora — Season 2026 Portfolio</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/assets/home.css">
+    <script>window.THEME_COLORS = { light: "#eae7de", dark: "#191b16" };</script>
     <script src="/assets/site.js" defer></script>
+    <script src="/assets/home.js" defer></script>
   </head>
   <body data-page="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -44,19 +48,87 @@
 
     <main id="main">
       <section class="intro home-intro" id="top" aria-labelledby="page-title">
-        <h1 id="page-title">Welcome to my<br><span>portfolio.</span></h1>
-        <p class="home-update-status" role="status" aria-live="polite">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>Last updated <time id="home-last-updated">checking…</time></span>
-        </p>
+        <div class="programme-masthead">
+          <h1 id="page-title" class="masthead-name">Liem Vora<span class="masthead-season">Season 2026</span></h1>
+          <div class="masthead-side">
+            <p class="masthead-mark" aria-hidden="true">δ</p>
+            <p class="home-update-status" role="status" aria-live="polite">
+              <span class="stamp-folio">Programme issued <span class="status-dot" aria-hidden="true"></span></span>
+              <time id="home-last-updated">checking…</time>
+            </p>
+          </div>
+          <p class="masthead-works"><a href="#works">The season's works <span aria-hidden="true">↓</span></a></p>
+          <p class="masthead-latest" data-latest-notice hidden></p>
+        </div>
+        <p class="masthead-note">Projects, photography, arrangements, and services — kept in one place, dated and reachable.</p>
+      </section>
+
+      <section class="home-overture" aria-labelledby="overture-title">
+        <h2 id="overture-title">Overture</h2>
+        <p class="overture-copy" data-reveal>One working practice: software, photography, musical arrangements, and the services built around them. Every act of the programme is reachable below — and the notices say when this programme last changed.</p>
+      </section>
+
+      <section class="home-works" id="works" aria-labelledby="works-title">
+        <div class="section-heading">
+          <h2 id="works-title">The Season's Works</h2>
+          <button class="works-fold" type="button" data-works-fold aria-expanded="true" aria-controls="works-list">At a glance</button>
+        </div>
+        <ul class="works-list" id="works-list" data-fold="full">
+          <li class="programme-entry" data-reveal>
+            <span class="entry-folio" aria-hidden="true">01</span>
+            <div class="entry-body">
+              <a class="entry-name" href="/projects">Projects</a>
+              <p class="entry-gloss"><span>Software projects, each with its own page.</span></p>
+            </div>
+            <span class="entry-arrow" aria-hidden="true">↗</span>
+          </li>
+          <li class="programme-entry" data-reveal>
+            <span class="entry-folio" aria-hidden="true">02</span>
+            <div class="entry-body">
+              <a class="entry-name" href="/arrangements.html">Arrangements</a>
+              <p class="entry-gloss"><span>Arrangements, with instruments and dates.</span></p>
+            </div>
+            <span class="entry-arrow" aria-hidden="true">↗</span>
+          </li>
+          <li class="programme-entry" data-reveal>
+            <span class="entry-folio" aria-hidden="true">03</span>
+            <div class="entry-body">
+              <a class="entry-name" href="/gallery">Gallery</a>
+              <p class="entry-gloss"><span>A selection of photographs.</span></p>
+            </div>
+            <span class="entry-arrow" aria-hidden="true">↗</span>
+          </li>
+          <li class="programme-entry" data-reveal>
+            <span class="entry-folio" aria-hidden="true">04</span>
+            <div class="entry-body">
+              <a class="entry-name" href="/accomplishments.html">Accomplishments</a>
+              <p class="entry-gloss"><span>Highlights of the practice, itemised.</span></p>
+            </div>
+            <span class="entry-arrow" aria-hidden="true">↗</span>
+          </li>
+        </ul>
       </section>
 
       <section class="home-news" id="news" hidden aria-labelledby="home-news-title">
         <div class="section-heading">
-          <h2 id="home-news-title">Latest news</h2>
+          <h2 id="home-news-title">Notices</h2>
           <a class="news-all-link" href="/news">ALL NEWS <span aria-hidden="true">↗</span></a>
         </div>
         <ul class="home-news-list" id="home-news-list"></ul>
+      </section>
+
+      <section class="home-boxoffice" aria-labelledby="booking-title">
+        <svg class="band-hatch" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+          <defs>
+            <pattern id="band-hatch-lines" width="9" height="9" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width="1.6"></line>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#band-hatch-lines)"></rect>
+        </svg>
+        <h2 id="booking-title">Box Office</h2>
+        <p class="boxoffice-copy" data-reveal>Services, availability, and enquiries run through the services page — the programme's booking window.</p>
+        <a class="boxoffice-cta" data-reveal href="/services">Services &amp; booking <span aria-hidden="true">↗</span></a>
       </section>
     </main>
 
