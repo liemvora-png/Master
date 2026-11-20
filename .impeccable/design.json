@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T18:33:05Z",
+  "title": "Design System: Master-Portfolio",
+  "seededFrom": {
+    "world": "season-programme",
+    "seed": "314c93e3c12a4c31",
+    "round": "direction",
+    "handId": "0e386c712a0a4023bbfd9309cccef9b2",
+    "origin": "roll-assigned"
+  },
+  "extensions": {
+    "colorMeta": {
+      "bone-paper": { "role": "neutral", "displayName": "Bone Paper", "canonical": "#eae7de", "sourceToken": "--paper", "darkMirror": "#191b16", "tonalRamp": ["#1e1c18", "#3a382f", "#57554a", "#77756a", "#9b998c", "#bfbcb0", "#dbd8cd", "#f4f1e9"] },
+      "bone-deep": { "role": "neutral", "displayName": "Pressed Bone", "canonical": "#e0dcd0", "sourceToken": "--paper-deep", "darkMirror": "#21241d", "tonalRamp": ["#1c1a16", "#37342c", "#545145", "#737062", "#979486", "#bcb8aa", "#d9d5c9", "#f1eee4"] },
+      "raised-paper": { "role": "surface", "displayName": "Raised Paper", "canonical": "#f1eee5", "sourceToken": "--surface", "darkMirror": "#1f221b", "tonalRamp": ["#1f1e1a", "#3c3a33", "#5c5a4f", "#7e7c6f", "#a3a195", "#c7c4b9", "#e3e0d7", "#f8f5ee"] },
+      "printer-ink": { "role": "neutral", "displayName": "Printer Ink", "canonical": "#1d1f1b", "sourceToken": "--ink", "darkMirror": "#e8e5da", "tonalRamp": ["#0c0d0b", "#161714", "#1d1f1b", "#2e3029", "#45473e", "#64665a", "#8c8e81", "#b9bbb0"] },
+      "folio-grey": { "role": "neutral", "displayName": "Folio Grey", "canonical": "#5c574c", "sourceToken": "--muted / --brown-deep", "darkMirror": "#a49e8f", "tonalRamp": ["#171511", "#27251f", "#3d3a31", "#5c574c", "#757063", "#948f83", "#b6b2a6", "#d9d6cc"] },
+      "furniture-brown": { "role": "neutral", "displayName": "Furniture Brown", "canonical": "#6f6a5e", "sourceToken": "--brown", "darkMirror": "#8f8a7c", "tonalRamp": ["#1a1915", "#2b2a23", "#413f36", "#5e594e", "#6f6a5e", "#918c7f", "#b3afa3", "#d5d1c7"] },
+      "rule-ink": { "role": "border", "displayName": "Hairline Ink", "canonical": "rgba(29, 31, 27, 0.22)", "sourceToken": "--line", "darkMirror": "rgba(232, 229, 218, 0.2)", "tonalRamp": ["#0b0c0a", "#151613", "#1e201b", "#2f312a", "#474940", "#66685c", "#8e9083", "#babcb1"] },
+      "rule-brown": { "role": "border", "displayName": "Hairline Brown", "canonical": "rgba(111, 106, 94, 0.35)", "sourceToken": "--brown-line", "darkMirror": "rgba(164, 158, 143, 0.35)", "tonalRamp": ["#1a1915", "#2b2a23", "#413f36", "#5e594e", "#6f6a5e", "#918c7f", "#b3afa3", "#d5d1c7"] },
+      "ticket-red": { "role": "primary", "displayName": "Ticket Red", "canonical": "#c22a1f", "sourceToken": "--olive / --danger / caret", "darkMirror": "#e0563f", "tonalRamp": ["#210a06", "#43120c", "#681b12", "#8f2418", "#c22a1f", "#d9594a", "#e68a7d", "#f3c1b9"] },
+      "red-rule": { "role": "border", "displayName": "Red Hairline", "canonical": "rgba(194, 42, 31, 0.35)", "sourceToken": "--danger-line", "darkMirror": "rgba(224, 86, 63, 0.4)", "tonalRamp": ["#210a06", "#43120c", "#681b12", "#8f2418", "#c22a1f", "#d9594a", "#e68a7d", "#f3c1b9"] },
+      "red-wash": { "role": "tint", "displayName": "Red Wash", "canonical": "rgba(194, 42, 31, 0.07)", "sourceToken": "--danger-soft", "darkMirror": "rgba(224, 86, 63, 0.1)", "tonalRamp": ["#210a06", "#43120c", "#681b12", "#8f2418", "#c22a1f", "#d9594a", "#e68a7d", "#f3c1b9"] },
+      "night-paper": { "role": "neutral", "displayName": "Night Paper", "canonical": "#191b16", "sourceToken": "--paper (dark press)", "tonalRamp": ["#0f100d", "#191b16", "#242620", "#33362d", "#474a3f", "#616457", "#83867a", "#acaea3"] },
+      "night-raised": { "role": "surface", "displayName": "Night Raised Paper", "canonical": "#1f221b", "sourceToken": "--surface (dark press)", "tonalRamp": ["#13140f", "#1f221b", "#2c2f26", "#3c4034", "#515548", "#6d7163", "#8f9385", "#b7baae"] },
+      "night-ink": { "role": "neutral", "displayName": "Night Ink", "canonical": "#e8e5da", "sourceToken": "--ink (dark press)", "tonalRamp": ["#1e1d19", "#3b3933", "#59574d", "#79776b", "#9d9b8e", "#c1beaf", "#ddd9cf", "#f1eee4"] },
+      "night-folio": { "role": "neutral", "displayName": "Night Folio", "canonical": "#a49e8f", "sourceToken": "--muted (dark press)", "tonalRamp": ["#1a1813", "#302d25", "#4b473b", "#6b6758", "#908b7b", "#a49e8f", "#c6c1b5", "#e8e5db"] },
+      "night-red": { "role": "primary", "displayName": "Night Ticket Red", "canonical": "#e0563f", "sourceToken": "--olive / --danger (dark press)", "tonalRamp": ["#250904", "#49110a", "#711c11", "#a02c1e", "#d34a35", "#e0563f", "#eb8b7c", "#f4beb4"] },
+      "night-rule": { "role": "border", "displayName": "Night Hairline", "canonical": "rgba(232, 229, 218, 0.2)", "sourceToken": "--line (dark press)", "tonalRamp": ["#1e1d1a", "#3b3a35", "#59584f", "#79786d", "#9d9c91", "#c0bfb3", "#dcdad0", "#f1efe7"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Season Title (name)", "purpose": "Masthead only, one per page: --t-name. Always uppercase Barlow Condensed 700.", "sourceToken": "--t-name" },
+      "headline": { "displayName": "Section Head", "purpose": "Programme section titles: Overture, The Season's Works, Notices, Box Office.", "sourceToken": "h2 clamp(1.5rem, 3.4vw, 2.1rem)" },
+      "title": { "displayName": "Entry Name", "purpose": "Running-order work names, uppercase, hairline underline that thickens on hover.", "sourceToken": "--t-entry" },
+      "body": { "displayName": "Programme Text", "purpose": "Work Sans text at --t-body, 46-62ch blocks; overture one step larger.", "sourceToken": "--t-body" },
+      "label": { "displayName": "Folio", "purpose": "Stamps, fold control, status lines, dates: uppercase Barlow, tracked 0.12-0.16em.", "sourceToken": "--t-folio" }
+    },
+    "shadows": [
+      { "name": "stamp-lift", "value": "0 8px 18px -12px rgba(29, 31, 27, 0.5)", "purpose": "The system's only drop shadow; sits under the issued stamp. Not reused, not dark-mirrored." }
+    ],
+    "motion": [
+      { "name": "curve-programme", "value": "cubic-bezier(0.22, 0.61, 0.36, 1)", "purpose": "The world's curve: reveal and fold openings." },
+      { "name": "reveal-rise", "value": "transform: translateY(1.15rem) -> none; 550ms cubic-bezier(0.22, 0.61, 0.36, 1); delay calc(var(--i, 0) * 80ms)", "purpose": "Programme unfolding: dated rows assemble on scroll. Transform-only; gated by html.home-motion; observer rootMargin 0 0 -8%, threshold 0.15; --i capped at 4." },
+      { "name": "fold-open", "value": "grid-template-rows: 0fr -> 1fr; 380ms cubic-bezier(0.22, 0.61, 0.36, 1); gloss opacity 260ms ease-out", "purpose": "At a glance / Full programme fold on entry rows." },
+      { "name": "state-swap", "value": "160ms ease-out on color / background-color / border-color / text-decoration-color", "purpose": "All hover and state changes on controls and links." },
+      { "name": "reduced-motion", "value": "prefers-reduced-motion: reduce disables reveal transforms, transitions, smooth scroll, and the stamp rotation", "purpose": "Content is visible by default; JS never hides information." }
+    ],
+    "breakpoints": [
+      { "name": "home-stack", "value": "860px" },
+      { "name": "home-narrow", "value": "560px" },
+      { "name": "chrome-stack", "value": "700px", "purpose": "Shared chrome header restructure (inherited, styles.css)" },
+      { "name": "chrome-narrow", "value": "420px", "purpose": "Shared chrome (inherited, styles.css)" },
+      { "name": "floor", "value": "320px" }
+    ],
+    "themeMirror": {
+      "note": "Light and dark are set in one scoped block per press (body[data-page=\"home\"], html[data-theme=\"dark\"] override, and the prefers-color-scheme fallback). Meta theme-color tracks the press via window.THEME_COLORS consumed by site.js.",
+      "metaThemeColor": { "light": "#eae7de", "dark": "#191b16" },
+      "additionalDarkTokens": {
+        "--paper-deep": "#21241d",
+        "--brown": "#8f8a7c",
+        "--brown-deep": "#a49e8f",
+        "--brown-line": "rgba(164, 158, 143, 0.35)",
+        "--danger-line": "rgba(224, 86, 63, 0.4)",
+        "--danger-soft": "rgba(224, 86, 63, 0.1)"
+      },
+      "selection": "ticket-red ground with paper text (both presses)",
+      "scrollbar": "thumb ticket-red, track paper-deep (both presses)"
+    },
+    "adoptionBoundary": "Shipped on home only (src/templates/home.html + public/assets/home.css). Other pages still render the legacy styles.css binding (cream #f4f1e9 + Playfair Display + olive #58604b); that legacy world is NOT part of this system and must not be mixed into world surfaces. Adopt by remapping shared token names in one scoped block."
+  },
+  "components": [
+    {
+      "name": "Issued Stamp",
+      "kind": "custom",
+      "refersTo": "stamp-issued",
+      "description": "Live 'Programme issued' timestamp at masthead edge; identity element, always real data.",
+      "html": "<p class=\"ds-stamp\" role=\"status\"><span class=\"ds-stamp-folio\">Programme issued <span class=\"ds-stamp-dot\"></span></span><span class=\"ds-stamp-time\">Nov 7 \u00b7 10:00</span></p>",
+      "css": ".ds-stamp { display: inline-grid; gap: 0.4rem; justify-items: start; margin: 0; padding: 0.7rem 0.9rem; border: 2px solid #c22a1f; outline: 1px solid #c22a1f; outline-offset: 3px; background: #f1eee5; color: #1d1f1b; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: 0.72rem; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; box-shadow: 0 8px 18px -12px rgba(29,31,27,0.5); transform: rotate(-1.6deg); } .ds-stamp-folio { display: flex; align-items: center; gap: 0.5rem; color: #c22a1f; } .ds-stamp-dot { width: 0.5rem; height: 0.5rem; background: currentColor; } .ds-stamp-time { color: #1d1f1b; font-size: 0.95rem; letter-spacing: 0.08em; text-transform: none; } @media (prefers-reduced-motion: reduce) { .ds-stamp { transform: none; } }"
+    },
+    {
+      "name": "Programme Entry Row",
+      "kind": "custom",
+      "refersTo": "entry-link",
+      "description": "Running-order row: red folio numeral, uppercase work name, gloss, arrow.",
+      "html": "<li class=\"ds-entry\"><span class=\"ds-entry-folio\">01</span><div><a class=\"ds-entry-name\" href=\"#\">Projects</a><p class=\"ds-entry-gloss\"><span>Software projects, each with its own page.</span></p></div><span class=\"ds-entry-arrow\">\u2197</span></li>",
+      "css": ".ds-entry { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr) auto; align-items: baseline; gap: 1.2rem; padding-block: 1.2rem; border-bottom: 1px solid rgba(29,31,27,0.22); list-style: none; background: #eae7de; } .ds-entry-folio { color: #c22a1f; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.12em; } .ds-entry-name { display: inline-block; color: #1d1f1b; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: 1.6rem; font-weight: 700; line-height: 1.05; letter-spacing: 0.02em; text-transform: uppercase; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: rgba(29,31,27,0.22); text-underline-offset: 0.3rem; transition: color 160ms ease-out, text-decoration-color 160ms ease-out; } .ds-entry-name:hover { color: #c22a1f; text-decoration-color: currentColor; text-decoration-thickness: 2px; } .ds-entry-name:focus-visible { outline: 2px solid #c22a1f; outline-offset: 3px; } .ds-entry-gloss { margin: 0.3rem 0 0; color: #5c574c; font-family: \"Work Sans\", \"Helvetica Neue\", Arial, sans-serif; font-size: 0.95rem; line-height: 1.6; } .ds-entry-arrow { color: #c22a1f; font-size: 1.05rem; } @media (max-width: 560px) { .ds-entry { grid-template-columns: 2.4rem minmax(0, 1fr); } .ds-entry-arrow { display: none; } }"
+    },
+    {
+      "name": "Fold Control",
+      "kind": "button",
+      "refersTo": "button-fold",
+      "description": "One named control with named states: 'At a glance' / 'Full programme'.",
+      "html": "<button class=\"ds-fold\" type=\"button\" aria-expanded=\"true\">At a glance</button>",
+      "css": ".ds-fold { padding: 0.55rem 0.9rem; border: 1px solid #6f6a5e; background: transparent; color: #1d1f1b; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: 0.72rem; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; transition: background-color 160ms ease-out, color 160ms ease-out, border-color 160ms ease-out; } .ds-fold:hover { background: #1d1f1b; color: #eae7de; border-color: #1d1f1b; } .ds-fold:focus-visible { outline: 2px solid #c22a1f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Box-Office Band",
+      "kind": "custom",
+      "refersTo": "band-boxoffice",
+      "description": "The one full-bleed red section with hatch strip; copy always full paper.",
+      "html": "<section class=\"ds-band\"><svg class=\"ds-band-hatch\" aria-hidden=\"true\" preserveAspectRatio=\"none\"><defs><pattern id=\"ds-hatch\" width=\"9\" height=\"9\" patternTransform=\"rotate(45)\" patternUnits=\"userSpaceOnUse\"><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"9\" stroke=\"currentColor\" stroke-width=\"1.6\"></line></pattern></defs><rect width=\"100%\" height=\"100%\" fill=\"url(#ds-hatch)\"></rect></svg><h2 class=\"ds-band-title\">Box Office</h2><p class=\"ds-band-copy\">Services, availability, and enquiries run through the services page \u2014 the programme's booking window.</p><a class=\"ds-band-cta\" href=\"#\">Services &amp; booking \u2197</a></section>",
+      "css": ".ds-band { position: relative; background: #c22a1f; color: #eae7de; padding: clamp(2.6rem, 7vh, 4rem) 7.5%; overflow: hidden; font-family: \"Work Sans\", \"Helvetica Neue\", Arial, sans-serif; } .ds-band-hatch { position: absolute; top: 0; left: 0; width: 100%; height: 10px; color: rgba(234,231,222,0.5); } .ds-band-title { margin: 0; color: inherit; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: clamp(1.5rem, 3.4vw, 2.1rem); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; } .ds-band-copy { max-width: 52ch; margin: 1rem 0 1.6rem; color: #eae7de; font-size: 1.02rem; line-height: 1.7; } .ds-band-cta { display: inline-block; padding: 0.85rem 1.4rem; border: 2px solid #eae7de; color: #eae7de; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; transition: background-color 160ms ease-out, color 160ms ease-out; } .ds-band-cta:hover { background: #eae7de; color: #c22a1f; } .ds-band-cta:focus-visible { outline: 2px solid #eae7de; outline-offset: 3px; }"
+    },
+    {
+      "name": "Masthead",
+      "kind": "custom",
+      "refersTo": "typography.display",
+      "description": "The programme page header: season name, season line, red delta, 4px closing rule.",
+      "html": "<div class=\"ds-mast\"><div><h1 class=\"ds-mast-name\">Liem Vora<span class=\"ds-mast-season\">Season 2026</span></h1></div><p class=\"ds-mast-mark\" aria-hidden=\"true\">\u03b4</p></div>",
+      "css": ".ds-mast { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(1.5rem, 4vw, 3rem); align-items: start; padding-bottom: 1.6rem; border-bottom: 4px solid #1d1f1b; } .ds-mast-name { grid-column: 1; grid-row: 1 / span 2; margin: 0; align-self: center; color: #1d1f1b; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: clamp(3.2rem, 10vw, 6rem); font-weight: 700; line-height: 0.92; letter-spacing: 0.01em; text-transform: uppercase; } .ds-mast-season { display: block; margin-top: 0.8rem; color: #c22a1f; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: clamp(1rem, 2.4vw, 1.5rem); font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; } .ds-mast-mark { grid-column: 2; margin: 0; color: #c22a1f; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1; } @media (max-width: 860px) { .ds-mast-name { grid-column: 1 / span 2; grid-row: 1; } .ds-mast-mark { grid-column: 2; grid-row: 2; font-size: 2rem; } }"
+    },
+    {
+      "name": "Notice Row",
+      "kind": "custom",
+      "refersTo": "typography.label",
+      "description": "Dated notice from the news API: date folio, ink title, red source link.",
+      "html": "<li class=\"ds-notice\"><span class=\"ds-notice-time\">Nov 7, 2026</span><h3 class=\"ds-notice-title\">New arrangement published</h3><a class=\"ds-notice-source\" href=\"#\">Read the notice \u2197</a></li>",
+      "css": ".ds-notice { padding-block: 1.1rem; border-bottom: 1px solid rgba(29,31,27,0.22); list-style: none; background: #eae7de; } .ds-notice-time { display: block; color: #5c574c; font-family: \"Barlow Condensed\", \"Arial Narrow\", sans-serif; font-size: 0.85rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; } .ds-notice-title { margin: 0.3rem 0; color: #1d1f1b; font-family: \"Work Sans\", \"Helvetica Neue\", Arial, sans-serif; font-size: 1.1rem; font-weight: 500; line-height: 1.45; } .ds-notice-source { color: #c22a1f; font-family: \"Work Sans\", \"Helvetica Neue\", Arial, sans-serif; font-size: 0.95rem; } .ds-notice-source:hover { text-decoration: underline; text-underline-offset: 0.25rem; }"
+    },
+    {
+      "name": "Chrome Control",
+      "kind": "button",
+      "refersTo": "button-chrome",
+      "description": "Theme toggle / admin entry: shared chrome re-inked by the token remap; 2px micro-radius is inherited legacy.",
+      "html": "<a class=\"ds-chrome\" href=\"#\">Admin \u2197</a>",
+      "css": ".ds-chrome { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border: 1px solid rgba(29,31,27,0.22); border-radius: 2px; background: transparent; color: #1d1f1b; font-family: \"Work Sans\", \"Helvetica Neue\", Arial, sans-serif; font-size: 0.76rem; text-decoration: none; transition: background-color 160ms ease-out, border-color 160ms ease-out, color 160ms ease-out; } .ds-chrome:hover { border-color: #c22a1f; background: #e0dcd0; color: #c22a1f; } .ds-chrome:focus-visible { outline: 2px solid #c22a1f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Site Navigation",
+      "kind": "nav",
+      "refersTo": "button-chrome",
+      "description": "Shared chrome nav inheriting the world remap: grey links, red hover/current, hairline underline on current.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Home</a><a href=\"#\">Projects</a><a href=\"#\">Gallery</a><a href=\"#\">Services</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2.2rem); color: #5c574c; font-family: \"Work Sans\", \"Helvetica Neue\", Arial, sans-serif; font-size: 0.76rem; background: #eae7de; } .ds-nav a { color: inherit; text-decoration: none; transition: color 180ms ease; } .ds-nav a:hover, .ds-nav a[aria-current=\"page\"] { color: #c22a1f; } .ds-nav a[aria-current=\"page\"] { text-decoration: underline; text-decoration-color: rgba(29,31,27,0.22); text-underline-offset: 0.35rem; } .ds-nav a:focus-visible { outline: 2px solid #c22a1f; outline-offset: 5px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Season Programme",
+    "overview": "The home page is the programme document of one working practice \u2014 the printed booklet itself, not a poster about it. Everything on the surface speaks that world's native material: rules and folios, a numbered running order of works, dated notices, a rubber-stamped issue line, a full-bleed box-office band with hatch texture. The paper is cool bone, the ink is near-black printer ink, and exactly one saturated colour \u2014 ticket red \u2014 carries every mark that matters. The visitor reads identity first (the name set as the season title), then proof of liveness (a real \"Programme issued\" timestamp fed by the content API), then the running order, then the notices, then the booking window. Nothing is centered-trio hero furniture; nothing is a row of equal cards. Depth is letterpress, never lighting: rules from 1px hairlines to a 4px masthead underline, a double red border+outline on the issued stamp, a diagonal hatch band, and one small shadow under the stamp. There are no gradients, no glass, no rounded surfaces. Motion is the programme unfolding as you scroll \u2014 dated rows rise into place, one named control (\"At a glance\" / \"Full programme\") opens or closes the running order \u2014 and all content is visible by default without JS or under reduced motion. The system currently ships on the home page only; other pages still render the previous cream+Playfair binding until adopted, and that legacy world is not part of this system.",
+    "keyCharacteristics": [
+      "Bone paper ground, printer-ink text, one ticket-red accent at folio scale plus (at most) one full-bleed red band.",
+      "Fixed typographic scale ladder \u2014 folio, body, entry, name \u2014 with all display type set uppercase in condensed Barlow.",
+      "Letterpress structure: rules, double borders, hatch texture, one stamp shadow; zero gradients, zero glass, zero rounded surfaces.",
+      "Live data as identity furniture: the issued stamp and dated notices render real timestamps; the world never fabricates a date.",
+      "Two presses of one ink: every light token has a dark mirror; switching theme is switching print run, not switching design."
+    ],
+    "rules": [
+      { "name": "The Ticket Red Rule", "body": "Ticket red is the system's only voice of emphasis \u2014 no second accent, no gradient to fake a second one. At rest it appears only as folio-scale marks; exactly one full-bleed band per page may invert it into a surface. Its rarity is the point: when red appears on a new surface, it must mean something (a folio, a live mark, a booking action).", "section": "colors" },
+      { "name": "The Two Presses Rule", "body": "Light and dark are one system printed twice: every token has a mirror value, set together in the same scoped block. Never hardcode one press.", "section": "colors" },
+      { "name": "The Fixed Ladder Rule", "body": "Hierarchy comes from the four-step ladder (folio, body, entry, name) before any invented size. One-off variants exist only as documented furniture steps; a new surface reaches for the ladder first.", "section": "typography" },
+      { "name": "The Set-Caps Rule", "body": "Programme words in the display face are uppercase and tracked; only the \u03b4 glyph and real date strings break caps. Never set body prose in Barlow.", "section": "typography" },
+      { "name": "The Bleed Rule", "body": "Full-bleed elements reach the viewport edge only via the \u22127.5% counter-offset of the column gutter, so the band's content realigns with the page column.", "section": "layout" },
+      { "name": "The Pressed, Not Lit Rule", "body": "Convey depth with rules, double borders, hatch texture, and the one stamp lift \u2014 never with shadows-as-lighting, gradients, or blur. If a new surface needs to feel raised, give it the stamp's paper (#f1eee5 / #1f221b) and a border, not a shadow.", "section": "elevation" },
+      { "name": "The Real Dates Rule", "body": "The issued stamp, notice dates, and masthead latest-notice line always render live content from the APIs; furniture with no real data stays hidden. The stamp's credibility is the whole world's credibility.", "section": "components" }
+    ],
+    "dos": [
+      "Do adopt the world on a new page by remapping the shared token names in one scoped block (as body[data-page=\"home\"] does), light and dark together \u2014 the shared chrome then inherits the world for free.",
+      "Do keep every token pair dual-press: light value plus dark mirror, written in the same block.",
+      "Do set display type uppercase Barlow Condensed from the fixed ladder; track small settings (0.12\u20130.2em) and leave large settings near 0.",
+      "Do render the issued stamp, notice dates, and nav labels from the live APIs; hide furniture that has no real data.",
+      "Do use the stamp lift only on the stamp; use borders, hairlines, and hatch for everything else.",
+      "Do keep reveal transforms and 160ms colour state swaps; ship content visible without JS.",
+      "Do put copy blocks at 46\u201362ch."
+    ],
+    "donts": [
+      "Don't mix worlds inside one page: a page either carries the Season Programme remap or stays explicitly legacy \u2014 never a legacy cream/Playfair element beside this world's bone/Barlow.",
+      "Don't add a second saturated accent, a gradient, or a glass/blur surface; this world is paper, ink, rules, and one red.",
+      "Don't invent kickers, eyebrows, boxed glyph icons, or hard offset shadows; the only glyph furniture is text itself (\u03b4, \u2197, \u2193) set in the system's own faces.",
+      "Don't fabricate dates, issue stamps, or programme data \u2014 the stamp's credibility is the whole world's credibility.",
+      "Don't round world surfaces: 0px corners on new components; the 2px chrome micro-radius is inherited legacy, not invitation.",
+      "Don't soften box-office copy below full paper (#eae7de / #191b16 ink equivalent) on red; that was a shipped fix, keep it.",
+      "Don't animate opacity of informative content; reveal is transform-only."
+    ]
+  }
+}

@@ -393,7 +393,7 @@ async function loadHomeNews() {
   }
 }
 
-const THEME_COLORS = { light: "#f4f1e9", dark: "#171717" };
+const THEME_COLORS = window.THEME_COLORS || { light: "#f4f1e9", dark: "#171717" };
 
 function currentTheme() {
   const attr = document.documentElement.getAttribute("data-theme");
