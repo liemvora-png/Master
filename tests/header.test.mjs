@@ -61,7 +61,7 @@ test("home page welcomes visitors and displays its managed update time", () => {
   const home = readFileSync(new URL("../src/templates/home.html", import.meta.url), "utf8");
   const siteScript = readFileSync(new URL("../public/assets/site.js", import.meta.url), "utf8");
 
-  assert.match(home, /Welcome to my<br><span>portfolio\.<\/span>/);
+  assert.match(home, /class="masthead-note">Projects, photography, arrangements, and services/);
   assert.match(home, /<time id="home-last-updated">checking…<\/time>/);
   assert.match(siteScript, /updateHomeTimestamp\(updatedAt\)/);
   assert.match(siteScript, /dayLabel = "today"/);

@@ -305,7 +305,7 @@ function renderPreview(container, page, sectionId) {
   previewFrame.title = `${sectionId} page preview`;
   previewFrame.loading = "eager";
   const frame = previewFrame;
-  previewFrame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base href="${window.location.origin}/"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css"><style>html,body{min-width:320px}body{min-height:100vh}</style></head><body><div id="site-preview"></div></body></html>`;
+  previewFrame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base href="${window.location.origin}/"><link rel="stylesheet" href="/styles.css"><style>html,body{min-width:320px}body{min-height:100vh}</style></head><body><div id="site-preview"></div></body></html>`;
   previewFrame.addEventListener("load", () => {
     if (previewFrame === frame) refreshPreviewFrame(sectionId);
   });

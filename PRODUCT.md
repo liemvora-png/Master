@@ -35,8 +35,8 @@ Personal portfolio for Connor Chen. It presents the person and their work, keeps
 
 - Architecture: Cloudflare Worker (`src/worker.js`) with static Assets binding, `run_worker_first: true`, D1 and R2 bindings. Node ≥ 20, `node --test` tests.
 - All public pages share one stylesheet (`public/styles.css`) and one behavior script (`public/assets/site.js`); home behavior depends on specific selectors (`#home-last-updated`, `#home-news-list`, `.wordmark-name`, `.site-footer > span`, `[data-theme-toggle]`, `meta[name="theme-color"]`). Behavior changes must keep these contracts.
-- Current redesign scope is **the home page only**. Home-scope surface brief keeps these untouched: nav structure, news feed, last-updated status, theme toggle behavior.
-- Shared stylesheet means other pages must not regress; home-scoped styling is the working approach.
+- The Season Programme world is now adopted **site-wide** (owner instruction: uniform fonts and colors across all pages): `public/styles.css` carries the self-hosted Barlow Condensed / Work Sans faces, the type ladder, and the shared palette for every page; `public/assets/home.css` is home-scoped structural CSS only. Home-scope surface brief keeps untouched: nav structure, news feed, last-updated status, theme toggle behavior.
+- Shared stylesheet means every page inherits the world's fonts, ladder, and palette from `styles.css`; page-specific files add structure only.
 
 ## Brand Commitments
 

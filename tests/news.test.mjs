@@ -7,7 +7,7 @@ test("home page carries a hidden news section linking to the digest", () => {
   const home = readFileSync(new URL("../src/templates/home.html", import.meta.url), "utf8");
 
   assert.match(home, /<section class="home-news"[^>]*hidden[^>]*aria-labelledby="home-news-title"/);
-  assert.match(home, /<h2 id="home-news-title">Latest news<\/h2>/);
+  assert.match(home, /<h2 id="home-news-title">Notices<\/h2>/);
   assert.match(home, /<a class="news-all-link" href="\/news"/);
   assert.match(home, /<ul class="home-news-list" id="home-news-list">/);
 });
