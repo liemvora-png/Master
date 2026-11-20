@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../../_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../../_shared/clerk.js";
 import { jsonResponse } from "../../_shared/content.js";
 
 function isText(value, maxLength, allowEmpty = false) {
@@ -21,7 +21,7 @@ async function readPortfolio(db) {
   const [services, subjects, gallery, availability, bookings] = await Promise.all([
     db.prepare("SELECT id, title, description, price, position, active FROM services ORDER BY position").all(),
     db.prepare("SELECT id, service_id, test_name, subject, position FROM test_prep_options ORDER BY test_name, position").all(),
-    db.prepare("SELECT id, image_url, alt_text, caption, position, active FROM photo_gallery ORDER BY position").all(),
+    db.prepare("SELECT id, image_url, preview_url, medium_url, alt_text, caption, position, active FROM photo_gallery ORDER BY position").all(),
     db.prepare("SELECT id, day_of_week, start_time, end_time, exception_date, is_available FROM availability ORDER BY day_of_week, exception_date, start_time").all(),
     db.prepare(
       "SELECT id, service_id, name, email, note, lesson_date, lesson_time, status, created_at " +
@@ -123,7 +123,7 @@ function portfolioStatements(db, input) {
 
 export async function onRequest({ request, env }) {
   const authorization = await authorizeAdmin(request, env);
-  if (!authorization.ok) return jsonResponse({ error: authorization.message }, authorization.status);
+  if (!authorization.ok) return jsonResponse(authorizationBody(authorization), authorization.status);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
 
   if (request.method === "GET") {
@@ -156,7 +156,7 @@ export async function onRequest({ request, env }) {
 
 export async function handleAdminBooking(request, env, pathname) {
   const authorization = await authorizeAdmin(request, env);
-  if (!authorization.ok) return jsonResponse({ error: authorization.message }, authorization.status);
+  if (!authorization.ok) return jsonResponse(authorizationBody(authorization), authorization.status);
   if (!env.DB) return jsonResponse({ error: "Content storage is not configured." }, 503);
   const id = pathname.slice("/api/admin/bookings/".length);
   if (!/^[\w-]{1,80}$/.test(id)) return jsonResponse({ error: "Booking not found." }, 404);

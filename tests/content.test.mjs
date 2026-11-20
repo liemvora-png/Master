@@ -85,7 +85,7 @@ const validContent = {
       metaDescription: "A regularly updated digest of technology news.",
       eyebrow: "Latest news",
       title: "Tech News Digest",
-      titleAccent: "work.",
+      titleAccent: "",
       description: "Latest tech headlines.",
       sectionTitle: "Latest news",
       items: []
@@ -183,4 +183,20 @@ test("requires the home page to remain title-only", () => {
   const content = structuredClone(validContent);
   content.pages.home.items = [{ name: "Unexpected entry" }];
   assert.match(validateContent(content), /home page/);
+});
+
+test("allows news page titleAccent to be empty while sectionTitle stays required", () => {
+  const content = structuredClone(validContent);
+  content.pages.news.titleAccent = "";
+  assert.equal(validateContent(content), null);
+
+  content.pages.news.sectionTitle = "";
+  assert.match(validateContent(content), /news page/);
+});
+
+test("rejects empty news title when titleAccent is empty but sectionTitle valid", () => {
+  const content = structuredClone(validContent);
+  content.pages.news.titleAccent = "";
+  content.pages.news.title = "";
+  assert.match(validateContent(content), /news page/);
 });

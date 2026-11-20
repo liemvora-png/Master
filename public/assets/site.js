@@ -319,6 +319,43 @@ function formatNewsDate(value) {
   }).format(new Date(value));
 }
 
+function renderHomeNewsRow(item) {
+  const row = document.createElement("li");
+  row.className = "home-news-item";
+
+  const when = document.createElement("span");
+  when.className = "home-news-time";
+  const stamp = item.published_at || "";
+  if (stamp && !Number.isNaN(new Date(stamp).getTime())) {
+    const time = document.createElement("time");
+    time.dateTime = stamp;
+    time.textContent = formatNewsDate(stamp);
+    when.append(time);
+  } else {
+    when.textContent = "";
+  }
+
+  const info = document.createElement("span");
+  info.className = "home-news-info";
+  const title = document.createElement("span");
+  title.className = "home-news-title";
+  title.textContent = item.headline || "Untitled";
+  info.append(title);
+
+  row.append(when, info);
+
+  const sourceHref = safeHref(item.source_url || "");
+  if (sourceHref) {
+    const source = document.createElement("a");
+    source.className = "project-link home-news-source";
+    source.href = sourceHref;
+    source.textContent = `${item.source_name || "Source"} ↗`;
+    row.append(source);
+  }
+
+  return row;
+}
+
 async function loadHomeNews() {
   if (document.body.dataset.page !== "home") return;
   const section = document.querySelector(".home-news");
@@ -326,59 +363,37 @@ async function loadHomeNews() {
   if (!section || !list) return;
 
   try {
-    const response = await fetch("/api/news", { headers: { Accept: "application/json" } });
+    const response = await fetch("/api/news?limit=1", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`News request returned ${response.status}.`);
     const { news } = await response.json();
     const items = Array.isArray(news) ? news : [];
-    items.length = Math.min(items.length, HOME_NEWS_LIMIT);
-
-    list.replaceChildren();
     if (items.length === 0) throw new Error("No news items available.");
 
-    for (const item of items) {
-      const row = document.createElement("li");
-      row.className = "home-news-item";
-
-      const when = document.createElement("span");
-      when.className = "home-news-time";
-      const stamp = item.published_at || "";
-      if (stamp && !Number.isNaN(new Date(stamp).getTime())) {
-        const time = document.createElement("time");
-        time.dateTime = stamp;
-        time.textContent = formatNewsDate(stamp);
-        when.append(time);
-      } else {
-        when.textContent = "";
-      }
-
-      const info = document.createElement("span");
-      info.className = "home-news-info";
-      const title = document.createElement("span");
-      title.className = "home-news-title";
-      title.textContent = item.headline || "Untitled";
-      info.append(title);
-
-      row.append(when, info);
-
-      const sourceHref = safeHref(item.source_url || "");
-      if (sourceHref) {
-        const source = document.createElement("a");
-        source.className = "project-link home-news-source";
-        source.href = sourceHref;
-        source.textContent = `${item.source_name || "Source"} ↗`;
-        row.append(source);
-      }
-
-      list.append(row);
-    }
+    // Render the newest item immediately so the digest appears fast,
+    // then stream in the rest one at a time.
+    list.replaceChildren();
+    list.append(renderHomeNewsRow(items[0]));
     section.hidden = false;
+
+    let loaded = 1;
+    while (loaded < HOME_NEWS_LIMIT) {
+      const next = await fetch(`/api/news?limit=1&offset=${loaded}`, {
+        headers: { Accept: "application/json" }
+      });
+      if (!next.ok) break;
+      const nextData = await next.json();
+      const nextItems = Array.isArray(nextData.news) ? nextData.news : [];
+      if (nextItems.length === 0) break;
+      list.append(renderHomeNewsRow(nextItems[0]));
+      loaded += 1;
+    }
   } catch (error) {
     console.error("Unable to load the news digest:", error);
     section.hidden = true;
   }
 }
 
-const THEME_COLORS = window.THEME_COLORS || { light: "#f4f1e9", dark: "#161814" };
+const THEME_COLORS = window.THEME_COLORS || { light: "#f4f1e9", dark: "#171717" };
 
 function currentTheme() {
   const attr = document.documentElement.getAttribute("data-theme");
@@ -443,6 +458,110 @@ function initThemeToggle() {
   }
 }
 
+function initMobileMenu() {
+  const toggle = document.querySelector(".menu-toggle");
+  const nav = document.querySelector(".site-nav");
+  if (!toggle || !nav) return;
+  const fullHeader = window.matchMedia("(min-width: 1100px)");
+
+  const syncHeaderMode = () => {
+    if (fullHeader.matches) {
+      toggle.classList.remove("is-active");
+      toggle.setAttribute("aria-expanded", "false");
+      nav.classList.remove("nav-open");
+      nav.setAttribute("aria-hidden", "false");
+      nav.inert = false;
+    } else {
+      setMenuOpen(false);
+    }
+  };
+
+  const positionDesktopMenu = () => {
+    if (fullHeader.matches) {
+      nav.style.right = "";
+      nav.style.top = "";
+      return;
+    }
+    if (window.matchMedia("(max-width: 700px)").matches) {
+      nav.style.right = "";
+      nav.style.top = "";
+      return;
+    }
+    const header = toggle.closest(".site-header");
+    const headerRect = header.getBoundingClientRect();
+    const toggleRect = toggle.getBoundingClientRect();
+    nav.style.right = `${Math.max(0, headerRect.right - toggleRect.right)}px`;
+    nav.style.top = `${toggleRect.bottom - headerRect.top}px`;
+  };
+
+  const setMenuOpen = (open) => {
+    toggle.classList.toggle("is-active", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    nav.classList.toggle("nav-open", open);
+    nav.setAttribute("aria-hidden", String(!open));
+    nav.inert = !open;
+    if (open) positionDesktopMenu();
+  };
+
+  toggle.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    setMenuOpen(open);
+    if (open) {
+      const firstLink = nav.querySelector("a[href]");
+      if (firstLink) firstLink.focus();
+    }
+  });
+
+  nav.addEventListener("click", (event) => {
+    if (event.target.closest("a")) setMenuOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (toggle.getAttribute("aria-expanded") !== "true") return;
+
+    if (event.key === "Escape") {
+      setMenuOpen(false);
+      toggle.focus();
+      return;
+    }
+
+    if (event.key === "Tab") {
+      const focusable = [...nav.querySelectorAll("a[href]")];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (!nav.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (
+      toggle.getAttribute("aria-expanded") === "true"
+      && !event.target.closest(".site-header")
+    ) {
+      setMenuOpen(false);
+    }
+  });
+  if (typeof fullHeader.addEventListener === "function") {
+    fullHeader.addEventListener("change", syncHeaderMode);
+  } else if (typeof fullHeader.addListener === "function") {
+    fullHeader.addListener(syncHeaderMode);
+  }
+  window.addEventListener("resize", positionDesktopMenu);
+  syncHeaderMode();
+}
+
 initThemeToggle();
+initMobileMenu();
 loadManagedContent();
 loadHomeNews();

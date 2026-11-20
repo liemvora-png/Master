@@ -1,4 +1,4 @@
-import { authorizeAdmin } from "../functions/_shared/clerk.js";
+import { authorizationBody, authorizeAdmin } from "../functions/_shared/clerk.js";
 import { jsonResponse } from "../functions/_shared/content.js";
 import { onRequest as adminContent } from "../functions/api/admin/content.js";
 import { handleAdminBooking, onRequest as adminPortfolio } from "../functions/api/admin/portfolio.js";
@@ -99,7 +99,7 @@ export function createWorker(templates) {
       if (pathname === "/admin" || pathname.startsWith("/admin/")) {
         const authorization = await authorizeAdmin(request, env);
         if (!authorization.ok) {
-          return jsonResponse({ error: authorization.message }, authorization.status);
+          return jsonResponse(authorizationBody(authorization), authorization.status);
         }
         return notFoundResponse();
       }
@@ -117,7 +117,7 @@ export function createWorker(templates) {
           return jsonResponse({ error: "Method not allowed." }, 405);
         }
         const filename = pathname.slice("/gallery-images/".length);
-        if (!/^[\w-]{36}\.(jpg|png|webp|gif)$/.test(filename) || !env.GALLERY) {
+        if (!/^[\w-]{36}(?:\.(?:low|medium)\.webp|\.(?:jpg|png|webp|avif|gif))$/.test(filename) || !env.GALLERY) {
           return notFoundResponse();
         }
         const object = await env.GALLERY.get(`gallery/${filename}`);
@@ -125,7 +125,7 @@ export function createWorker(templates) {
         return new Response(request.method === "HEAD" ? null : object.body, {
           headers: {
             "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
-            "Cache-Control": "public, max-age=86400",
+            "Cache-Control": "public, max-age=31536000, immutable",
             "X-Content-Type-Options": "nosniff"
           }
         });

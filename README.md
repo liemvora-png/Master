@@ -50,19 +50,25 @@ SELECT id FROM blocks WHERE content IS NULL OR trim(content) = '';
 
 The final two integrity checks should return no rows. After upgrading, confirm the `services` and `gallery` rows exist, the projects slug is `projects`, accomplishments has no blocks, and the site name is `Liem Vora`.
 
-The `DB` binding and the Clerk variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. Set `CLERK_PUBLISHABLE_KEY` to the publishable key for the selected Clerk application, `CLERK_ISSUER` to that application's JWT issuer, `CLERK_JWKS_URL` to its JWKS endpoint, and `CLERK_ADMIN_USER_ID` to the only Clerk user allowed to edit the site. The browser uses Clerk for sign-in and the Worker validates the Clerk JWT signature, issuer, expiry, and user ID before returning the editor or accepting writes. Never put a Clerk secret key in this repository.
+The `DB` binding and the Clerk variables are declared in `wrangler.jsonc`; do not also add dashboard-only copies. Set `CLERK_PUBLISHABLE_KEY` to the publishable key for the selected Clerk application, `CLERK_ISSUER` to that application's JWT issuer, `CLERK_JWKS_URL` to its JWKS endpoint, and `CLERK_ADMIN_USER_ID` to the Clerk account allowed to edit the site; `CLERK_ADMIN_USER_IDS` accepts a comma-separated list when several accounts should have access. The browser uses Clerk for sign-in and the Worker validates the Clerk JWT signature, issuer, expiry, and user ID before returning the editor or accepting writes. Never put a Clerk secret key in this repository.
+
+User IDs and the JWT issuer belong to a single Clerk application, so changing the application or its primary domain means updating all four variables together; tokens from the previous application or domain are rejected. Each rejection names the account id and issuer that were actually seen, so a rejected sign-in reports the values to put here.
 
 The existing Cloudflare Workers Build can continue deploying from this repository with `wrangler deploy`. The asset directory is `./public`, and `run_worker_first: true` sends every request through `src/worker.js`. The Worker serves templates imported from `src/templates/`, uses D1 for content and bookings, stores gallery objects in the configured R2 bucket, and sends booking notices through the Email Service binding. The templates, Worker code, SQL, and tests are not in the public directory; `.assetsignore` also excludes `src` and other repository files.
 
 Create an R2 bucket named `portfolio-gallery` to match the `GALLERY` binding in `wrangler.jsonc`.
 
+Run [`migrations/0008_gallery_progressive_images.sql`](migrations/0008_gallery_progressive_images.sql) once to add low and medium image URL fields for progressive gallery loading. Existing gallery rows remain valid and automatically fall back to their original `image_url`.
+
 For booking email, configure Cloudflare Email Service (outbound sending) in addition to any Email Routing you use for inbound mail. Onboard/verify a sender domain with Email Service, and verify the Gmail destination address as an allowed recipient. Add Worker secrets named `BOOKING_EMAIL_TO` (your verified Gmail destination) and `BOOKING_EMAIL_FROM` (an address on the verified sending domain). The destination and sender are not included in the repository, and the Gmail address is never displayed publicly. Without these values, the Worker still saves the request as pending but reports that email notification is not configured.
+
+Tech news is stored in the D1 `news_items` table and served only through `/api/news`. The News and Home pages do not contain static article fallback content. Use the admin Tech news editor or insert/update `news_items` directly to publish or remove digest entries.
 
 Keep the admin routes protected by Clerk regardless of the hostname used to reach the Worker. The API does not trust browser cookies or the visibility of the admin page; every admin request must include a valid Clerk bearer token.
 
 ## Editing content
 
-Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads support JPEG, PNG, WebP, and GIF up to 8 MB, and require alt text.
+Open `/admin` and sign in with the configured Clerk admin user. The labeled editor manages site branding, navigation, page copy, projects, accomplishments, arrangements, services, lesson availability, gallery photos, and booking requests. Arrangement entries can include an optional date. Lesson availability is entered as weekly windows or date-specific overrides; each appointment reserves one 60-minute slot. Requests remain pending until manually confirmed. Optional service prices are shown only when set. Gallery uploads accept JPEG, PNG, WebP, AVIF, and GIF up to 90 MB each; photos up to 20 MB upload at full quality, photos over 20 MB are resized to 2560 px WebP in the browser before upload, and alt text is required.
 
 For Clerk application-domain redirects, use `https://www.liemvora.cc/admin` for sign-in and sign-up, and `https://www.liemvora.cc/` after sign-out. Keep sign-up restricted to the intended admin account.
 

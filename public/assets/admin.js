@@ -1,5 +1,6 @@
 const editor = document.querySelector("#content-editor");
 const tabs = document.querySelector("#editor-tabs");
+const workspaceTabs = document.querySelector("#admin-workspace-tabs");
 const status = document.querySelector("#editor-status");
 const saveButton = document.querySelector("#save-content");
 const reloadButton = document.querySelector("#reload-content");
@@ -13,6 +14,12 @@ const SECTIONS = [
   { id: "services", label: "Services page" },
   { id: "gallery", label: "Gallery page" },
   { id: "news", label: "Tech news" }
+];
+const WORKSPACE_AREAS = [
+  { id: "content", panel: "page-content-panel" },
+  { id: "services", panel: "services-panel" },
+  { id: "gallery", panel: "gallery-panel" },
+  { id: "bookings", panel: "bookings-panel" }
 ];
 
 const PAGE_FIELDS = [
@@ -35,6 +42,71 @@ let newsItems = [];
 let activeSection = "site";
 let dirty = false;
 let previewFrame;
+let menuOpen = false;
+let activeWorkspace = "content";
+
+function setWorkspacePanel(workspaceId, focus = false) {
+  const area = WORKSPACE_AREAS.find((item) => item.id === workspaceId);
+  if (!area || !workspaceTabs) return;
+  activeWorkspace = area.id;
+
+  for (const tab of workspaceTabs.querySelectorAll("[role='tab']")) {
+    const isActive = tab.dataset.workspace === activeWorkspace;
+    tab.setAttribute("aria-selected", String(isActive));
+    tab.tabIndex = isActive ? 0 : -1;
+    if (focus && isActive) tab.focus();
+  }
+
+  for (const panel of document.querySelectorAll(".admin-workspace-panel")) {
+    panel.hidden = panel.id !== area.panel;
+  }
+
+  document.dispatchEvent(new CustomEvent("admin-workspace-change", {
+    detail: { workspace: activeWorkspace }
+  }));
+}
+
+function initWorkspaceTabs() {
+  if (!workspaceTabs) return;
+  workspaceTabs.addEventListener("click", (event) => {
+    const tab = event.target.closest("[data-workspace]");
+    if (!tab) return;
+    setWorkspacePanel(tab.dataset.workspace);
+  });
+  workspaceTabs.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const buttons = [...workspaceTabs.querySelectorAll("[role='tab']")];
+    const current = buttons.findIndex((button) => button.dataset.workspace === activeWorkspace);
+    const next = event.key === "Home" ? 0
+      : event.key === "End" ? buttons.length - 1
+        : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+    setWorkspacePanel(buttons[next].dataset.workspace, true);
+  });
+  setWorkspacePanel(activeWorkspace);
+}
+
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  const nav = document.querySelector(".site-nav");
+  const toggle = document.querySelector(".menu-toggle");
+  if (!nav || !toggle) return;
+  nav.classList.toggle("nav-open", menuOpen);
+  toggle.setAttribute("aria-expanded", String(menuOpen));
+}
+
+function initMenu() {
+  const toggle = document.querySelector(".menu-toggle");
+  if (!toggle) return;
+  toggle.addEventListener("click", toggleMenu);
+  // Close menu when a nav link is clicked
+  document.addEventListener("click", (event) => {
+    if (!menuOpen) return;
+    if (event.target.closest(".site-nav a")) {
+      toggleMenu();
+    }
+  });
+}
 
 function setStatus(message, state = "") {
   status.textContent = message;
@@ -297,7 +369,7 @@ function renderPreviewMarkup(page, sectionId) {
     section = '<section><p class="empty-state">Tech news items are edited below in this tab.</p></section>';
   }
 
-  return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">${escapeHtml(content.brand)}</span></a><nav class="site-nav" aria-label="Main navigation">${navigation}</nav>${adminLink}</header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;
+  return `<header class="site-header"><a class="wordmark" href="/" aria-label="Liem Vora home"><span class="wordmark-symbol" aria-hidden="true">δ</span><span class="wordmark-name">${escapeHtml(content.brand)}</span></a><nav class="site-nav" id="site-navigation" aria-label="Main navigation" aria-hidden="true" inert>${navigation}</nav><div class="header-actions"><button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="site-navigation" aria-expanded="false"><span class="menu-toggle-lines" aria-hidden="true"><span class="menu-toggle-line"></span><span class="menu-toggle-line"></span><span class="menu-toggle-line"></span></span></button><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme"><span class="theme-toggle-icon" aria-hidden="true">☾</span></button>${adminLink}</div></header><main id="main"><section class="intro${sectionId === "home" ? " home-intro" : ""}" aria-labelledby="page-title">${eyebrow}${heading}${description}</section>${section}</main><footer class="site-footer"><span>${escapeHtml(content.footer.label)}</span><span>${escapeHtml(content.footer.note)} <span class="footer-dot" aria-hidden="true">·</span> ${escapeHtml(content.footer.year)}</span></footer>`;
 }
 
 function safePreviewHref(value) {
@@ -543,6 +615,7 @@ async function loadContent() {
     ]);
     dirty = false;
     renderEditor();
+    initMenu();
     setStatus(`All changes are saved. Last updated ${new Date(content.updatedAt).toLocaleString()}.`, "success");
   } catch (error) {
     setStatus(`Could not load content: ${error.message}`, "error");
@@ -710,4 +783,5 @@ reloadButton.addEventListener("click", () => {
 });
 saveButton.addEventListener("click", saveContent);
 
+initWorkspaceTabs();
 loadContent();
