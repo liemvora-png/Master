@@ -125,7 +125,7 @@ export function createWorker(templates) {
         return new Response(request.method === "HEAD" ? null : object.body, {
           headers: {
             "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
-            "Cache-Control": "public, max-age=86400",
+            "Cache-Control": "public, max-age=31536000, immutable",
             "X-Content-Type-Options": "nosniff"
           }
         });

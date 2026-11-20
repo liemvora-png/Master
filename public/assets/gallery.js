@@ -66,8 +66,11 @@ fetch("/api/gallery", { headers: { Accept: "application/json" } })
         } else if (originalUrl !== lowUrl) {
           upgrade(originalUrl);
         }
+        if (mediumUrl !== lowUrl && originalUrl !== mediumUrl) {
+          image.srcset = `${mediumUrl} 1440w, ${originalUrl} 2560w`;
+          image.sizes = "(min-width: 1200px) 33vw, (min-width: 768px) 50vw, 100vw";
+        }
       }, { once: true });
-
       if (photo.caption) {
         const caption = document.createElement("figcaption");
         caption.textContent = photo.caption;
