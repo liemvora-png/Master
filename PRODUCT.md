@@ -41,6 +41,7 @@ Personal portfolio for Connor Chen. It presents the person and their work, keeps
 ## Brand Commitments
 
 - Brand-element binding status was **not decided** when asked (δ glyph, name, copy voice, live-content primacy were offered as a set; owner skipped). Treat them as open questions, not free variables.
+- Color anchor **is decided** (owner instruction during the home redesign): every page, home included, uses the shared palette in `public/styles.css` (cream/olive/ink light, dark mirror); no page-private palettes.
 - Structural facts regardless of that choice: the δ wordmark glyph and the name are rendered in markup and updated by `site.js` from live API content; footer strings are likewise API-driven. Existing page copy ("Welcome to my portfolio.", "MADE WITH CARE · 2026") is current product truth and stays unless the owner changes it.
 - Live, admin-managed content is the source of truth for news, timestamps, nav labels, and footer strings. Design work renders that content; it never hardcodes substitutes.
 
