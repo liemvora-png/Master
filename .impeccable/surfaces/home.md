@@ -17,13 +17,13 @@ Unresolved: brand anchors (PRODUCT.md leaves them undecided); world adoption on 
 
 ## Direction contract
 
-THESIS: The home page is the season programme of one person's working practice — the document itself, not a poster of it. It refuses the category default (centered hero over a row of equal cards) and refuses drift back to the incumbent cream-and-serif editorial.
+THESIS: The home page is the season programme of one person's working practice — the document itself, not a poster of it. It refuses the category default (centered hero over a row of equal cards) and refuses drift back to the incumbent editorial layout; its identity is carried by structure and type, not a private palette (owner instruction: shared site colours).
 
-OWN-WORLD: Programme print. Cool bone paper ground (#eae7de), near-black printer ink (#1d1f1b), one saturated ticket red (#c22a1f) carrying marks at page scale, folio grey (#5c574c for text, #6f6a5e for rules) for furniture. Barlow Condensed set as all-caps display on a fixed scale ladder (folio, body, entry, name); Work Sans as text grotesque. Letterpress structure: rules, folios, dated entry rows, a ticket-style issued stamp, hatch shadows — no gradients, no glass.
+OWN-WORLD: Programme print on the site's shared palette (owner instruction: same colour scheme as the rest of the site). Light theme: cream paper (#f4f1e9), deeper cream (#e7ddcd), near-black ink (#242820), olive (#58604b) carrying the marks; dark theme mirrors the shared tokens (paper #171717, ink #e6e5e1, olive #a9b891). No home-only palette — every colour is a shared styles.css token, so the home page flips with the site theme toggle. Barlow Condensed set as all-caps display on a fixed scale ladder (folio, body, entry, name); Work Sans as text grotesque. Letterpress structure: rules, folios, dated entry rows, a ticket-style issued stamp, hatch shadows — no gradients, no glass.
 
 STORY: The visitor lands on a masthead that works as a page: the name set as the season title, the real last-updated time rendered as a "programme issued" stamp — evidence the practice is live. Scroll reads as programme structure: overture (practice note), the season's works (projects, gallery, arrangements, accomplishments as running-order entries), notices (real dated news rows), booking window (services). They believe this practice is current, then follow a work or book time.
 
-FIRST VIEWPORT: Left-set masthead, no centered trio: name as huge condensed caps at name scale, "Season 2026" folio beside it, the δ mark in ticket red, the issued stamp (real timestamp) at the masthead edge, one heavy rule beneath; the first dated notice rows peek at the fold. Primary action: "Works ↓" anchor in the masthead furniture, red on paper.
+FIRST VIEWPORT: Left-set masthead, no centered trio: name as huge condensed caps at name scale, "Season 2026" folio beside it, the δ mark in olive, the issued stamp (real timestamp) at the masthead edge, one heavy rule beneath; the first dated notice rows peek at the fold. Primary action: "Works ↓" anchor in the masthead furniture, olive on paper.
 
 FORM: Grounded candidate 3 of my ordered list (1 lab notebook — the pick; 2 pegboard wall; 3 Season Programme — the roll's assignment, chosen). seed:314c93e3c12a4c31.
 

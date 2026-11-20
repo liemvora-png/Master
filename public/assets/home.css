@@ -68,20 +68,6 @@
 /* --- Programme tokens: remap the shared variables for this surface only --- */
 
 body[data-page="home"] {
-  color-scheme: light;
-  --paper: #eae7de;
-  --paper-deep: #e0dcd0;
-  --ink: #1d1f1b;
-  --muted: #5c574c;
-  --olive: #c22a1f;
-  --line: rgba(29, 31, 27, 0.22);
-  --surface: #f1eee5;
-  --danger: #c22a1f;
-  --danger-line: rgba(194, 42, 31, 0.35);
-  --danger-soft: rgba(194, 42, 31, 0.07);
-  --brown: #6f6a5e;
-  --brown-deep: #5c574c;
-  --brown-line: rgba(111, 106, 94, 0.35);
   --sans: "Work Sans", "Helvetica Neue", Arial, sans-serif;
   --serif: "Barlow Condensed", "Arial Narrow", sans-serif;
   --mono: "Work Sans", "Helvetica Neue", Arial, sans-serif;
@@ -90,50 +76,10 @@ body[data-page="home"] {
   --t-body: 1.02rem;
   --t-entry: 1.6rem;
   --t-name: clamp(3.2rem, 10vw, 6rem);
-  caret-color: #c22a1f;
-}
-
-html[data-theme="dark"] body[data-page="home"] {
-  color-scheme: dark;
-  --paper: #191b16;
-  --paper-deep: #21241d;
-  --ink: #e8e5da;
-  --muted: #a49e8f;
-  --olive: #e0563f;
-  --line: rgba(232, 229, 218, 0.2);
-  --surface: #1f221b;
-  --danger: #e0563f;
-  --danger-line: rgba(224, 86, 63, 0.4);
-  --danger-soft: rgba(224, 86, 63, 0.1);
-  --brown: #8f8a7c;
-  --brown-deep: #a49e8f;
-  --brown-line: rgba(164, 158, 143, 0.35);
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) body[data-page="home"] {
-    color-scheme: dark;
-    --paper: #191b16;
-    --paper-deep: #21241d;
-    --ink: #e8e5da;
-    --muted: #a49e8f;
-    --olive: #e0563f;
-    --line: rgba(232, 229, 218, 0.2);
-    --surface: #1f221b;
-    --danger: #e0563f;
-    --danger-line: rgba(224, 86, 63, 0.4);
-    --danger-soft: rgba(224, 86, 63, 0.1);
-    --brown: #8f8a7c;
-    --brown-deep: #a49e8f;
-    --brown-line: rgba(164, 158, 143, 0.35);
-  }
+  caret-color: var(--olive);
 }
 
 body[data-page="home"] {
-  scrollbar-color: #c22a1f var(--paper-deep);
-}
-
-html[data-theme="dark"] body[data-page="home"] {
   scrollbar-color: var(--olive) var(--paper-deep);
 }
 
@@ -497,11 +443,9 @@ body[data-page="home"] .band-hatch {
   left: 0;
   width: 100%;
   height: 10px;
-  color: rgba(234, 231, 222, 0.5);
-}
-
-html[data-theme="dark"] body[data-page="home"] .band-hatch {
-  color: rgba(25, 27, 22, 0.55);
+  /* paper token flips per theme: light hatch on olive (light), dark hatch on sage (dark) */
+  color: var(--paper);
+  opacity: 0.5;
 }
 
 /* --- Content status (site.js fallback line) --- */
