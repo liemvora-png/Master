@@ -17,8 +17,8 @@ export const ENCODE_STEPS = [
 ];
 export const PREVIEW_LONG_EDGE = 32;
 export const PREVIEW_QUALITY = 0.38;
-export const MEDIUM_LONG_EDGE = 1440;
-export const MEDIUM_QUALITY = 0.82;
+export const MEDIUM_LONG_EDGE = 1920;
+export const MEDIUM_QUALITY = 0.86;
 export const MAX_BATCH = 20;
 export const MAX_ALT_LENGTH = 240;
 export const MAX_CAPTION_LENGTH = 300;

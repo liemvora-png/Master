@@ -6,6 +6,7 @@ import {
   MAX_IMAGE_SIZE,
   MAX_INPUT_BYTES,
   REENCODE_INPUT_BYTES,
+  TARGET_LONG_EDGE,
   PREVIEW_LONG_EDGE,
   PREVIEW_QUALITY,
   MEDIUM_LONG_EDGE,
@@ -81,6 +82,8 @@ test("file sizes read the way the queue shows them", () => {
 test("progressive preview dimensions are intentionally smaller than the original quality tier", () => {
   assert.equal(PREVIEW_LONG_EDGE, 32);
   assert.equal(PREVIEW_QUALITY, 0.38);
-  assert.equal(MEDIUM_LONG_EDGE, 1440);
-  assert.equal(MEDIUM_QUALITY, 0.82);
+  assert.equal(MEDIUM_LONG_EDGE, 1920);
+  assert.equal(MEDIUM_QUALITY, 0.86);
+  assert.ok(MEDIUM_LONG_EDGE < TARGET_LONG_EDGE);
+  assert.ok(MEDIUM_QUALITY < 1);
 });
