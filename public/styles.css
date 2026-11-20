@@ -759,6 +759,14 @@ h1 span {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--paper-deep);
+  opacity: 0.55;
+  filter: blur(1px);
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+.gallery-photo img.is-ready {
+  opacity: 1;
+  filter: none;
 }
 
 .gallery-photo-image {

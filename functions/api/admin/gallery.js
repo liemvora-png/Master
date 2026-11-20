@@ -11,6 +11,14 @@ const IMAGE_TYPES = new Map([
   ["image/gif", "gif"]
 ]);
 
+function variantFile(form, name, maxSize = 20 * 1024 * 1024) {
+  const file = form.get(name);
+  return file instanceof File && file.size > 0 && file.size <= maxSize
+    && (file.type === "image/webp" || file.type === "image/jpeg" || file.type === "image/png" || file.type === "image/gif")
+    ? file
+    : null;
+}
+
 async function isAdmin(request, env) {
   const authorization = await authorizeAdmin(request, env);
   return authorization.ok ? null : jsonResponse(authorizationBody(authorization), authorization.status);
@@ -149,7 +157,7 @@ export async function onRequest({ request, env }) {
     }
     try {
       const image = await env.DB.prepare(
-        "SELECT image_url FROM photo_gallery WHERE id = ?"
+        "SELECT image_url, preview_url, medium_url FROM photo_gallery WHERE id = ?"
       ).bind(id).first();
       if (!image) return jsonResponse({ error: "Gallery image not found." }, 404);
       const filename = image.image_url.split("/").pop();

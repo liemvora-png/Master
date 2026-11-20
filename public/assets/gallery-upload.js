@@ -11,15 +11,14 @@ export const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
 export const REENCODE_INPUT_BYTES = 20 * 1024 * 1024;
 export const TARGET_LONG_EDGE = 2560;
 export const ENCODE_STEPS = [
-  { longEdge: TARGET_LONG_EDGE, quality: 0.86 },
-  { longEdge: TARGET_LONG_EDGE, quality: 0.75 },
-  { longEdge: 1920, quality: 0.75 },
-  { longEdge: 1600, quality: 0.7 }
+  { longEdge: TARGET_LONG_EDGE, quality: 0.88 },
+  { longEdge: TARGET_LONG_EDGE, quality: 0.82 },
+  { longEdge: 2048, quality: 0.80 }
 ];
 export const PREVIEW_LONG_EDGE = 32;
 export const PREVIEW_QUALITY = 0.38;
-export const MEDIUM_LONG_EDGE = 960;
-export const MEDIUM_QUALITY = 0.72;
+export const MEDIUM_LONG_EDGE = 1440;
+export const MEDIUM_QUALITY = 0.82;
 export const MAX_BATCH = 20;
 export const MAX_ALT_LENGTH = 240;
 export const MAX_CAPTION_LENGTH = 300;

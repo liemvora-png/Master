@@ -81,6 +81,6 @@ test("file sizes read the way the queue shows them", () => {
 test("progressive preview dimensions are intentionally smaller than the original quality tier", () => {
   assert.equal(PREVIEW_LONG_EDGE, 32);
   assert.equal(PREVIEW_QUALITY, 0.38);
-  assert.equal(MEDIUM_LONG_EDGE, 960);
-  assert.equal(MEDIUM_QUALITY, 0.72);
+  assert.equal(MEDIUM_LONG_EDGE, 1440);
+  assert.equal(MEDIUM_QUALITY, 0.82);
 });
