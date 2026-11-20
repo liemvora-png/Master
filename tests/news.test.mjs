@@ -35,7 +35,9 @@ test("news page uses D1 and has no static fallback", () => {
   const page = readFileSync(new URL("../public/news/index.html", import.meta.url), "utf8");
 
   assert.doesNotMatch(page, /news-static|renderStaticFallback/);
-  assert.match(page, /fetch\("\/api\/news\?limit=1"/);
+  assert.match(page, /const PAGE_SIZE = 100;/);
+  assert.match(page, /fetch\(`\/api\/news\?limit=\$\{PAGE_SIZE\}&offset=\$\{offset\}`/);
+  assert.match(page, /data-news-more/);
   assert.match(page, /class="menu-toggle"/);
   assert.match(page, /aria-controls="site-navigation"/);
   assert.match(page, /Loading tech news/);

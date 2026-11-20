@@ -188,15 +188,19 @@
     }
   }
 
-  function renderNews(items) {
+  const PAGE_SIZE = 100;
+  let allItems = [];
+  let hasMore = false;
+
+  function renderNews() {
     list.setAttribute("aria-busy", "false");
-    if (!items.length) {
+    if (!allItems.length) {
       renderStatus("No tech news is available right now.");
       return;
     }
 
     const groups = new Map();
-    for (const item of items) {
+    for (const item of allItems) {
       const date = item.published_at ? new Date(item.published_at) : new Date();
       const key = date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
       if (!groups.has(key)) groups.set(key, []);
@@ -223,23 +227,43 @@
 </article>`;
       }
     }
+    if (hasMore) {
+      html += `
+<div class="news-status">
+  <button type="button" data-news-more>Load older news</button>
+</div>`;
+    }
     list.innerHTML = html;
+    if (hasMore) {
+      list.querySelector("[data-news-more]").addEventListener("click", loadMore);
+    }
+  }
+
+  async function fetchPage(offset) {
+    const response = await fetch(`/api/news?limit=${PAGE_SIZE}&offset=${offset}`, {
+      headers: { Accept: "application/json" }
+    });
+    if (!response.ok) throw new Error(`News request returned ${response.status}.`);
+    const data = await response.json();
+    const items = Array.isArray(data.news) ? data.news : [];
+    return { items, more: Boolean(data.hasMore) && items.length > 0 };
   }
 
   async function loadNews() {
     list.setAttribute("aria-busy", "true");
+    allItems = [];
+    hasMore = false;
     try {
-        const response = await fetch("/api/news?limit=1", { headers: { Accept: "application/json" } });
-      if (!response.ok) throw new Error(`News request returned ${response.status}.`);
-        const data = await response.json();
-        const items = Array.isArray(data.news) ? data.news : [];
-      if (items.length) {
-        const newest = items[0].published_at || "";
+      const page = await fetchPage(0);
+      allItems = page.items;
+      hasMore = page.more;
+      if (allItems.length) {
+        const newest = allItems[0].published_at || "";
         if (newest && updated) {
           updated.dateTime = newest;
           updated.textContent = formatDate(newest);
         }
-        renderNews(items);
+        renderNews();
         return;
       }
       if (updated) updated.textContent = "Unavailable";
@@ -248,6 +272,23 @@
       console.error("Unable to load the news digest:", error);
       if (updated) updated.textContent = "Unavailable";
       renderStatus("Tech news could not be loaded.", true);
+    }
+  }
+
+  async function loadMore() {
+    const button = list.querySelector("[data-news-more]");
+    if (button) button.disabled = true;
+    try {
+      const page = await fetchPage(allItems.length);
+      allItems = allItems.concat(page.items);
+      hasMore = page.more;
+      renderNews();
+    } catch (error) {
+      console.error("Unable to load more news:", error);
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Could not load. Try again.";
+      }
     }
   }
 
