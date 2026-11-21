@@ -12,8 +12,7 @@ body[data-page="home"] .programme-masthead {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: clamp(1.5rem, 4vw, 3rem);
   align-items: start;
-  padding-bottom: 1.6rem;
-  border-bottom: 4px solid var(--ink);
+  padding-bottom: 0;
 }
 
 body[data-page="home"] .masthead-name {
@@ -153,14 +152,6 @@ body[data-page="home"] .masthead-latest a {
 body[data-page="home"] .masthead-latest a:hover {
   color: var(--olive);
   text-decoration-color: currentColor;
-}
-
-body[data-page="home"] .masthead-note {
-  max-width: 46ch;
-  margin: 1.4rem 0 0;
-  color: var(--muted);
-  font-size: var(--t-body);
-  line-height: 1.7;
 }
 
 /* --- Programme sections share one heading rhythm --- */
@@ -338,13 +329,6 @@ body[data-page="home"] .home-news-time {
   font-weight: 400;
   letter-spacing: 0.02em;
   text-transform: none;
-}
-
-body[data-page="home"] .notices-frame {
-  margin: 0 0 0.4rem;
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
 }
 
 body[data-page="home"] .home-news-title {
