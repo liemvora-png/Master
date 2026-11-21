@@ -442,6 +442,11 @@ a:focus-visible {
   letter-spacing: 0.12em;
 }
 
+/* Fixed Ladder Rule: nothing readable sits below the 0.72rem folio floor. */
+.site-footer {
+  font-size: 0.72rem;
+}
+
 .header-note {
   color: var(--muted);
 }
@@ -1637,19 +1642,19 @@ h1 span {
 
     .menu-toggle {
       display: inline-flex;
-      width: 36px;
-      min-width: 36px;
-      height: 36px;
-      min-height: 36px;
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      min-height: 44px;
     }
 
   .admin-entry-button {
-    min-height: 36px;
+    min-height: 44px;
     padding: 0.45rem 0.65rem;
   }
 
   .theme-toggle {
-    min-height: 36px;
+    min-height: 44px;
     padding: 0.45rem 0.6rem;
   }
 
@@ -1768,8 +1773,7 @@ h1 span {
 }
 
 @media (max-width: 420px) {
-  .header-note,
-  .project-link {
+  .header-note {
     font-size: 0.58rem;
   }
 
