@@ -70,7 +70,9 @@ test("home page welcomes visitors and displays its managed update time", () => {
   const siteScript = readFileSync(new URL("../public/assets/site.js", import.meta.url), "utf8");
   const handler = readFileSync(new URL("../src/worker-handler.js", import.meta.url), "utf8");
 
-  assert.match(home, /class="masthead-note">Projects, photography, arrangements, and services/);
+  // The masthead note was removed; the intro now ends with the programme masthead.
+  assert.doesNotMatch(home, /class="masthead-note"/);
+  assert.match(home, /class="programme-masthead"/);
   // The stamp ships a server-rendered real default, never a stuck loading string.
   assert.match(home, /<time id="home-last-updated">__HOME_ISSUED__<\/time>/);
   assert.match(handler, /__HOME_ISSUED__/);
