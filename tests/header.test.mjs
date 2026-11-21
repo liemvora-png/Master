@@ -30,6 +30,14 @@ test("every page uses the same header navigation order and includes Admin", () =
   }
 });
 
+test("public pages lead with the title and ship no kicker line", () => {
+  for (const templateName of ["projects.html", "accomplishments.html", "arrangements.html", "services.html", "gallery.html"]) {
+    const template = readFileSync(new URL(`../src/templates/${templateName}`, import.meta.url), "utf8");
+    assert.doesNotMatch(template, /class="eyebrow"/, `${templateName} should not ship an eyebrow kicker`);
+    assert.match(template, /class="intro"[^>]*>\s*<h1/, `${templateName} should open its intro with the title`);
+  }
+});
+
 test("desktop breakpoint exposes full navigation and hides the burger", () => {
   const styles = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
   const script = readFileSync(new URL("../public/assets/site.js", import.meta.url), "utf8");
