@@ -75,15 +75,36 @@ function updateNavigation(content, currentPage) {
   }
 }
 
+function normalizeStamp(value) {
+  if (typeof value !== "string" || !value) return null;
+  const normalized = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value)
+    ? value
+    : value.replace(" ", "T") + "Z";
+  const time = Date.parse(normalized);
+  return Number.isNaN(time) ? null : time;
+}
+
+// The stamp reads "last revision": the later of the last admin edit and the newest notice.
+let homeUpdatedAt = null;
+let homeNewsAt = null;
+
+function applyHomeStamp() {
+  if (document.body.dataset.page !== "home") return;
+  const base = normalizeStamp(homeUpdatedAt);
+  const newest = normalizeStamp(homeNewsAt);
+  let winner = null;
+  if (base !== null && (newest === null || base >= newest)) winner = homeUpdatedAt;
+  else if (newest !== null) winner = homeNewsAt;
+  updateHomeTimestamp(winner);
+}
+
 function updateHomeTimestamp(updatedAt) {
   const timestamp = document.querySelector("#home-last-updated");
   if (!timestamp) return;
 
   const value = typeof updatedAt === "string" ? updatedAt : "";
-  const normalized = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value)
-    ? value
-    : value.replace(" ", "T") + "Z";
-  const date = new Date(normalized);
+  const stampTime = normalizeStamp(value);
+  const date = new Date(stampTime === null ? NaN : stampTime);
   if (!value || Number.isNaN(date.getTime())) {
     timestamp.textContent = "time unavailable";
     return;
@@ -111,8 +132,10 @@ function updateHomeTimestamp(updatedAt) {
     hour: "numeric",
     minute: "2-digit"
   }).format(date);
+  const stampText = `${dayLabel} at ${timeLabel}`;
+  if (timestamp.textContent === stampText) return; // role="status": re-announce only on real change
   timestamp.dateTime = date.toISOString();
-  timestamp.textContent = `${dayLabel} at ${timeLabel}`;
+  timestamp.textContent = stampText;
 }
 
 function renderProjects(items, labels) {
@@ -275,8 +298,11 @@ async function loadManagedContent() {
 
     updateNavigation(content, currentPage);
     if (!currentPage) return;
-    if (currentPage === "home") updateHomeTimestamp(updatedAt);
-    else updatePageHeading(page);
+    if (currentPage === "home") {
+      homeUpdatedAt = updatedAt;
+      applyHomeStamp();
+      renderHomeArtifacts(content);
+    } else updatePageHeading(page);
     setText(document.querySelector(".wordmark-name"), content.brand);
     setText(document.querySelector(".site-footer > span:first-child"), content.footer.label);
     const footerNote = document.querySelector(".site-footer > span:last-child");
@@ -303,7 +329,7 @@ async function loadManagedContent() {
     }
   } catch (error) {
     console.error("Unable to load live site content:", error);
-    if (currentPage === "home") updateHomeTimestamp(null);
+    if (currentPage === "home") applyHomeStamp();
     showContentStatus("Live content is unavailable; showing the saved page instead.");
   }
 }
@@ -363,34 +389,104 @@ async function loadHomeNews() {
   if (!section || !list) return;
 
   try {
-    const response = await fetch("/api/news?limit=1", { headers: { Accept: "application/json" } });
+    // One bounded call feeds the notices rows, the masthead line, and the stamp.
+    const response = await fetch(`/api/news?limit=${HOME_NEWS_LIMIT}`, { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`News request returned ${response.status}.`);
     const { news } = await response.json();
     const items = Array.isArray(news) ? news : [];
     if (items.length === 0) throw new Error("No news items available.");
 
-    // Render the newest item immediately so the digest appears fast,
-    // then stream in the rest one at a time.
-    list.replaceChildren();
-    list.append(renderHomeNewsRow(items[0]));
-    section.hidden = false;
+    homeNewsAt = items.reduce((latest, item) => {
+      const time = normalizeStamp(item.published_at);
+      if (time === null) return latest;
+      const latestTime = normalizeStamp(latest);
+      return latestTime === null || time > latestTime ? item.published_at : latest;
+    }, null);
+    applyHomeStamp();
+    renderLatestNotice(items[0]);
 
-    let loaded = 1;
-    while (loaded < HOME_NEWS_LIMIT) {
-      const next = await fetch(`/api/news?limit=1&offset=${loaded}`, {
-        headers: { Accept: "application/json" }
-      });
-      if (!next.ok) break;
-      const nextData = await next.json();
-      const nextItems = Array.isArray(nextData.news) ? nextData.news : [];
-      if (nextItems.length === 0) break;
-      list.append(renderHomeNewsRow(nextItems[0]));
-      loaded += 1;
-    }
+    list.replaceChildren();
+    items.slice(0, HOME_NEWS_LIMIT).forEach((item) => list.append(renderHomeNewsRow(item)));
+    section.hidden = false;
   } catch (error) {
     console.error("Unable to load the news digest:", error);
     section.hidden = true;
   }
+}
+
+// The masthead's one concrete line: the newest dated notice. The <time>
+// sits outside the caps-set folio so date strings stay plain (Set-Caps Rule).
+function renderLatestNotice(item) {
+  const latest = document.querySelector("[data-latest-notice]");
+  if (!latest) return;
+  latest.replaceChildren();
+
+  const folio = document.createElement("span");
+  folio.className = "latest-folio";
+  folio.textContent = "Latest notice";
+  latest.append(folio);
+
+  const time = normalizeStamp(item.published_at || "");
+  if (time !== null) {
+    const when = document.createElement("time");
+    when.className = "latest-time";
+    when.dateTime = new Date(time).toISOString();
+    when.textContent = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(time)) + " ·";
+    latest.append(" ", when);
+  }
+
+  const link = document.createElement("a");
+  link.href = "/news";
+  link.textContent = item.headline || "Untitled";
+  link.append(" ↗");
+  latest.append(" ", link);
+  latest.hidden = false;
+}
+
+function setArtifact(key, label, value, date) {
+  const slot = document.querySelector(`[data-entry-artifact="${key}"]`);
+  if (!slot || !value) return;
+  slot.replaceChildren();
+
+  const labelEl = document.createElement("span");
+  labelEl.className = "artifact-label";
+  labelEl.textContent = label;
+  const valueEl = document.createElement("span");
+  valueEl.className = "artifact-value";
+  valueEl.textContent = value;
+  slot.append(labelEl, valueEl);
+
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const when = document.createElement("time");
+    when.className = "artifact-date";
+    when.dateTime = date;
+    when.textContent = new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    slot.append(when);
+  }
+  slot.hidden = false;
+}
+
+// Programme proof: each running-order entry names one real thing from the
+// managed content, not only its category. Labels claim nothing superlative.
+function renderHomeArtifacts(content) {
+  const pages = content.pages || {};
+  const projects = Array.isArray(pages.projects?.items) ? pages.projects.items : [];
+  const arrangements = Array.isArray(pages.arrangements?.items) ? pages.arrangements.items : [];
+  const accomplishments = Array.isArray(pages.accomplishments?.items) ? pages.accomplishments.items : [];
+
+  if (projects[0]) setArtifact("projects", "Includes", projects[0].name);
+  if (arrangements[0]) setArtifact("arrangements", "Includes", arrangements[0].name, arrangements[0].date);
+  if (accomplishments[0]) setArtifact("accomplishments", "Includes", accomplishments[0].name);
+
+  fetch("/api/gallery", { headers: { Accept: "application/json" } })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      const images = Array.isArray(data?.images) ? data.images : [];
+      if (images.length > 0) setArtifact("gallery", "On the wall", `${images.length} ${images.length === 1 ? "frame" : "frames"}`);
+    })
+    .catch(() => {
+      /* the entry keeps its saved gloss line */
+    });
 }
 
 const THEME_COLORS = { light: "#f4f1e9", dark: "#171717" };

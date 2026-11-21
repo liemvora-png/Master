@@ -135,6 +135,14 @@ body[data-page="home"] .latest-folio {
   text-transform: uppercase;
 }
 
+/* Set-Caps Rule: the real date string is never tracked or caps-set. */
+body[data-page="home"] .masthead-latest .latest-time {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
 body[data-page="home"] .masthead-latest a {
   color: var(--ink);
   text-decoration: underline;
@@ -186,6 +194,7 @@ body[data-page="home"] .overture-copy {
 /* --- The season's works: running order --- */
 
 body[data-page="home"] .works-fold {
+  min-height: 44px;
   padding: 0.55rem 0.9rem;
   border: 1px solid var(--brown);
   background: transparent;
@@ -203,6 +212,11 @@ body[data-page="home"] .works-fold:hover {
   background: var(--ink);
   color: var(--paper);
   border-color: var(--ink);
+}
+
+body[data-page="home"] .works-fold:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
 }
 
 body[data-page="home"] .works-list {
@@ -268,10 +282,42 @@ body[data-page="home"] .entry-gloss span {
 
 body[data-page="home"] .works-list[data-fold="glance"] .entry-gloss {
   grid-template-rows: 0fr;
+  /* hidden by the fold means hidden from assistive tech, not just painted away */
+  visibility: hidden;
 }
 
 body[data-page="home"] .works-list[data-fold="glance"] .entry-gloss span {
   opacity: 0;
+}
+
+/* Programme proof line: one real artifact per entry, set in the world's faces. */
+body[data-page="home"] .entry-artifact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.6rem;
+  margin: 0.5rem 0 0;
+}
+
+body[data-page="home"] .artifact-label {
+  color: var(--olive);
+  font-family: var(--serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+body[data-page="home"] .artifact-value {
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+body[data-page="home"] .artifact-date {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
 }
 
 body[data-page="home"] .entry-arrow {
@@ -290,8 +336,15 @@ body[data-page="home"] .home-news-time {
   font-family: var(--serif);
   font-size: 0.85rem;
   font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+body[data-page="home"] .notices-frame {
+  margin: 0 0 0.4rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 body[data-page="home"] .home-news-title {

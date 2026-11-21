@@ -9,6 +9,7 @@ import { onRequest as bookingApi } from "../functions/api/bookings.js";
 import { onRequest as galleryApi } from "../functions/api/gallery.js";
 import { onRequest as newsApi } from "../functions/api/news.js";
 import { onRequest as publicContent } from "../functions/api/content.js";
+import { readSiteContent } from "../functions/_shared/site-storage.js";
 import { onRequest as servicesApi } from "../functions/api/services.js";
 
 const PAGE_ROUTES = new Map([
@@ -27,6 +28,44 @@ const PAGE_ROUTES = new Map([
 ]);
 
 const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsubGllbXZvcmEuY2Mk";
+
+function stampTime(value) {
+  if (typeof value !== "string" || !value) return null;
+  const iso = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value) ? value : `${value.replace(" ", "T")}Z`;
+  const time = Date.parse(iso);
+  return Number.isNaN(time) ? null : time;
+}
+
+// Server-rendered default for the home stamp: the real last revision
+// (last admin edit vs newest notice, whichever is later), so the page is
+// never stuck on a loading string when JS is off or slow.
+async function issuedStampValue(env) {
+  if (!env.DB) return "awaiting programme data";
+  let best = null;
+  try {
+    const site = await readSiteContent(env.DB);
+    best = stampTime(site && site.updatedAt);
+  } catch {
+    best = null;
+  }
+  try {
+    const row = await env.DB.prepare(
+      "SELECT published_at FROM news_items WHERE active = 1 ORDER BY published_at DESC LIMIT 1"
+    ).first();
+    const newest = stampTime(row && row.published_at);
+    if (newest !== null && (best === null || newest > best)) best = newest;
+  } catch {
+    /* news table may be missing; the site stamp still answers */
+  }
+  if (best === null) return "awaiting programme data";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(new Date(best));
+}
 
 function notFoundResponse() {
   return new Response("Not found.", {
@@ -109,7 +148,11 @@ export function createWorker(templates) {
         if (request.method !== "GET" && request.method !== "HEAD") {
           return jsonResponse({ error: "Method not allowed." }, 405);
         }
-        return pageResponse(templates[page], request);
+        let template = templates[page];
+        if (page === "home") {
+          template = template.replace("__HOME_ISSUED__", await issuedStampValue(env));
+        }
+        return pageResponse(template, request);
       }
 
       if (pathname.startsWith("/gallery-images/")) {

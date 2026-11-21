@@ -17,7 +17,7 @@ test("site script renders the newest digest items on the home page", () => {
 
   assert.match(siteScript, /async function loadHomeNews\(\)/);
   assert.match(siteScript, /document\.body\.dataset\.page !== "home"/);
-  assert.match(siteScript, /fetch\("\/api\/news\?limit=1"/);
+  assert.match(siteScript, /fetch\(`\/api\/news\?limit=\$\{HOME_NEWS_LIMIT\}`/);
   assert.match(siteScript, /HOME_NEWS_LIMIT/);
   assert.match(siteScript, /section\.hidden = false;/);
   assert.match(siteScript, /loadHomeNews\(\);/);
